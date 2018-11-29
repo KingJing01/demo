@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"back/models"
+	"demo/models"
 	"encoding/json"
 	"errors"
 	"strconv"

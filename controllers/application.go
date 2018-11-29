@@ -18,13 +18,13 @@ type ApplicationController struct {
 }
 
 // URLMapping ...
-/*func (c *ApplicationController) URLMapping() {
+func (c *ApplicationController) URLMapping() {
 	c.Mapping("Post", c.Post)
 	c.Mapping("GetOne", c.GetOne)
 	c.Mapping("GetAll", c.GetAll)
 	c.Mapping("Put", c.Put)
 	c.Mapping("Delete", c.Delete)
-}*/
+}
 
 // Post ...
 // @Title Post
@@ -34,16 +34,22 @@ type ApplicationController struct {
 // @Failure 403 body is empty
 // @router / [post]
 func (c *ApplicationController) Post() {
+	result := &out.OperResult{}
 	var v models.Application
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
+		v.CreationTime = time.Now()
 		if _, err := models.AddApplication(&v); err == nil {
-			c.Ctx.Output.SetStatus(201)
-			c.Data["json"] = v
+			result.Result = 1
+			c.Data["json"] = result
 		} else {
-			c.Data["json"] = err.Error()
+			result.Result = 0
+			result.Message = err.Error()
+			c.Data["json"] = result
 		}
 	} else {
-		c.Data["json"] = err.Error()
+		result.Result = 0
+		result.Message = err.Error()
+		c.Data["json"] = result
 	}
 	c.ServeJSON()
 }
@@ -195,27 +201,4 @@ func (c *ApplicationController) Delete() {
 		c.Data["json"] = result
 	}
 	c.ServeJSON()
-}
-
-//Insert ...
-//@Title Insert
-//@Description  新增一个新的应用
-//@router /addApplication [post]
-func (c *ApplicationController) Insert() {
-	result := &out.OperResult{}
-	l := &models.Application{}
-	json.Unmarshal(c.Ctx.Input.RequestBody, l)
-	l.CreationTime = time.Now()
-	_, err := models.AddApplication(l)
-	if err == nil {
-		result.Result = 1
-		c.Data["json"] = result
-		c.ServeJSON()
-	} else {
-		result.Result = 0
-		result.Message = err.Error()
-		c.Data["json"] = result
-		c.ServeJSON()
-	}
-
 }

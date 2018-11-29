@@ -26,6 +26,7 @@ type Permission struct {
 	DeleterUserId          int64     `orm:"column(DeleterUserId);null"`
 	LastModificationTime   time.Time `orm:"column(LastModificationTime);type(datetime)"`
 	LastModificationUserId int64     `orm:"column(LastModificationUserId);null"`
+	IsDeleted              int       `orm:"column(IsDeleted);0"`
 }
 
 func (t *Permission) TableName() string {

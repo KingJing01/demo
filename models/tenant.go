@@ -19,7 +19,7 @@ type Tenant struct {
 	DeletionTime         time.Time `orm:"column(DeletionTime);type(datetime);null"`
 	EditionId            int64     `orm:"column(EditionId);null"`
 	IsActive             int8      `orm:"column(IsActive)"`
-	IsDeleted            int8      `orm:"column(IsDeleted)"`
+	IsDeleted            int8      `orm:"column(IsDeleted);0"`
 	LastModificationTime time.Time `orm:"column(LastModificationTime);type(datetime);null"`
 	LastModifierUserId   int64     `orm:"column(LastModifierUserId);null"`
 	Name                 string    `orm:"column(Name);size(128)"`

@@ -18,7 +18,7 @@ type Application struct {
 	CreatorUserId          int64     `orm:"column(CreatorUserId);null"`
 	LastModificationTime   time.Time `orm:"column(LastModificationTime);type(datetime);time"`
 	LastModificationUserId int64     `orm:"column(LastModificationUserId);null"`
-	IsDeleted              int       `orm:"column(IsDeleted);null"`
+	IsDeleted              int       `orm:"column(IsDeleted);0"`
 	DeletionTime           time.Time `orm:"column(DeletionTime);type(datetime);time"`
 	DeletionUserId         int64     `orm:"column(DeletionUserId);null"`
 }

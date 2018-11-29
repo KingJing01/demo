@@ -131,6 +131,7 @@ func (c *PermissionController) GetAll() {
 			query[k] = v
 		}
 	}
+	query["IsDeleted"] = "0"
 	total, _ := models.GetTotalPermission(query)
 	l, err := models.GetAllPermission(query, fields, sortby, order, offset, limit)
 	result := &out.OperResult{}

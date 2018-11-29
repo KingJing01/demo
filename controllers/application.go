@@ -67,7 +67,9 @@ func (c *ApplicationController) GetOne() {
 	id, _ := strconv.Atoi(idStr)
 	v, err := models.GetApplicationById(id)
 	if err != nil {
-		c.Data["json"] = err.Error()
+		result.Result = 0
+		result.Message = err.Error()
+		c.Data["json"] = result
 	} else {
 		result.Result = 1
 		result.Data = v

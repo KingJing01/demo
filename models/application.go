@@ -11,13 +11,16 @@ import (
 )
 
 type Application struct {
-	Id                   int       `orm:"column(Id);auto;pk"`
-	SysName              string    `orm:"column(SysName);size(45)"`
-	SysUrl               string    `orm:"column(SysUrl);size(255)"`
-	CreationTime         time.Time `orm:"column(CreationTime);type(datetime);time"`
-	CreatorUserId        int64     `orm:"column(CreatorUserId);null"`
-	IsDeleted            int       `orm:"column(IsDeleted);null"`
-	LastModificationTime time.Time `orm:"column(LastModificationTime);type(datetime);time"`
+	Id                     int       `orm:"column(Id);auto;pk"`
+	SysName                string    `orm:"column(SysName);size(45)"`
+	SysUrl                 string    `orm:"column(SysUrl);size(255)"`
+	CreationTime           time.Time `orm:"column(CreationTime);type(datetime);time"`
+	CreatorUserId          int64     `orm:"column(CreatorUserId);null"`
+	LastModificationTime   time.Time `orm:"column(LastModificationTime);type(datetime);time"`
+	LastModificationUserId int64     `orm:"column(LastModificationUserId);null"`
+	IsDeleted              int       `orm:"column(IsDeleted);null"`
+	DeletionTime           time.Time `orm:"column(DeletionTime);type(datetime);time"`
+	DeletionUserId         int64     `orm:"column(DeletionUserId);null"`
 }
 
 func (t *Application) TableName() string {
@@ -166,7 +169,7 @@ func DeleteApplication(id int) (err error) {
 	o := orm.NewOrm()
 	v := Application{Id: id}
 	if err = o.Read(&v); err == nil {
-		_, err = o.Raw("update application set IsDeleted=1 where Id= ? and  LastModificationTime = ? ", id, time.Now()).Exec()
+		_, err = o.Raw("update application set IsDeleted=1 , DeletionTime = ?  where Id= ?  ", time.Now(), id).Exec()
 	}
 	return
 }

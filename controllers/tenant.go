@@ -67,7 +67,9 @@ func (c *TenantController) GetOne() {
 	id, _ := strconv.Atoi(idStr)
 	v, err := models.GetTenantById(id)
 	if err != nil {
-		c.Data["json"] = err.Error()
+		result.Result = 0
+		result.Message = err.Error()
+		c.Data["json"] = result
 	} else {
 		result.Result = 1
 		result.Data = v
@@ -132,7 +134,7 @@ func (c *TenantController) GetAll() {
 
 	query["IsDeleted"] = "0"
 
-	total, _ := models.GetTotalApplication(query)
+	total, _ := models.GetTotalTenant(query)
 
 	l, err := models.GetAllTenant(query, fields, sortby, order, offset, limit)
 	result := &out.OperResult{}

@@ -2,10 +2,12 @@ package controllers
 
 import (
 	"demo/models"
+	out "demo/outmodels"
 	"encoding/json"
 	"errors"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/astaxie/beego"
 )
@@ -32,16 +34,22 @@ func (c *PermissionController) URLMapping() {
 // @Failure 403 body is empty
 // @router / [post]
 func (c *PermissionController) Post() {
+	result := &out.OperResult{}
 	var v models.Permission
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
+		v.CreationTime = time.Now()
 		if _, err := models.AddPermission(&v); err == nil {
-			c.Ctx.Output.SetStatus(201)
-			c.Data["json"] = v
+			result.Result = 1
+			c.Data["json"] = result
 		} else {
-			c.Data["json"] = err.Error()
+			result.Result = 0
+			result.Message = err.Error()
+			c.Data["json"] = result
 		}
 	} else {
-		c.Data["json"] = err.Error()
+		result.Result = 0
+		result.Message = err.Error()
+		c.Data["json"] = result
 	}
 	c.ServeJSON()
 }
@@ -54,13 +62,18 @@ func (c *PermissionController) Post() {
 // @Failure 403 :id is empty
 // @router /:id [get]
 func (c *PermissionController) GetOne() {
+	result := &out.OperResult{}
 	idStr := c.Ctx.Input.Param(":id")
 	id, _ := strconv.Atoi(idStr)
 	v, err := models.GetPermissionById(id)
 	if err != nil {
-		c.Data["json"] = err.Error()
+		result.Result = 0
+		result.Message = err.Error()
+		c.Data["json"] = result
 	} else {
-		c.Data["json"] = v
+		result.Result = 1
+		result.Data = v
+		c.Data["json"] = result
 	}
 	c.ServeJSON()
 }
@@ -118,12 +131,22 @@ func (c *PermissionController) GetAll() {
 			query[k] = v
 		}
 	}
-
+	total, _ := models.GetTotalPermission(query)
 	l, err := models.GetAllPermission(query, fields, sortby, order, offset, limit)
+	result := &out.OperResult{}
 	if err != nil {
 		c.Data["json"] = err.Error()
 	} else {
-		c.Data["json"] = l
+		result.Result = 1
+		var page = make(map[string]interface{})
+		page["list"] = l
+		var ListQuery = make(map[string]int64)
+		ListQuery["limit"] = limit
+		ListQuery["page"] = offset
+		page["listQuery"] = ListQuery
+		page["total"] = total
+		result.Data = page
+		c.Data["json"] = result
 	}
 	c.ServeJSON()
 }
@@ -137,17 +160,24 @@ func (c *PermissionController) GetAll() {
 // @Failure 403 :id is not int
 // @router /:id [put]
 func (c *PermissionController) Put() {
+	result := &out.OperResult{}
 	idStr := c.Ctx.Input.Param(":id")
 	id, _ := strconv.Atoi(idStr)
 	v := models.Permission{Id: id}
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
+		v.LastModificationTime = time.Now()
 		if err := models.UpdatePermissionById(&v); err == nil {
-			c.Data["json"] = "OK"
+			result.Result = 1
+			c.Data["json"] = result
 		} else {
-			c.Data["json"] = err.Error()
+			result.Result = 0
+			result.Message = err.Error()
+			c.Data["json"] = result
 		}
 	} else {
-		c.Data["json"] = err.Error()
+		result.Result = 0
+		result.Message = err.Error()
+		c.Data["json"] = result
 	}
 	c.ServeJSON()
 }
@@ -160,12 +190,16 @@ func (c *PermissionController) Put() {
 // @Failure 403 id is empty
 // @router /:id [delete]
 func (c *PermissionController) Delete() {
+	result := &out.OperResult{}
 	idStr := c.Ctx.Input.Param(":id")
 	id, _ := strconv.Atoi(idStr)
 	if err := models.DeletePermission(id); err == nil {
-		c.Data["json"] = "OK"
+		result.Result = 1
+		c.Data["json"] = result
 	} else {
-		c.Data["json"] = err.Error()
+		result.Result = 0
+		result.Message = err.Error()
+		c.Data["json"] = result
 	}
 	c.ServeJSON()
 }

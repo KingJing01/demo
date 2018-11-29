@@ -47,7 +47,7 @@ func AddTenant(m *Tenant) (id int64, err error) {
 func GetTenantById(id int) (v *Tenant, err error) {
 	o := orm.NewOrm()
 	v = &Tenant{Id: id}
-	v.IsDeleted = 0
+	//v.IsDeleted = 0
 	if err = o.Read(v); err == nil {
 		return v, nil
 	}
@@ -157,6 +157,7 @@ func UpdateTenantById(m *Tenant) (err error) {
 	v := Tenant{Id: m.Id}
 	// ascertain id exists in the database
 	if err = o.Read(&v); err == nil {
+		m.CreationTime = v.CreationTime
 		var num int64
 		if num, err = o.Update(m); err == nil {
 			fmt.Println("Number of records updated in database:", num)
@@ -172,7 +173,7 @@ func DeleteTenant(id int) (err error) {
 	v := Tenant{Id: id}
 	// ascertain id exists in the database
 	if err = o.Read(&v); err == nil {
-		_, err = o.Raw("update tenant set IsDeleted=1 where Id= ? and  LastModificationTime = ? ", id, time.Now()).Exec()
+		_, err = o.Raw("update tenant set IsDeleted=1 ,DeletionTime = ?  where Id= ? ", time.Now(), id).Exec()
 	}
 	return
 }

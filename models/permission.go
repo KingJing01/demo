@@ -11,17 +11,21 @@ import (
 )
 
 type Permission struct {
-	Id            int       `orm:"column(Id);auto"`
-	CreationTime  time.Time `orm:"column(CreationTime);type(datetime)"`
-	CreatorUserId int64     `orm:"column(CreatorUserId);null"`
-	Discriminator string    `orm:"column(Discriminator);size(300)"`
-	IsGranted     int8      `orm:"column(IsGranted)"`
-	Name          string    `orm:"column(Name);size(128)"`
-	TenantId      int       `orm:"column(TenantId);null"`
-	RoleId        int       `orm:"column(RoleId);null"`
-	UserId        int64     `orm:"column(UserId);null"`
-	DisplayName   string    `orm:"column(DisplayName);size(50)"`
-	SysId         int       `orm:"column(SysId);0"`
+	Id                     int       `orm:"column(Id);auto"`
+	CreationTime           time.Time `orm:"column(CreationTime);type(datetime)"`
+	CreatorUserId          int64     `orm:"column(CreatorUserId);null"`
+	Discriminator          string    `orm:"column(Discriminator);size(300)"`
+	IsGranted              int8      `orm:"column(IsGranted)"`
+	Name                   string    `orm:"column(Name);size(128)"`
+	TenantId               int       `orm:"column(TenantId);null"`
+	RoleId                 int       `orm:"column(RoleId);null"`
+	UserId                 int64     `orm:"column(UserId);null"`
+	DisplayName            string    `orm:"column(DisplayName);size(50)"`
+	SysId                  int       `orm:"column(SysId);0"`
+	DeletionTime           time.Time `orm:"column(DeletionTime);type(datetime)"`
+	DeleterUserId          int64     `orm:"column(DeleterUserId);null"`
+	LastModificationTime   time.Time `orm:"column(LastModificationTime);type(datetime)"`
+	LastModificationUserId int64     `orm:"column(LastModificationUserId);null"`
 }
 
 func (t *Permission) TableName() string {
@@ -144,6 +148,24 @@ func UpdatePermissionById(m *Permission) (err error) {
 	return
 }
 
+//获取筛选条件下的数据总量
+func GetTotalPermission(query map[string]string) (total int64, err error) {
+	o := orm.NewOrm()
+	qs := o.QueryTable(new(Permission))
+	// query k=v
+	for k, v := range query {
+		// rewrite dot-notation to Object__Attribute
+		k = strings.Replace(k, ".", "__", -1)
+		if strings.Contains(k, "isnull") {
+			qs = qs.Filter(k, (v == "true" || v == "1"))
+		} else {
+			qs = qs.Filter(k, v)
+		}
+	}
+	total, err = qs.Count()
+	return total, err
+}
+
 // DeletePermission deletes Permission by Id and returns error if
 // the record to be deleted doesn't exist
 func DeletePermission(id int) (err error) {
@@ -151,10 +173,7 @@ func DeletePermission(id int) (err error) {
 	v := Permission{Id: id}
 	// ascertain id exists in the database
 	if err = o.Read(&v); err == nil {
-		var num int64
-		if num, err = o.Delete(&Permission{Id: id}); err == nil {
-			fmt.Println("Number of records deleted in database:", num)
-		}
+		_, err = o.Raw("update permission set IsDeleted=1 ,DeletionTime = ?  where Id= ? ", time.Now(), id).Exec()
 	}
 	return
 }

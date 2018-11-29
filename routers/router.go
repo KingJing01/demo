@@ -57,6 +57,12 @@ func init() {
 				&controllers.AuthorityManageController{},
 			),
 		),
+
+		beego.NSNamespace("/tenant",
+			beego.NSInclude(
+				&controllers.TenantController{},
+			),
+		),
 	)
 	beego.AddNamespace(ns)
 }

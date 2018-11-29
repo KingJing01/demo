@@ -56,6 +56,24 @@ func GetRoleById(id int) (v *Role, err error) {
 	return nil, err
 }
 
+//获取筛选条件下的数据总量
+func GetTotalRole(query map[string]string) (total int64, err error) {
+	o := orm.NewOrm()
+	qs := o.QueryTable(new(Role))
+	// query k=v
+	for k, v := range query {
+		// rewrite dot-notation to Object__Attribute
+		k = strings.Replace(k, ".", "__", -1)
+		if strings.Contains(k, "isnull") {
+			qs = qs.Filter(k, (v == "true" || v == "1"))
+		} else {
+			qs = qs.Filter(k, v)
+		}
+	}
+	total, err = qs.Count()
+	return total, err
+}
+
 // GetAllRole retrieves all Role matches certain condition. Returns empty list if
 // no records exist
 func GetAllRole(query map[string]string, fields []string, sortby []string, order []string,
@@ -156,10 +174,7 @@ func DeleteRole(id int) (err error) {
 	v := Role{Id: id}
 	// ascertain id exists in the database
 	if err = o.Read(&v); err == nil {
-		var num int64
-		if num, err = o.Delete(&Role{Id: id}); err == nil {
-			fmt.Println("Number of records deleted in database:", num)
-		}
+		_, err = o.Raw("update role set IsDeleted=1 , DeletionTime = ?  where Id= ?  ", time.Now(), id).Exec()
 	}
 	return
 }

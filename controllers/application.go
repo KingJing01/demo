@@ -62,13 +62,16 @@ func (c *ApplicationController) Post() {
 // @Failure 403 :id is empty
 // @router /:id [get]
 func (c *ApplicationController) GetOne() {
+	result := &out.OperResult{}
 	idStr := c.Ctx.Input.Param(":id")
 	id, _ := strconv.Atoi(idStr)
 	v, err := models.GetApplicationById(id)
 	if err != nil {
 		c.Data["json"] = err.Error()
 	} else {
-		c.Data["json"] = v
+		result.Result = 1
+		result.Data = v
+		c.Data["json"] = result
 	}
 	c.ServeJSON()
 }
@@ -128,7 +131,6 @@ func (c *ApplicationController) GetAll() {
 	}
 	query["IsDeleted"] = "0"
 
-	//lt, err := models.GetAllApplication(query, fields, sortby, order, offset, nil)
 	total, _ := models.GetTotalApplication(query)
 
 	l, err := models.GetAllApplication(query, fields, sortby, order, offset, limit)
@@ -163,8 +165,8 @@ func (c *ApplicationController) Put() {
 	idStr := c.Ctx.Input.Param(":id")
 	id, _ := strconv.Atoi(idStr)
 	v := models.Application{Id: id}
-	v.LastModificationTime = time.Now()
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
+		v.LastModificationTime = time.Now()
 		if err := models.UpdateApplicationById(&v); err == nil {
 			result.Result = 1
 			c.Data["json"] = result

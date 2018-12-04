@@ -1,0 +1,88 @@
+<template>
+  <div>
+    <el-form :inline="true" :model="form" class="demo-form-inline">
+      <el-form-item label="系统代码">
+        <el-input v-model="form.sysCode" placeholder="系统代码"/>
+      </el-form-item>
+      <el-form-item label="系统名称">
+        <el-input v-model="form.sysName" placeholder="系统名称"/>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="onSubmit">查询</el-button>
+      </el-form-item>
+    </el-form>
+    <el-table :data="tableData" style="width: 90%" border>
+      <el-table-column prop="Id" label="序号" align="center"/>
+      <el-table-column prop="SysCode" label="系统代码" align="center"/>
+      <el-table-column prop="SysName" label="系统名称" align="center"/>
+      <el-table-column prop="isValid" label="是否有效" align="center"/>
+      <el-table-column prop="address" label="操作" align="center">
+        <template slot-scope="scope">
+          <el-button size="small" type="text" @click="handleClick(scope.row)">查看</el-button>
+          <el-button type="text" size="small">编辑</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <div class="block">
+      <el-pagination :page-size="20" :pager-count="11" :total="1000" layout="prev, pager, next" aligen="center"/>
+    </div>
+  </div>
+</template>
+<script>
+import { getListData } from '@/api/sysconfig'
+export default {
+  data() {
+    return {
+      tableData: [],
+      form: {
+        sysCode: '',
+        sysName: ''
+      }
+    }
+  },
+  created() {
+    this.getList()
+  },
+  methods: {
+    onSubmit() {
+      console.log('submit!')
+    },
+    handleClick(row) {
+      console.log(row)
+    },
+    getList() {
+      debugger
+      getListData().then(response => {
+        debugger
+        this.tableData = response.Data.list
+      })
+    }
+  }
+
+}
+
+</script>
+<style>
+.el-row {
+  margin-bottom: 20px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.el-col {
+  border-radius: 4px;
+}
+
+.grid-content {
+  border-radius: 4px;
+  min-height: 36px;
+}
+
+.row-bg {
+  padding: 10px 0;
+  background-color: #f9fafc;
+}
+
+</style>

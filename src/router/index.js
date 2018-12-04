@@ -36,7 +36,6 @@ export const constantRouterMap = [
       component: () => import('@/views/dashboard/index')
     }]
   },
-
   {
     path: '/example',
     component: Layout,
@@ -71,7 +70,18 @@ export const constantRouterMap = [
       }
     ]
   },
-
+  {
+    path: '/authconfig',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'authconfig',
+        component: () => import('@/views/authconfig/index'),
+        meta: { title: '权限配置', icon: 'form' }
+      }
+    ]
+  },
   {
     path: '/nested',
     component: Layout,

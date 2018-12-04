@@ -82,13 +82,13 @@
     </div>
 
     <el-dialog
-      title="收货地址"
-       width="40%"
+      title="新增系统"
+      width="40%"
       :visible.sync="dialogFormVisible"
     >
       <el-form :model="form">
         <el-form-item
-          label="活动名称"
+          label="系统代码"
           :label-width="formLabelWidth"
         >
           <el-input
@@ -97,23 +97,28 @@
           ></el-input>
         </el-form-item>
         <el-form-item
-          label="活动区域"
+          label="系统名称"
           :label-width="formLabelWidth"
         >
-          <el-select
-            v-model="form.region"
-            placeholder="请选择活动区域"
-          >
-            <el-option
-              label="区域一"
-              value="shanghai"
-            ></el-option>
-            <el-option
-              label="区域二"
-              value="beijing"
-            ></el-option>
-          </el-select>
+          <el-input
+            v-model="form.name"
+            autocomplete="off"
+          ></el-input>
         </el-form-item>
+        <el-form-item
+          label="是否有效"
+          :label-width="formLabelWidth"
+        >
+          <el-radio
+            v-model="radio"
+            label="0"
+          >有效</el-radio>
+          <el-radio
+            v-model="radio"
+            label="1"
+          >无效</el-radio>
+        </el-form-item>
+
       </el-form>
       <div
         slot="footer"
@@ -140,7 +145,8 @@ export default {
       },
       dialogTableVisible: false,
       dialogFormVisible: false,
-      formLabelWidth: "120px"
+      formLabelWidth: "120px",
+      radio: "0"
     };
   },
   created() {

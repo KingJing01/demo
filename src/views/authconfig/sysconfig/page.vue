@@ -24,7 +24,7 @@
         >查询</el-button>
         <el-button
           type="primary"
-          @click="dialogFormVisible  = true"
+          @click="dialogFormVisible = true"
         >新增</el-button>
       </el-form-item>
     </el-form>
@@ -34,10 +34,10 @@
       border
     >
       <el-table-column
-       type="index" 
-       label="序号"
-       align="center"
-       width="auto"
+        type="index"
+        label="序号"
+        align="center"
+        width="auto"
       />
       <el-table-column
         prop="SysCode"
@@ -50,10 +50,10 @@
         align="center"
       />
       <el-table-column
+        :formatter="formatText"
         prop="IsValid"
         label="是否有效"
         align="center"
-      :formatter="formatText"
 
       />
       <el-table-column
@@ -65,7 +65,7 @@
           <el-button
             type="text"
             size="small"
-             @click="handleClick(scope.row)"
+            @click="handleClick(scope.row)"
           >编辑</el-button>
         </template>
       </el-table-column>
@@ -81,32 +81,32 @@
     </div>
 
     <el-dialog
+      :visible.sync="dialogFormVisible"
       title="新增系统"
       width="40%"
-      :visible.sync="dialogFormVisible"
     >
       <el-form :model="form">
         <el-form-item
+          :label-width="formLabelWidth"
           label="系统代码"
-          :label-width="formLabelWidth"
         >
           <el-input
             v-model="form.name"
             autocomplete="off"
-          ></el-input>
+          />
         </el-form-item>
         <el-form-item
+          :label-width="formLabelWidth"
           label="系统名称"
-          :label-width="formLabelWidth"
         >
           <el-input
             v-model="form.name"
             autocomplete="off"
-          ></el-input>
+          />
         </el-form-item>
         <el-form-item
-          label=""
           :label-width="formLabelWidth"
+          label=""
         >
           <el-checkbox v-model="checked">是否有效</el-checkbox>
         </el-form-item>
@@ -126,50 +126,49 @@
   </div>
 </template>
 <script>
-import { getListData } from "@/api/sysconfig";
+import { getListData } from '@/api/sysconfig'
 export default {
   data() {
     return {
       tableData: [],
       form: {
-        sysCode: "",
-        sysName: ""
+        sysCode: '',
+        sysName: ''
       },
       dialogTableVisible: false,
       dialogFormVisible: false,
-      formLabelWidth: "120px",
+      formLabelWidth: '120px',
       checked: true
-    };
+    }
   },
   created() {
-    this.getList();
+    this.getList()
   },
   methods: {
     onSubmit() {
-      console.log("submit!");
+      console.log('submit!')
     },
     handleClick(row) {
-      console.log(row);
+      console.log(row)
     },
     getList() {
       getListData().then(response => {
-        this.tableData = response.Data.list;
-      });
+        this.tableData = response.Data.list
+      })
     },
     handleClose(done) {
-      done();
+      done()
     },
-    formatText(row, column){
+    formatText(row, column) {
       const data = row[column.property]
-      return data==0?'是':'否'
+      return data === 0 ? '是' : '否'
     }
   }
-};
+}
 </script>
-<style>
+<style rel="stylesheet/scss" lang="scss" scoped>
 .el-row {
   margin-bottom: 20px;
-
   &:last-child {
     margin-bottom: 0;
   }

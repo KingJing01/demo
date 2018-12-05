@@ -181,6 +181,7 @@ export default {
       this.search.sysName = ''
       this.search.pageSize = 10
       this.search.offset = 0
+      this.dialogInfo = false
       this.getList()
     },
     handleSizeChange(val) {

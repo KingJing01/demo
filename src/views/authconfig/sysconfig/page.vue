@@ -93,6 +93,8 @@
         >
           <el-input
             :disabled="true"
+            v-model="form.name"
+            autocomplete="off"
           />
         </el-form-item>
         <el-form-item
@@ -205,10 +207,9 @@ export default {
   }
 }
 </script>
-<style rel="stylesheet/scss" lang="scss" scope>
+<style rel="stylesheet/scss" lang="scss" scoped>
 .el-row {
   margin-bottom: 20px;
-
   &:last-child {
     margin-bottom: 0;
   }

@@ -1,22 +1,21 @@
 import request from '@/utils/request'
 
-export function login(username, password) {
+export function login(username, password, sysId) {
   return request({
-    //  url: '/authoritymanage/Login',
-    url: '/user/login',
+    url: '/authoritymanage/Login',
     method: 'post',
     data: {
       username,
-      password
+      password,
+      sysId
     }
   })
 }
 
 export function getInfo(token) {
   return request({
-    url: '/user/info',
-    method: 'get',
-    params: { token }
+    url: '/authoritymanage/GetUserInfo',
+    method: 'get'
   })
 }
 

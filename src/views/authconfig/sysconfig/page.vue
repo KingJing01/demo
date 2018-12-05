@@ -34,9 +34,10 @@
       border
     >
       <el-table-column
-        prop="Id"
-        label="序号"
-        align="center"
+       type="index" 
+       label="序号"
+       align="center"
+       width="auto"
       />
       <el-table-column
         prop="SysCode"
@@ -49,9 +50,11 @@
         align="center"
       />
       <el-table-column
-        prop="isValid"
+        prop="IsValid"
         label="是否有效"
         align="center"
+      :formatter="formatText"
+
       />
       <el-table-column
         prop="address"
@@ -60,13 +63,9 @@
       >
         <template slot-scope="scope">
           <el-button
-            size="small"
-            type="text"
-            @click="handleClick(scope.row)"
-          >查看</el-button>
-          <el-button
             type="text"
             size="small"
+             @click="handleClick(scope.row)"
           >编辑</el-button>
         </template>
       </el-table-column>
@@ -106,17 +105,10 @@
           ></el-input>
         </el-form-item>
         <el-form-item
-          label="是否有效"
+          label=""
           :label-width="formLabelWidth"
         >
-          <el-radio
-            v-model="radio"
-            label="0"
-          >有效</el-radio>
-          <el-radio
-            v-model="radio"
-            label="1"
-          >无效</el-radio>
+          <el-checkbox v-model="checked">是否有效</el-checkbox>
         </el-form-item>
 
       </el-form>
@@ -146,7 +138,7 @@ export default {
       dialogTableVisible: false,
       dialogFormVisible: false,
       formLabelWidth: "120px",
-      radio: "0"
+      checked: true
     };
   },
   created() {
@@ -166,6 +158,10 @@ export default {
     },
     handleClose(done) {
       done();
+    },
+    formatText(row, column){
+      const data = row[column.property]
+      return data==0?'是':'否'
     }
   }
 };

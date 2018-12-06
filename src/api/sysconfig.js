@@ -1,4 +1,5 @@
 /*
+ * 系统配置
  *权限系统 引用配置的api
  */
 import request from '@/utils/request'

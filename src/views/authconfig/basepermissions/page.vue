@@ -222,31 +222,15 @@ export default {
     saveData() {
       if (this.dialogInfoVisable === false) {
         if (this.insertAct === true) {
-          saveSysInfo(this.form).then(response => {
-            this.dialogFormVisible = false
-            this.dialogInfoVisable = false
-            this.getList()
-          })
+          console.log('修改信息')
         } else {
           console.log('修改信息')
-          updateSysInfo(this.form).then(response => {
-            this.dialogFormVisible = false
-            this.dialogInfoVisable = false
-            this.insertAct = true
-            this.getList()
-          })
         }
       }
     },
     // 系统信息验重
     checkRepeat() {
-      uniqueCheck(this.form.sysName).then(response => {
-        if (response.Result > 0) {
-          this.dialogInfoVisable = true
-        } else {
-          this.dialogInfoVisable = false
-        }
-      })
+      console.log('修改信息')
     },
     // dialog 取消按钮
     handleCancle() {

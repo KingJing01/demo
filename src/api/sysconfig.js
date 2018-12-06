@@ -6,16 +6,10 @@ import request from '@/utils/request'
 
 //  界面搜索查询的方法(带分页) 支持模糊搜索
 export function getListData(info) {
-  const query = 'SysName:' + info.sysName + ',SysCode:' + info.sysCode
   return request({
     url: '/application',
     method: 'get',
-    params: {
-      'query': query,
-      'fields': 'SysName,SysCode,Id,IsValid,SysUrl',
-      'limit': info.pageSize,
-      'offset': info.offset
-    }
+    params: info
   })
 }
 

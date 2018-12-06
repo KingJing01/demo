@@ -206,7 +206,7 @@ export default {
     },
     // 重置按钮
     onReset() {
-      this.search.c = ''
+      this.search.sysCode = ''
       this.search.sysName = ''
       this.search.pageSize = 10
       this.search.offset = 0

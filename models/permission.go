@@ -205,7 +205,7 @@ func GetPermissionByUser(userid int64, sysId string) (permissions []Permission, 
 }
 
 // 获取列表的信息
-func GetPermissionInfo(menuName string, sysName string, offset int64, limit int64) (result []out.MenuInfo, err error) {
+func GetPermissionList(menuName string, sysName string, offset int64, limit int64) (result []out.MenuInfo, err error) {
 	o := orm.NewOrm()
 	var sql = "SELECT t1.DisplayName menu_name,t2.SysName sys_name,t1.MenuText menu_text,t1.id FROM permission t1 LEFT JOIN application t2 ON t1.SysCode = t2.SysCode WHERE t1.isMenu=0"
 	conditions := []string{}

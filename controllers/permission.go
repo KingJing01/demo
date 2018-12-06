@@ -109,7 +109,7 @@ func (c *PermissionController) GetAll() {
 		sysName = v
 	}
 	result := &out.OperResult{}
-	data, err := models.GetPermissionInfo(menuName, sysName, offset, limit)
+	data, err := models.GetPermissionList(menuName, sysName, offset, limit)
 	total := models.CountPermissionInfo(menuName, sysName)
 	if err != nil {
 		c.Data["json"] = err.Error()

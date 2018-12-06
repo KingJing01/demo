@@ -24,6 +24,7 @@ func (c *ApplicationController) URLMapping() {
 	c.Mapping("GetAll", c.GetAll)
 	c.Mapping("Put", c.Put)
 	c.Mapping("Delete", c.Delete)
+	c.Mapping("check", c.CheckRepeat)
 }
 
 // Post ...
@@ -38,6 +39,8 @@ func (c *ApplicationController) Post() {
 	var v models.Application
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 		v.CreationTime = time.Now()
+		//生成系统编号
+		v.SysCode = models.GenerateSysCode()
 		if _, err := models.AddApplication(&v); err == nil {
 			result.Result = 1
 			c.Data["json"] = result
@@ -127,11 +130,13 @@ func (c *ApplicationController) GetAll() {
 				c.ServeJSON()
 				return
 			}
-			k, v := kv[0], kv[1]
-			query[k] = v
+			// 空的判断  使用 like 模糊查询避免 '%%'
+			if kv[1] != "" {
+				k, v := kv[0], kv[1]
+				query[k] = v
+			}
 		}
 	}
-	query["IsDeleted"] = "0"
 
 	total, _ := models.GetTotalApplication(query)
 
@@ -202,6 +207,21 @@ func (c *ApplicationController) Delete() {
 	} else {
 		result.Result = 0
 		result.Message = err.Error()
+		c.Data["json"] = result
+	}
+	c.ServeJSON()
+}
+
+// check ...
+// @router /checkRepeat [get]
+func (c *ApplicationController) CheckRepeat() {
+	result := &out.OperResult{}
+	sysName := c.GetString("SysName")
+	if total, _ := models.CheckRepeat(sysName); total > 0 {
+		result.Result = 1
+		c.Data["json"] = result
+	} else {
+		result.Result = 0
 		c.Data["json"] = result
 	}
 	c.ServeJSON()

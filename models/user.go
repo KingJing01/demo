@@ -42,7 +42,7 @@ type User struct {
 	TenantId               int       `orm:"column(TenantId);null"`
 	UserName               string    `orm:"column(UserName);size(32)"`
 	SysId                  int       `orm:"column(SysId)"`
-	SsoID                  int       `orm:"column(SsoI)"`
+	SsoID                  int       `orm:"column(SsoId)"`
 }
 
 func (t *User) TableName() string {

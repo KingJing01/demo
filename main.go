@@ -5,12 +5,21 @@ import (
 
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
+	"github.com/astaxie/beego/plugins/cors"
 	_ "github.com/go-sql-driver/mysql"
 )
 
 func init() {
 	orm.RegisterDataBase("default", "mysql", "root:Xsungroup333@tcp(rm-8vb2a06qoj31utdhnlo.mysql.zhangbei.rds.aliyuncs.com:3306)/godatabase?charset=utf8&loc=Asia%2FShanghai")
 	orm.Debug = true
+	beego.InsertFilter("*", beego.BeforeRouter, cors.Allow(&cors.Options{
+		AllowAllOrigins:  true,
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Authorization", "Access-Control-Allow-Origin", "Access-Control-Allow-Headers", "Content-Type"},
+		ExposeHeaders:    []string{"Content-Length", "Access-Control-Allow-Origin", "Access-Control-Allow-Headers", "Content-Type"},
+		AllowCredentials: true,
+	}))
+
 	/*var FilterUser = func(ctx *context.Context) {
 		//正则匹配访问路径
 		b, _ := regexp.MatchString("/v1/authoritymanage/xsunLogin", ctx.Request.RequestURI)

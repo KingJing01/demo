@@ -132,8 +132,6 @@ func (c *TenantController) GetAll() {
 		}
 	}
 
-	query["IsDeleted"] = "0"
-
 	total, _ := models.GetTotalTenant(query)
 
 	l, err := models.GetAllTenant(query, fields, sortby, order, offset, limit)

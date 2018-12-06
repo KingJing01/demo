@@ -12,6 +12,7 @@ import (
 
 type Application struct {
 	Id                     int       `orm:"column(Id);auto;pk"`
+	SysCode                string    `orm:"column(SysCode);size(20)"`
 	SysName                string    `orm:"column(SysName);size(45)"`
 	SysUrl                 string    `orm:"column(SysUrl);size(255)"`
 	CreationTime           time.Time `orm:"column(CreationTime);type(datetime);time"`
@@ -21,6 +22,7 @@ type Application struct {
 	IsDeleted              int       `orm:"column(IsDeleted);0"`
 	DeletionTime           time.Time `orm:"column(DeletionTime);type(datetime);time"`
 	DeletionUserId         int64     `orm:"column(DeletionUserId);null"`
+	IsValid                int       `orm:"column(IsValid);0"`
 }
 
 func (t *Application) TableName() string {
@@ -62,6 +64,7 @@ func GetTotalApplication(query map[string]string) (total int64, err error) {
 		if strings.Contains(k, "isnull") {
 			qs = qs.Filter(k, (v == "true" || v == "1"))
 		} else {
+			k = k + "__icontains"
 			qs = qs.Filter(k, v)
 		}
 	}
@@ -82,6 +85,7 @@ func GetAllApplication(query map[string]string, fields []string, sortby []string
 		if strings.Contains(k, "isnull") {
 			qs = qs.Filter(k, (v == "true" || v == "1"))
 		} else {
+			k = k + "__icontains"
 			qs = qs.Filter(k, v)
 		}
 	}
@@ -172,4 +176,18 @@ func DeleteApplication(id int) (err error) {
 		_, err = o.Raw("update application set IsDeleted=1 , DeletionTime = ?  where Id= ?  ", time.Now(), id).Exec()
 	}
 	return
+}
+
+// 系统名验证重复
+func CheckRepeat(sysName string) (total int64, err error) {
+	o := orm.NewOrm()
+	qs := o.QueryTable(new(Application)).Filter("SysName", sysName)
+	return qs.Count()
+}
+
+func GenerateSysCode() (SysCode string) {
+	var maps []orm.Params
+	o := orm.NewOrm()
+	o.Raw("select IFNULL(MAX(SysCode),'100000')+1  sysCode from application").Values(&maps)
+	return maps[0]["sysCode"].(string)
 }

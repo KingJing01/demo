@@ -1,9 +1,11 @@
 package models
 
 import (
+	out "demo/outmodels"
 	"errors"
 	"fmt"
 	"reflect"
+	"strconv"
 	"strings"
 	"time"
 
@@ -21,12 +23,14 @@ type Permission struct {
 	RoleId                 int       `orm:"column(RoleId);null"`
 	UserId                 int64     `orm:"column(UserId);null"`
 	DisplayName            string    `orm:"column(DisplayName);size(50)"`
-	SysId                  int       `orm:"column(SysId);0"`
+	SysCode                int       `orm:"column(SysCode);0"`
 	DeletionTime           time.Time `orm:"column(DeletionTime);type(datetime)"`
 	DeleterUserId          int64     `orm:"column(DeleterUserId);null"`
 	LastModificationTime   time.Time `orm:"column(LastModificationTime);type(datetime)"`
 	LastModificationUserId int64     `orm:"column(LastModificationUserId);null"`
 	IsDeleted              int       `orm:"column(IsDeleted);0"`
+	MenuCode               int       `orm:"column(MenuCode);null"`
+	isMenu                 int       `orm:"column(isMenu);0"`
 }
 
 func (t *Permission) TableName() string {
@@ -198,4 +202,43 @@ func GetPermissionByUser(userid int64, sysId string) (permissions []Permission, 
 	o := orm.NewOrm()
 	num, _ = o.QueryTable("permission").Filter("UserId", userid).Filter("SysId", sysId).All(&permissions)
 	return permissions, num
+}
+
+// 获取列表的信息
+func GetPermissionInfo(menuName string, sysName string, offset int64, limit int64) (result []out.MenuInfo, err error) {
+	o := orm.NewOrm()
+	var sql = "SELECT t1.DisplayName menu_name,t2.SysName sys_name,t1.MenuText menu_text,t1.id FROM permission t1 LEFT JOIN application t2 ON t1.SysCode = t2.SysCode WHERE t1.isMenu=0"
+	conditions := []string{}
+	if menuName != "" {
+		conditions = append(conditions, " t1.DisplayName like '%"+menuName+"%'")
+	}
+	if sysName != "" {
+		conditions = append(conditions, " t2.SysName  like '%"+sysName+"%'")
+	}
+	if len(conditions) > 0 {
+		sql = sql + " and " + strings.Join(conditions, " and ")
+	}
+	sql = sql + "\n limit " + strconv.FormatInt(limit, 10) + "  offset " + strconv.FormatInt(offset, 10)
+	_, err = o.Raw(sql).QueryRows(&result)
+	return result, err
+}
+
+// 统计查询条件的数量
+func CountPermissionInfo(menuName string, sysName string) (total int64) {
+	o := orm.NewOrm()
+	conditions := []string{}
+	var sql = "SELECT count(0) total FROM permission t1 LEFT JOIN application t2 ON t1.SysCode = t2.SysCode WHERE t1.isMenu=0"
+	if menuName != "" {
+		conditions = append(conditions, " t1.DisplayName like '%"+menuName+"%'")
+	}
+	if sysName != "" {
+		conditions = append(conditions, " t2.SysName  like '%"+sysName+"%'")
+	}
+	if len(conditions) > 0 {
+		sql = sql + " and " + strings.Join(conditions, " and ")
+	}
+	var maps []orm.Params
+	o.Raw(sql).Values(&maps)
+	total, _ = strconv.ParseInt(maps[0]["total"].(string), 10, 64)
+	return total
 }

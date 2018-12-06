@@ -11,7 +11,7 @@ export function getListData(info) {
     method: 'get',
     params: {
       'query': query,
-      'fields': 'SysName,SysCode,Id,IsValid',
+      'fields': 'SysName,SysCode,Id,IsValid,SysUrl',
       'limit': info.pageSize,
       'offset': info.offset
     }
@@ -24,8 +24,8 @@ export function saveSysInfo(info) {
     url: '/application',
     method: 'post',
     data: {
-      'SysName': info.SysName,
-      'IsValid': info.IsValid
+      'SysName': info.sysName,
+      'IsValid': info.IsValid === true ? 0 : 1
     }
   })
 }
@@ -36,6 +36,20 @@ export function uniqueCheck(sysName) {
     method: 'get',
     params: {
       'SysName': sysName
+    }
+  })
+}
+
+// 修改系统信息
+export function updateSysInfo(info) {
+  return request({
+    url: '/application/' + info.id,
+    method: 'put',
+    data: {
+      'SysName': info.sysName,
+      'IsValid': info.IsValid === true ? 0 : 1,
+      'SysCode': info.sysCode,
+      'SysUrl': info.sysUrl
     }
   })
 }

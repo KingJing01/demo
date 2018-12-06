@@ -207,7 +207,7 @@ func GetPermissionByUser(userid int64, sysId string) (permissions []Permission, 
 // 获取列表的信息
 func GetPermissionList(menuName string, sysName string, offset int64, limit int64) (result []out.MenuInfo, err error) {
 	o := orm.NewOrm()
-	var sql = "SELECT t1.DisplayName menu_name,t2.SysName sys_name,t1.MenuText menu_text,t1.id FROM permission t1 LEFT JOIN application t2 ON t1.SysCode = t2.SysCode WHERE t1.isMenu=0"
+	var sql = "SELECT t1.DisplayName menu_name,t2.SysName sys_name,t1.MenuText menu_text,t1.id FROM permission t1 LEFT JOIN application t2 ON t1.SysCode = t2.SysCode WHERE t1.isMenu=0 "
 	conditions := []string{}
 	if menuName != "" {
 		conditions = append(conditions, " t1.DisplayName like '%"+menuName+"%'")
@@ -218,7 +218,7 @@ func GetPermissionList(menuName string, sysName string, offset int64, limit int6
 	if len(conditions) > 0 {
 		sql = sql + " and " + strings.Join(conditions, " and ")
 	}
-	sql = sql + "\n limit " + strconv.FormatInt(limit, 10) + "  offset " + strconv.FormatInt(offset, 10)
+	sql = sql + " limit " + strconv.FormatInt(limit, 10) + "  offset " + strconv.FormatInt(offset, 10)
 	_, err = o.Raw(sql).QueryRows(&result)
 	return result, err
 }

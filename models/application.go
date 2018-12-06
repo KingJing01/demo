@@ -1,9 +1,11 @@
 package models
 
 import (
+	out "demo/outmodels"
 	"errors"
 	"fmt"
 	"reflect"
+	"strconv"
 	"strings"
 	"time"
 
@@ -190,4 +192,43 @@ func GenerateSysCode() (SysCode string) {
 	o := orm.NewOrm()
 	o.Raw("select IFNULL(MAX(SysCode),'100000')+1  sysCode from application").Values(&maps)
 	return maps[0]["sysCode"].(string)
+}
+
+// 获取列表的信息
+func GetApplicationList(sysCode string, sysName string, offset int64, limit int64) (result []out.SysInfo, err error) {
+	o := orm.NewOrm()
+	var sql = "select SysCode sys_code,SysName sys_name,SysUrl sys_url,IsValid is_valid,Id id from application "
+	conditions := []string{}
+	if sysCode != "" {
+		conditions = append(conditions, " sysCode like '%"+sysCode+"%'")
+	}
+	if sysName != "" {
+		conditions = append(conditions, " SysName  like '%"+sysName+"%'")
+	}
+	if len(conditions) > 0 {
+		sql = sql + " where " + strings.Join(conditions, " and ")
+	}
+	sql = sql + " limit " + strconv.FormatInt(limit, 10) + "  offset " + strconv.FormatInt(offset, 10)
+	_, err = o.Raw(sql).QueryRows(&result)
+	return result, err
+}
+
+// 统计查询条件的数量
+func CountApplicationInfo(sysCode string, sysName string) (total int64) {
+	o := orm.NewOrm()
+	conditions := []string{}
+	var sql = "SELECT count(0) total FROM application "
+	if sysCode != "" {
+		conditions = append(conditions, " sysCode like '%"+sysCode+"%'")
+	}
+	if sysName != "" {
+		conditions = append(conditions, " SysName  like '%"+sysName+"%'")
+	}
+	if len(conditions) > 0 {
+		sql = sql + " where " + strings.Join(conditions, " and ")
+	}
+	var maps []orm.Params
+	o.Raw(sql).Values(&maps)
+	total, _ = strconv.ParseInt(maps[0]["total"].(string), 10, 64)
+	return total
 }

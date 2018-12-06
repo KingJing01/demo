@@ -12,3 +12,18 @@ type LoginResult struct {
 	OperResult
 	Token string
 }
+
+// 菜单列表数据
+type MenuInfo struct {
+	Id       int64
+	MenuName string
+	SysName  string
+	MenuText string
+}
+
+type SysInfo struct {
+	Id      int64
+	SysCode string
+	SysName string
+	IsValid string
+}

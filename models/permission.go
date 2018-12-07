@@ -30,7 +30,7 @@ type Permission struct {
 	LastModificationUserId int64     `orm:"column(LastModificationUserId);null"`
 	IsDeleted              int       `orm:"column(IsDeleted);0"`
 	MenuCode               int       `orm:"column(MenuCode);null"`
-	isMenu                 int       `orm:"column(isMenu);0"`
+	IsMenu                 int       `orm:"column(IsMenu);0"`
 }
 
 func (t *Permission) TableName() string {

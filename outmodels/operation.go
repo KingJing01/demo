@@ -21,6 +21,7 @@ type MenuInfo struct {
 	MenuText string
 }
 
+// 权限系统 系统配置返回结构
 type SysInfo struct {
 	Id      int64
 	SysCode string

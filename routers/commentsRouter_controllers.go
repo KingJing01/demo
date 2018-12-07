@@ -187,6 +187,15 @@ func init() {
             Filters: nil,
             Params: nil})
 
+    beego.GlobalControllerRouter["demo/controllers:SetMealController"] = append(beego.GlobalControllerRouter["demo/controllers:SetMealController"],
+        beego.ControllerComments{
+            Method: "GetAll",
+            Router: `/`,
+            AllowHTTPMethods: []string{"get"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
     beego.GlobalControllerRouter["demo/controllers:SsouserController"] = append(beego.GlobalControllerRouter["demo/controllers:SsouserController"],
         beego.ControllerComments{
             Method: "Post",

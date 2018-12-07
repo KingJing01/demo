@@ -28,3 +28,12 @@ type SysInfo struct {
 	SysName string
 	IsValid string
 }
+
+//套餐返回结构
+type SetMealInfo struct {
+	Id             int64
+	SetMealName    string
+	SetMealCode    string
+	SysName        string
+	PermissionText string
+}

@@ -63,6 +63,12 @@ func init() {
 				&controllers.TenantController{},
 			),
 		),
+
+		beego.NSNamespace("/setmeal",
+			beego.NSInclude(
+				&controllers.SetMealController{},
+			),
+		),
 	)
 	beego.AddNamespace(ns)
 }

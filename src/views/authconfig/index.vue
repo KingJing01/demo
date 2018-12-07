@@ -10,7 +10,7 @@
 import BasePermission from './basepermissions/page'
 import SysConfig from './sysconfig/page'
 import UserManager from './usermanager/page'
-import UserPackage from './userpackage/page'
+import UserPackage from './setmeal/page'
 export default {
   components: { BasePermission, SysConfig, UserManager, UserPackage },
   data() {

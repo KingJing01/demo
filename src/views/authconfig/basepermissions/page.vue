@@ -78,7 +78,7 @@
         layout="prev, pager, next"/>
     </div>
     <el-row id="action_line">
-      <el-button>新增菜单</el-button>
+      <el-button @click="dialogFormVisible = true"> 新增菜单</el-button>
       <el-button type="primary">生成套餐</el-button>
     </el-row>
 
@@ -86,45 +86,48 @@
     <!-- 弹出层 信息录入和修改  start -->
     <el-dialog
       :visible.sync="dialogFormVisible"
-      title="系统配置"
+      title="菜单配置"
       width="40%"
     >
       <el-form :model="form">
         <el-form-item
           :label-width="formLabelWidth"
-          label="系统代码"
-        >
-          <el-input
-            :disabled="true"
-            v-model="form.sysCode"
-            autocomplete="off"
-          />
-        </el-form-item>
-        <el-form-item
-          :label-width="formLabelWidth"
           label="系统名称"
         >
           <el-input
+            :disabled="true"
             v-model="form.sysName"
             autocomplete="off"
-            @change="checkRepeat"
           />
-          <span v-if= "dialogInfoVisable==true" id="dialogInfo">系统名称已经存在,请重新输入</span>
         </el-form-item>
         <el-form-item
           :label-width="formLabelWidth"
-          label="系统地址"
+          label="菜单编码"
         >
           <el-input
-            v-model="form.sysUrl"
+            :disabled="true"
+            v-model="form.menuCode"
             autocomplete="off"
           />
         </el-form-item>
         <el-form-item
           :label-width="formLabelWidth"
-          label=""
+          label="菜单名称"
         >
-          <el-checkbox v-model="form.IsValid">是否有效</el-checkbox>
+          <el-input
+            v-model="form.menuName"
+            autocomplete="off"
+          />
+        </el-form-item>
+        <el-form-item
+          :label-width="formLabelWidth"
+          label="操作名称"
+        >
+          <el-input
+            :disabled="true"
+            v-model="form.menuText"
+            autocomplete="off"
+          />
         </el-form-item>
       </el-form>
       <div
@@ -156,7 +159,7 @@ export default {
       form: {
         id: '',
         sysName: '',
-        sysCode: '',
+        menuCode: '',
         sysUrl: '',
         IsValid: true
       },

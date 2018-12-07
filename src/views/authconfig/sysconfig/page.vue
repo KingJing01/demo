@@ -72,71 +72,74 @@
     </el-table>
     <!-- 系统信息列表  end -->
     <!-- 分页控件  start -->
-    <div class="block">
-      <el-pagination
-        :page-size="20"
-        :pager-count="11"
-        :total="1000"
-        layout="prev, pager, next"/>
-    </div>
-    <!-- 分页控件  end -->
-    <!-- 弹出层 信息录入和修改  start -->
-    <el-dialog
-      :visible.sync="dialogFormVisible"
-      title="系统配置"
-      width="40%"
-    >
-      <el-form :model="form">
-        <el-form-item
-          :label-width="formLabelWidth"
-          label="系统代码"
-        >
-          <el-input
-            :disabled="true"
-            v-model="form.sysCode"
-            autocomplete="off"
-          />
-        </el-form-item>
-        <el-form-item
-          :label-width="formLabelWidth"
-          label="系统名称"
-        >
-          <el-input
-            v-model="form.sysName"
-            autocomplete="off"
-            @change="checkRepeat"
-          />
-          <span v-if= "dialogInfoVisable==true" id="dialogInfo">系统名称已经存在,请重新输入</span>
-        </el-form-item>
-        <el-form-item
-          :label-width="formLabelWidth"
-          label="系统地址"
-        >
-          <el-input
-            v-model="form.sysUrl"
-            autocomplete="off"
-          />
-        </el-form-item>
-        <el-form-item
-          :label-width="formLabelWidth"
-          label=""
-        >
-          <el-checkbox v-model="form.IsValid">是否有效</el-checkbox>
-        </el-form-item>
-      </el-form>
-      <div
-        slot="footer"
-        class="dialog-footer"
-      >
-        <el-button @click="handleCancle">取 消</el-button>
-        <el-button
-          type="primary"
-          @click="saveData"
-        >确 定</el-button>
+    <template>
+      <div class="block">
+        <el-pagination
+          :current-page.sync="currentPage1"
+          :page-size="5"
+          :total="pageTotal"
+          layout="total, prev, pager, next"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"/>
       </div>
-    </el-dialog>
-    <!-- 弹出层 信息录入和修改  end -->
-  </div>
+      <!-- 分页控件  end -->
+      <!-- 弹出层 信息录入和修改  start -->
+      <el-dialog
+        :visible.sync="dialogFormVisible"
+        title="系统配置"
+        width="40%"
+      >
+        <el-form :model="form">
+          <el-form-item
+            :label-width="formLabelWidth"
+            label="系统代码"
+          >
+            <el-input
+              :disabled="true"
+              v-model="form.sysCode"
+              autocomplete="off"
+            />
+          </el-form-item>
+          <el-form-item
+            :label-width="formLabelWidth"
+            label="系统名称"
+          >
+            <el-input
+              v-model="form.sysName"
+              autocomplete="off"
+              @change="checkRepeat"
+            />
+            <span v-if= "dialogInfoVisable==true" id="dialogInfo">系统名称已经存在,请重新输入</span>
+          </el-form-item>
+          <el-form-item
+            :label-width="formLabelWidth"
+            label="系统地址"
+          >
+            <el-input
+              v-model="form.sysUrl"
+              autocomplete="off"
+            />
+          </el-form-item>
+          <el-form-item
+            :label-width="formLabelWidth"
+            label=""
+          >
+            <el-checkbox v-model="form.IsValid">是否有效</el-checkbox>
+          </el-form-item>
+        </el-form>
+        <div
+          slot="footer"
+          class="dialog-footer"
+        >
+          <el-button @click="handleCancle">取 消</el-button>
+          <el-button
+            type="primary"
+            @click="saveData"
+          >确 定</el-button>
+        </div>
+      </el-dialog>
+      <!-- 弹出层 信息录入和修改  end -->
+  </template></div>
 </template>
 <script>
 import { getListData, saveSysInfo, uniqueCheck, updateSysInfo } from '@/api/sysconfig'
@@ -161,7 +164,8 @@ export default {
       dialogFormVisible: false,
       formLabelWidth: '120px',
       dialogInfoVisable: false,
-      insertAct: true
+      insertAct: true,
+      pageTotal: 0
     }
   },
   created() {
@@ -190,6 +194,7 @@ export default {
     getList() {
       getListData(this.search).then(response => {
         this.tableData = response.Data.list
+        this.pageTotal = response.Data.total
       })
     },
     handleClose(done) {

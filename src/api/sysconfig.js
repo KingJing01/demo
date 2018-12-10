@@ -48,3 +48,11 @@ export function updateSysInfo(info) {
     }
   })
 }
+
+// select 系统下拉数据
+export function sysDataSelect() {
+  return request({
+    url: '/application/getSelectData',
+    method: 'post'
+  })
+}

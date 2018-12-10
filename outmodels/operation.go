@@ -21,12 +21,17 @@ type MenuInfo struct {
 	MenuText string
 }
 
+type SelectInfo struct {
+	code  string
+	label string
+}
+
 // 权限系统 系统配置返回结构
 type SysInfo struct {
 	Id      int64
+	IsValid string
 	SysCode string
 	SysName string
-	IsValid string
 }
 
 //套餐返回结构

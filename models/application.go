@@ -232,3 +232,10 @@ func CountApplicationInfo(sysCode string, sysName string) (total int64) {
 	total, _ = strconv.ParseInt(maps[0]["total"].(string), 10, 64)
 	return total
 }
+
+// 获取下拉框数据
+func GetSelectData() (sysInfo []out.SysInfo) {
+	o := orm.NewOrm()
+	o.Raw("select SysCode sys_code,SysName sys_name from application where IsValid = 0 ").QueryRows(&sysInfo)
+	return sysInfo
+}

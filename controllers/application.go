@@ -23,6 +23,7 @@ func (c *ApplicationController) URLMapping() {
 	c.Mapping("Put", c.Put)
 	c.Mapping("Delete", c.Delete)
 	c.Mapping("check", c.CheckRepeat)
+	c.Mapping("getSelectData", c.GetSelectData)
 }
 
 // Post ...
@@ -159,6 +160,21 @@ func (c *ApplicationController) CheckRepeat() {
 	sysName := c.GetString("SysName")
 	if total, _ := models.CheckRepeat(sysName); total > 0 {
 		result.Result = 1
+		c.Data["json"] = result
+	} else {
+		result.Result = 0
+		c.Data["json"] = result
+	}
+	c.ServeJSON()
+}
+
+// 获取下拉框的数据...
+// @router /getSelectData [post]
+func (c *ApplicationController) GetSelectData() {
+	result := &out.OperResult{}
+	if sysInfo := models.GetSelectData(); len(sysInfo) > 0 {
+		result.Result = 1
+		result.Data = sysInfo
 		c.Data["json"] = result
 	} else {
 		result.Result = 0

@@ -52,6 +52,15 @@ func init() {
             Filters: nil,
             Params: nil})
 
+    beego.GlobalControllerRouter["demo/controllers:ApplicationController"] = append(beego.GlobalControllerRouter["demo/controllers:ApplicationController"],
+        beego.ControllerComments{
+            Method: "GetSelectData",
+            Router: `/getSelectData`,
+            AllowHTTPMethods: []string{"post"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
     beego.GlobalControllerRouter["demo/controllers:AuthorityManageController"] = append(beego.GlobalControllerRouter["demo/controllers:AuthorityManageController"],
         beego.ControllerComments{
             Method: "AuthorityError",

@@ -180,33 +180,6 @@ export default {
       radio1: '',
       options: [],
       sysInfoSelect: '',
-      /* authData: [
-        {
-          'childrenList': [
-            { 'mychecked': false, 'indeterminate': false, 'permissionId': 21, 'permissionName': '订单' },
-            { 'mychecked': false, 'indeterminate': false, 'permissionId': 22, 'permissionName': '用户' },
-            { 'mychecked': false, 'indeterminate': false, 'permissionId': 23, 'permissionName': '导出订单' },
-            { 'mychecked': false, 'indeterminate': false, 'permissionId': 24, 'permissionName': '导出用户' },
-            { 'mychecked': false, 'indeterminate': false, 'permissionId': 25, 'permissionName': '订单1' },
-            { 'mychecked': false, 'indeterminate': false, 'permissionId': 26, 'permissionName': '用户1' },
-            { 'mychecked': false, 'indeterminate': false, 'permissionId': 27, 'permissionName': '导出订单1' },
-            { 'mychecked': false, 'indeterminate': false, 'permissionId': 28, 'permissionName': '导出用户1' },
-            { 'mychecked': false, 'indeterminate': false, 'permissionId': 29, 'permissionName': '订单12' },
-            { 'mychecked': false, 'indeterminate': false, 'permissionId': 30, 'permissionName': '用户12' },
-            { 'mychecked': false, 'indeterminate': false, 'permissionId': 31, 'permissionName': '导出订单12' },
-            { 'mychecked': false, 'indeterminate': false, 'permissionId': 32, 'permissionName': '导出用户12' }
-          ],
-          'permissionName': '用户服务', 'mychecked': false, 'indeterminate': false, 'permissionId': 15
-        },
-        {
-          'childrenList': [
-            { 'mychecked': false, 'indeterminate': false, 'permissionId': 25, 'permissionName': '内容查看' },
-            { 'mychecked': false, 'indeterminate': false, 'permissionId': 26, 'permissionName': '内容采纳' },
-            { 'mychecked': false, 'indeterminate': false, 'permissionId': 27, 'permissionName': '分销中心' },
-            { 'mychecked': false, 'indeterminate': false, 'permissionId': 28, 'permissionName': '我的商城' }
-          ],
-          'permissionName': '内容商城', 'mychecked': false, 'indeterminate': false, 'permissionId': 16, 'showFlag': '1'
-        }],*/
       authData: [],
       activeName: 'accountManage',
       people: '',
@@ -301,15 +274,15 @@ export default {
       })
     },
     onChangeTop(index, topId, e) { // 父级change事件
-      this.tableData[index].mychecked = e// 父级勾选后，子级全部勾选或者取消
-      if (e === false) this.tableData[index].indeterminate = false // 去掉不确定状态
-      var childrenArray = this.tableData[index].childrenList
+      this.authData[index].mychecked = e// 父级勾选后，子级全部勾选或者取消
+      if (e === false) this.authData[index].indeterminate = false // 去掉不确定状态
+      var childrenArray = this.authData[index].childrenList
       if (childrenArray) {
         for (var i = 0, len = childrenArray.length; i < len; i++) { childrenArray[i].mychecked = e }
       }
     },
     onChangeSon(topIndex, sonId, topId, e) { // 子级change事件
-      var childrenArray = this.tableData[topIndex].childrenList
+      var childrenArray = this.authData[topIndex].childrenList
       var tickCount = 0
       var unTickCount = 0
       var len = childrenArray.length
@@ -319,14 +292,14 @@ export default {
         if (childrenArray[i].mychecked === false) unTickCount++
       }
       if (tickCount === len) { // 子级全勾选
-        this.tableData[topIndex].mychecked = true
-        this.tableData[topIndex].indeterminate = false
+        this.authData[topIndex].mychecked = true
+        this.authData[topIndex].indeterminate = false
       } else if (unTickCount === len) { // 子级全不勾选
-        this.tableData[topIndex].mychecked = false
-        this.tableData[topIndex].indeterminate = false
+        this.authData[topIndex].mychecked = false
+        this.authData[topIndex].indeterminate = false
       } else {
-        this.tableData[topIndex].mychecked = true
-        this.tableData[topIndex].indeterminate = true // 添加不确定状态
+        this.authData[topIndex].mychecked = true
+        this.authData[topIndex].indeterminate = true // 添加不确定状态
       }
     }
 
@@ -334,16 +307,6 @@ export default {
 }
 </script>
 <style rel="stylesheet/scss" lang="scss" scoped>
-.el-row {
-  margin-bottom: 20px;
-  &:last-child {
-    margin-bottom: 0;
-  }
-}
-
-.el-col {
-  border-radius: 4px;
-}
 
 .grid-content {
   border-radius: 4px;

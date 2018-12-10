@@ -151,6 +151,15 @@ func init() {
             Filters: nil,
             Params: nil})
 
+    beego.GlobalControllerRouter["demo/controllers:PermissionController"] = append(beego.GlobalControllerRouter["demo/controllers:PermissionController"],
+        beego.ControllerComments{
+            Method: "GetPerInfoBySysCode",
+            Router: `/getPerInfoBySysCode/:sysCode`,
+            AllowHTTPMethods: []string{"get"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
     beego.GlobalControllerRouter["demo/controllers:RoleController"] = append(beego.GlobalControllerRouter["demo/controllers:RoleController"],
         beego.ControllerComments{
             Method: "Post",

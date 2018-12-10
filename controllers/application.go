@@ -22,8 +22,8 @@ func (c *ApplicationController) URLMapping() {
 	c.Mapping("GetAll", c.GetAll)
 	c.Mapping("Put", c.Put)
 	c.Mapping("Delete", c.Delete)
-	c.Mapping("check", c.CheckRepeat)
-	c.Mapping("getSelectData", c.GetSelectData)
+	c.Mapping("Check", c.CheckRepeat)
+	c.Mapping("GetSelectData", c.GetSelectData)
 }
 
 // Post ...

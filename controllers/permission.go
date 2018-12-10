@@ -3,6 +3,7 @@ package controllers
 import (
 	"demo/models"
 	out "demo/outmodels"
+	tool "demo/tools"
 	"encoding/json"
 	"strconv"
 	"time"
@@ -22,6 +23,7 @@ func (c *PermissionController) URLMapping() {
 	c.Mapping("GetAll", c.GetAll)
 	c.Mapping("Put", c.Put)
 	c.Mapping("Delete", c.Delete)
+	c.Mapping("getPerInfoBySysCode", c.GetPerInfoBySysCode)
 }
 
 // Post ...
@@ -172,6 +174,24 @@ func (c *PermissionController) Delete() {
 	id, _ := strconv.Atoi(idStr)
 	if err := models.DeletePermission(id); err == nil {
 		result.Result = 1
+		c.Data["json"] = result
+	} else {
+		result.Result = 0
+		result.Message = err.Error()
+		c.Data["json"] = result
+	}
+	c.ServeJSON()
+}
+
+// 根据系统编号获取对应的权限
+// @router /getPerInfoBySysCode/:sysCode [get]
+func (c *PermissionController) GetPerInfoBySysCode() {
+	result := &out.OperResult{}
+	sysCode := c.Ctx.Input.Param(":sysCode")
+	if data, err := models.GetPerInfoBySysCode(sysCode); len(data) > 0 {
+		permissionList := tool.ParsePermissionDataForCheckbox(data)
+		result.Result = 1
+		result.Data = permissionList
 		c.Data["json"] = result
 	} else {
 		result.Result = 0

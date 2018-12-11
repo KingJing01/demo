@@ -90,9 +90,19 @@ func AddSetMeal(setMeatInfo *input.SetMeatInput) (id int64, err error) {
 	setMeal.CreationTime = time.Now()
 	setMeal.SysCode = setMeatInfo.SysCode
 	o := orm.NewOrm()
-	_, err = o.Insert(setMeal)
+	id, err = o.Insert(setMeal)
+	length := len(setMeatInfo.PerId)
 	//权限套餐关系数据录入
-	return
+	var permission []PermissionPackage
+	arr := strings.Split(setMeatInfo.PerId, ",")
+	for _, per := range arr {
+		var permObject PermissionPackage
+		permObject.PermissionCode = per
+		permObject.SetMealCode = setMeatCode
+		permission = append(permission, permObject)
+	}
+	id, err = o.InsertMulti(length, permission)
+	return id, err
 }
 
 // 删除套餐信息

@@ -1,6 +1,7 @@
 package models
 
 import (
+	input "demo/inputmodels"
 	out "demo/outmodels"
 	"strconv"
 	"strings"
@@ -32,10 +33,10 @@ func init() {
 	orm.RegisterModel(new(SetMeal))
 }
 
-// 获取列表的信息
+// 获取套餐列表的信息
 func GetSetMealList(setMealName string, sysName string, offset int64, limit int64) (result []out.SetMealInfo, err error) {
 	o := orm.NewOrm()
-	var sql = "SELECT t1.Id id,t1.SetMealCode set_meal_code, t1.SetMealName set_meal_name, t2.SysName sys_name,t1.PermissionText permission_text FROM setmeal t1 LEFT JOIN application t2 ON t1.SysCode = t2.SysCode WHERE  t1.IsDeleted = 0"
+	var sql = "SELECT t1.Id id,t1.SetMealCode set_meal_code, t1.SetMealName set_meal_name, t2.SysName sys_name,t1.PermissionText permission_text,t1.IsDeleted is_deleted FROM setmeal t1 LEFT JOIN application t2 ON t1.SysCode = t2.SysCode "
 	conditions := []string{}
 	if setMealName != "" {
 		conditions = append(conditions, " t1.SetMealName like '%"+setMealName+"%'")
@@ -44,7 +45,7 @@ func GetSetMealList(setMealName string, sysName string, offset int64, limit int6
 		conditions = append(conditions, " t2.SysName  like '%"+sysName+"%'")
 	}
 	if len(conditions) > 0 {
-		sql = sql + " and " + strings.Join(conditions, " and ")
+		sql = sql + " where " + strings.Join(conditions, " and ")
 	}
 	sql = sql + " limit " + strconv.FormatInt(limit, 10) + "  offset " + strconv.FormatInt(offset, 10)
 	_, err = o.Raw(sql).QueryRows(&result)
@@ -55,7 +56,7 @@ func GetSetMealList(setMealName string, sysName string, offset int64, limit int6
 func CountSetMealInfo(setMealName string, sysName string) (total int64) {
 	o := orm.NewOrm()
 	conditions := []string{}
-	var sql = "SELECT count(0) total FROM setmeal t1 LEFT JOIN application t2 ON t1.SysCode = t2.SysCode WHERE  t1.IsDeleted = 0"
+	var sql = "SELECT count(0) total FROM setmeal t1 LEFT JOIN application t2 ON t1.SysCode = t2.SysCode "
 	if setMealName != "" {
 		conditions = append(conditions, " t1.SetMealName like '%"+setMealName+"%'")
 	}
@@ -63,10 +64,48 @@ func CountSetMealInfo(setMealName string, sysName string) (total int64) {
 		conditions = append(conditions, " t2.SysName  like '%"+sysName+"%'")
 	}
 	if len(conditions) > 0 {
-		sql = sql + " and " + strings.Join(conditions, " and ")
+		sql = sql + " where " + strings.Join(conditions, " and ")
 	}
 	var maps []orm.Params
 	o.Raw(sql).Values(&maps)
 	total, _ = strconv.ParseInt(maps[0]["total"].(string), 10, 64)
 	return total
+}
+
+func GenerateSetMeatCode() (SetMealCode string) {
+	var maps []orm.Params
+	o := orm.NewOrm()
+	o.Raw("select IFNULL(MAX(SetMealCode),'1000')+1  setMealCode from setmeal").Values(&maps)
+	return maps[0]["setMealCode"].(string)
+}
+
+func AddSetMeal(setMeatInfo *input.SetMeatInput) (id int64, err error) {
+	//生成套餐编号
+	setMeatCode := GenerateSetMeatCode()
+	// 套餐表
+	setMeal := new(SetMeal)
+	setMeal.SetMealName = setMeatInfo.SetMealName
+	setMeal.SetMealCode = setMeatCode
+	setMeal.PermissionText = setMeatInfo.PerName
+	setMeal.CreationTime = time.Now()
+	setMeal.SysCode = setMeatInfo.SysCode
+	o := orm.NewOrm()
+	_, err = o.Insert(setMeal)
+	//权限套餐关系数据录入
+	return
+}
+
+// 删除套餐信息
+func DeleteSetMeal(ids string) (err error) {
+	arr := strings.Split(ids, ",")
+	var param string
+	for _, x := range arr {
+		param += x + ","
+	}
+	length := len(param) - 1
+	params := param[0:length]
+	var sql = "update setmeal set IsDeleted=1 , DeletionTime = ?  where Id in ( " + params + ")"
+	o := orm.NewOrm()
+	_, err = o.Raw(sql, time.Now()).Exec()
+	return
 }

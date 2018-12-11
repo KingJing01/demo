@@ -1,8 +1,10 @@
 package controllers
 
 import (
+	input "demo/inputmodels"
 	"demo/models"
 	out "demo/outmodels"
+	"encoding/json"
 
 	"github.com/astaxie/beego"
 )
@@ -67,6 +69,54 @@ func (c *SetMealController) GetAll() {
 		page["listQuery"] = ListQuery
 		page["total"] = total
 		result.Data = page
+		c.Data["json"] = result
+	}
+	c.ServeJSON()
+}
+
+// Post ...
+// @Title Post
+// @Description create SetMeat
+// @Param	body		body 	models.Application	true		"body for Application content"
+// @Success 201 {int} models.Application
+// @Failure 403 body is empty
+// @router / [post]
+func (c *SetMealController) Post() {
+	result := &out.OperResult{}
+	var v input.SetMeatInput
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
+		if _, err := models.AddSetMeal(&v); err == nil {
+			result.Result = 1
+			c.Data["json"] = result
+		} else {
+			result.Result = 0
+			result.Message = err.Error()
+			c.Data["json"] = result
+		}
+	} else {
+		result.Result = 0
+		result.Message = err.Error()
+		c.Data["json"] = result
+	}
+	c.ServeJSON()
+}
+
+// Delete ...
+// @Title Delete
+// @Description delete the setmeal
+// @Param	id		path 	string	true		"The id you want to delete"
+// @Success 200 {string} delete success!
+// @Failure 403 id is empty
+// @router /:id [delete]
+func (c *SetMealController) Delete() {
+	result := &out.OperResult{}
+	ids := c.Ctx.Input.Param(":id")
+	if err := models.DeleteSetMeal(ids); err == nil {
+		result.Result = 1
+		c.Data["json"] = result
+	} else {
+		result.Result = 0
+		result.Message = err.Error()
 		c.Data["json"] = result
 	}
 	c.ServeJSON()

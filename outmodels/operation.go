@@ -41,6 +41,7 @@ type SetMealInfo struct {
 	SetMealCode    string
 	SysName        string
 	PermissionText string
+	IsDeleted      int64
 }
 
 type PermissionCheckInfo struct {

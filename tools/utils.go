@@ -8,18 +8,11 @@ import (
 /* authData: [
    {
      'childrenList': [
-       { 'mychecked': false, 'indeterminate': false, 'permissionId': 21, 'permissionName': '订单' },
-       { 'mychecked': false, 'indeterminate': false, 'permissionId': 32, 'permissionName': '导出用户12' }
+       { 'mychecked': false, 'indeterminate': false, 'permissionId': 'tms.bill.export', 'permissionName': '导出账单' },
+       { 'mychecked': false, 'indeterminate': false, 'permissionId':  'tms.bill.peint', 'permissionName': '打印账单' }
      ],
-     'permissionName': '用户服务', 'mychecked': false, 'indeterminate': false, 'permissionId': 15
-   },
-   {
-     'childrenList': [
-       { 'mychecked': false, 'indeterminate': false, 'permissionId': 25, 'permissionName': '内容查看' },
-       { 'mychecked': false, 'indeterminate': false, 'permissionId': 28, 'permissionName': '我的商城' }
-     ],
-     'permissionName': '内容商城', 'mychecked': false, 'indeterminate': false, 'permissionId': 16, 'showFlag': '1'
-   }],*/
+     'permissionName': '财务系统', 'mychecked': false, 'indeterminate': false, 'permissionId': 'tms.bill'
+   }]*/
 // 将后台查询的数据进行格式转化方便前台使用
 func ParsePermissionDataForCheckbox(data []out.PermissionCheckInfo) (result []map[string]interface{}) {
 	for _, x := range data {

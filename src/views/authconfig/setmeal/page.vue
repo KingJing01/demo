@@ -32,11 +32,13 @@
       :data="tableData"
       style="width: 90%"
       border
+      @selection-change="selectChangeFun"
     >
       <el-table-column
         type="selection"
         width="auto"
-        align="center"/>
+        align="center"
+      />
       <el-table-column
         prop="SetMealCode"
         label="套餐编码"
@@ -56,7 +58,13 @@
         prop="PermissionText"
         label="操作名称"
         align="center"
-
+        show-overflow-tooltip="true"
+      />
+      <el-table-column
+        :formatter="formatText"
+        prop="IsDeleted"
+        label="是否有效"
+        align="center"
       />
       <el-table-column
         prop="Id"
@@ -83,7 +91,7 @@
     </div>
     <el-row id="action_line">
       <el-button @click="dialogFormVisible = true">新增套餐</el-button>
-      <el-button type="primary">删除套餐</el-button>
+      <el-button type="primary" @click="handleDeleteSetMeal">禁用套餐</el-button>
     </el-row>
 
     <!-- 分页控件  end -->
@@ -108,7 +116,7 @@
           :label-width="formLabelWidth"
           label="菜单编码"
         >
-          <el-select v-model="sysInfoSelect" placeholder="请选择" @change="changeSysSelect">
+          <el-select v-model="form.sysCode" placeholder="请选择" @change="changeSysSelect">
             <el-option
               v-for="item in options"
               :key="item.SysCode"
@@ -152,9 +160,10 @@
   </div>
 </template>
 <script>
-import { getSetMealList } from '@/api/setmeal'
+import { getSetMealList, addSetMealInfo, deleteSetMeal } from '@/api/setmeal'
 import { sysDataSelect } from '@/api/sysconfig'
 import { getPerInfoBySysCode } from '@/api/permission'
+import { transPermisionCheckedData } from '@/api/utils'
 export default {
   data() {
     return {
@@ -166,25 +175,19 @@ export default {
         offset: 0
       },
       form: {
-        id: '',
+        perName: '',
         setMealName: '',
-        menuCode: '',
-        sysUrl: '',
-        IsValid: true
+        perId: '',
+        sysCode: ''
       },
       dialogTableVisible: false,
       dialogFormVisible: false,
       formLabelWidth: '120px',
       dialogInfoVisable: false,
       insertAct: true,
-      radio1: '',
       options: [],
-      sysInfoSelect: '',
       authData: [],
-      activeName: 'accountManage',
-      people: '',
-      phoneNum: '',
-      isIndeterminate: true
+      multipleSelection: []
     }
   },
   created() {
@@ -217,9 +220,6 @@ export default {
       })
     },
     handleClose(done) {
-      this.form.sysName = ''
-      this.form.sysCode = ''
-      this.form.IsValid = true
       this.dialogInfoVisable = false
       done()
     },
@@ -241,12 +241,25 @@ export default {
     },
     // 保存系统信息
     saveData() {
+      var transData = transPermisionCheckedData(this.authData)
+      if (transData.perName === '') {
+        this.$message({
+          message: '请选择操作权限',
+          type: 'warning'
+        })
+        return false
+      }
+      this.form.perId = transData.perId
+      this.form.perName = transData.perName
       if (this.dialogInfoVisable === false) {
         if (this.insertAct === true) {
-          console.log('修改信息')
-        } else {
-          console.log('修改信息')
+          addSetMealInfo(this.form).then(response => {
+            this.dialogFormVisible = false
+            this.getList()
+          })
         }
+      } else {
+        console.log('修改信息')
       }
     },
     // 系统信息验重
@@ -301,8 +314,26 @@ export default {
         this.authData[topIndex].mychecked = true
         this.authData[topIndex].indeterminate = true // 添加不确定状态
       }
+    },
+    // 表格选择框的改变事件 监听
+    selectChangeFun(selection) {
+      var data = []
+      for (var i = 0; i < selection.length; i++) {
+        data.push(selection[i].Id)
+      }
+      this.multipleSelection = data
+    },
+    // 批量禁用套餐
+    handleDeleteSetMeal() {
+      deleteSetMeal(this.multipleSelection.toString()).then(response => {
+        this.getList()
+      })
+    },
+    // 文本格式转换
+    formatText(row, column) {
+      const data = row[column.property]
+      return data === 0 ? '是' : '否'
     }
-
   }
 }
 </script>
@@ -328,4 +359,5 @@ export default {
 .el-checkbox{
   margin:2% 5%
 }
+
 </style>

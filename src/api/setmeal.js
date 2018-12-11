@@ -11,3 +11,18 @@ export function getSetMealList(info) {
     params: info
   })
 }
+
+export function addSetMealInfo(info) {
+  return request({
+    url: '/setmeal',
+    method: 'post',
+    data: info
+  })
+}
+
+export function deleteSetMeal(ids) {
+  return request({
+    url: '/setmeal/' + ids,
+    method: 'delete'
+  })
+}

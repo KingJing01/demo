@@ -33,6 +33,7 @@
       style="width: 90%"
       border
       @selection-change="selectChangeFun"
+      @row-dblclick="handleRowClick"
     >
       <el-table-column
         type="selection"
@@ -52,6 +53,11 @@
       <el-table-column
         prop="SysName"
         label="系统名称"
+        align="center"
+      /><el-table-column
+        v-if="hide"
+        prop="SysCode"
+        label="系统编码"
         align="center"
       />
       <el-table-column
@@ -98,9 +104,11 @@
     <!-- 弹出层 信息录入和修改  start -->
     <el-dialog
       :visible.sync="dialogFormVisible"
-      title="套餐配置"
       width="40%"
-    >
+      @close="handleCloseDialog"
+    > <h4 v-if="type==='detail'" slot="title">套餐详情</h4>
+      <h4 v-else-if="type==='update'" slot="title">修改套餐</h4>
+      <h4 v-else slot="title">新增套餐</h4>
       <el-form :model="form">
         <el-form-item
           :label-width="formLabelWidth"
@@ -128,7 +136,7 @@
       <template>
         <div class="content">
           <div class="power">
-            <h4>权限设置</h4>
+            <h4>模块配置</h4>
             <el-row>
               <el-col :span="7">菜单功能</el-col>
               <el-col :span="17">权限名称</el-col>
@@ -160,13 +168,14 @@
   </div>
 </template>
 <script>
-import { getSetMealList, addSetMealInfo, deleteSetMeal } from '@/api/setmeal'
+import { getSetMealList, addSetMealInfo, deleteSetMeal, updateSetMealInfo } from '@/api/setmeal'
 import { sysDataSelect } from '@/api/sysconfig'
-import { getPerInfoBySysCode } from '@/api/permission'
+import { getPerInfoBySysCode, getPerInfoBySysCodeUpdate } from '@/api/permission'
 import { transPermisionCheckedData } from '@/api/utils'
 export default {
   data() {
     return {
+      type: '',
       tableData: [],
       search: {
         setMealName: '',
@@ -177,8 +186,10 @@ export default {
       form: {
         perName: '',
         setMealName: '',
+        setMealCode: '',
         perId: '',
-        sysCode: ''
+        sysCode: '',
+        id: ''
       },
       dialogTableVisible: false,
       dialogFormVisible: false,
@@ -201,17 +212,16 @@ export default {
     },
     // 编辑事件
     handleClick(row) {
+      this.type = 'update'
       this.dialogFormVisible = true
+      this.form.setMealName = row.SetMealName
+      this.form.setMealCode = row.SetMealCode
       this.form.sysCode = row.SysCode
-      this.form.sysName = row.SysName
       this.form.id = row.Id
-      this.form.sysUrl = row.SysUrl
       this.insertAct = false
-      if (row.IsValid === 0) {
-        this.form.IsValid = true
-      } else {
-        this.form.IsValid = false
-      }
+      getPerInfoBySysCodeUpdate(row.SysCode, row.SetMealCode).then(response => {
+        this.authData = response.Data
+      })
     },
     // 获取列表数据
     getList() {
@@ -252,12 +262,19 @@ export default {
       this.form.perId = transData.perId
       this.form.perName = transData.perName
       if (this.dialogInfoVisable === false) {
+        // 新增操作
         if (this.insertAct === true) {
           addSetMealInfo(this.form).then(response => {
             this.dialogFormVisible = false
             this.getList()
           })
+        } else {
+          updateSetMealInfo(this.form).then(response => {
+            this.dialogFormVisible = false
+            this.getList()
+          })
         }
+        this.type = 'new'
       } else {
         console.log('修改信息')
       }
@@ -268,9 +285,6 @@ export default {
     },
     // dialog 取消按钮
     handleCancle() {
-      this.form.sysName = ''
-      this.form.sysCode = ''
-      this.form.IsValid = true
       this.dialogFormVisible = false
       this.dialogInfoVisable = false
     },
@@ -333,6 +347,19 @@ export default {
     formatText(row, column) {
       const data = row[column.property]
       return data === 0 ? '是' : '否'
+    },
+    // 监听dialog的关闭事件
+    handleCloseDialog() {
+      this.form.perName = ''
+      this.form.perId = ''
+      this.form.sysCode = ''
+      this.form.setMealName = ''
+      this.authData = []
+    },
+    // 双击点击事件
+    handleRowClick(row, event) {
+      this.type = 'detail'
+      this.dialogFormVisible = true
     }
   }
 }

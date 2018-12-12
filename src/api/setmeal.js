@@ -26,3 +26,11 @@ export function deleteSetMeal(ids) {
     method: 'delete'
   })
 }
+
+export function updateSetMealInfo(info) {
+  return request({
+    url: '/setmeal/updateSetMealInfo',
+    method: 'put',
+    data: info
+  })
+}

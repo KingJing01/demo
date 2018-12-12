@@ -6,6 +6,7 @@
       :model="search"
       class="demo-form-inline"
     >
+
       <el-form-item label="套餐名称">
         <el-input
           v-model="search.setMealName"
@@ -110,28 +111,33 @@
       <h4 v-else-if="type==='update'" slot="title">修改套餐</h4>
       <h4 v-else slot="title">新增套餐</h4>
       <el-form :model="form">
-        <el-form-item
-          :label-width="formLabelWidth"
-          label="套餐名"
-        >
-          <el-input
-            v-model="form.setMealName"
-            autocomplete="off"
-          />
-        </el-form-item>
+        <div v-if="type!='detail'">
+          <el-form-item
+            :label-width="formLabelWidth"
+            label="套餐名"
+          >
+            <el-input
+              v-model="form.setMealName"
+              autocomplete="off"
+            />
+          </el-form-item>
 
-        <el-form-item
-          :label-width="formLabelWidth"
-          label="菜单编码"
-        >
-          <el-select v-model="form.sysCode" placeholder="请选择" @change="changeSysSelect">
-            <el-option
-              v-for="item in options"
-              :key="item.SysCode"
-              :label="item.SysName"
-              :value="item.SysCode"/>
-          </el-select>
-        </el-form-item>
+          <el-form-item
+            :label-width="formLabelWidth"
+            label="菜单编码"
+          >
+            <el-select v-model="form.sysCode" placeholder="请选择" @change="changeSysSelect">
+              <el-option
+                v-for="item in options"
+                :key="item.SysCode"
+                :label="item.SysName"
+                :value="item.SysCode"/>
+            </el-select>
+          </el-form-item>
+        </div>
+        <div v-else>
+          <span> {{ form.sysName }}  {{ form.setMealName }} </span>
+        </div>
       </el-form>
       <template>
         <div class="content">
@@ -141,14 +147,14 @@
               <el-col :span="7">菜单功能</el-col>
               <el-col :span="17">权限名称</el-col>
             </el-row>
-            <div v-for="(permissionTop, topIndex) in authData" :key="topIndex" >
+            <div v-for="(permissionTop, topIndex) in authData" :key="topIndex">
               <el-row>
                 <el-col :span="6">
                   <p class="checkGroup" style="width:99%;">
-                    <el-checkbox :indeterminate="permissionTop.indeterminate" :key="topIndex" v-model="permissionTop.mychecked" :label="permissionTop.permissionId" class="auth_check" @change="onChangeTop(topIndex, permissionTop.permissionId, $event)">{{ permissionTop.permissionName }}</el-checkbox>
+                    <el-checkbox :indeterminate="permissionTop.indeterminate" :key="topIndex" v-model="permissionTop.mychecked" :label="permissionTop.permissionId" :disabled="type=='detail'?true:false" class="auth_check" @change="onChangeTop(topIndex, permissionTop.permissionId, $event)">{{ permissionTop.permissionName }}</el-checkbox>
                 </p></el-col>
                 <el-col :span="18">
-                  <el-checkbox v-for="permissionSon in permissionTop.childrenList" v-model="permissionSon.mychecked" :label="permissionSon.permissionId" :key="permissionSon.permissionId" @change="onChangeSon(topIndex, permissionSon.permissionId, permissionTop.permissionId, $event)">{{ permissionSon.permissionName }}</el-checkbox>
+                  <el-checkbox v-for="permissionSon in permissionTop.childrenList" v-model="permissionSon.mychecked" :label="permissionSon.permissionId" :key="permissionSon.permissionId" :disabled="type=='detail'?true:false" @change="onChangeSon(topIndex, permissionSon.permissionId, permissionTop.permissionId, $event)">{{ permissionSon.permissionName }}</el-checkbox>
                 </el-col>
             </el-row></div>
           </div>
@@ -159,6 +165,7 @@
       >
         <el-button @click="handleCancle">取 消</el-button>
         <el-button
+          v-show="type!='detail'"
           type="primary"
           @click="saveData"
         >确 定</el-button>
@@ -360,6 +367,11 @@ export default {
     handleRowClick(row, event) {
       this.type = 'detail'
       this.dialogFormVisible = true
+      this.form.setMealName = row.SetMealName
+      this.form.sysName = row.SysName
+      getPerInfoBySysCodeUpdate(row.SysCode, row.SetMealCode).then(response => {
+        this.authData = response.Data
+      })
     }
   }
 }

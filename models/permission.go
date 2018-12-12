@@ -245,6 +245,6 @@ func CountPermissionInfo(menuName string, sysName string) (total int64) {
 
 func GetPerInfoBySysCode(SysCode string) (result []out.PermissionCheckInfo, err error) {
 	o := orm.NewOrm()
-	_, err = o.Raw("SELECT t1. NAME name ,t1.DisplayName display_name,GROUP_CONCAT(t2.NAME) code ,GROUP_CONCAT(t2.DisplayName) code_name FROM permission t1 LEFT JOIN permission t2 ON t1.MenuCode = t2.MenuCode WHERE t1.SysCode = t2.SysCode AND t1.IsMenu = 0 AND t1.SysCode = ? AND t2.IsMenu = 1 group by t1.Name", SysCode).QueryRows(&result)
+	_, err = o.Raw("SELECT t1. NAME name ,t1.DisplayName display_name,GROUP_CONCAT(t2.NAME) code ,GROUP_CONCAT(t2.DisplayName) code_name FROM permission t1 LEFT JOIN permission t2 ON t1.MenuCode = t2.MenuCode WHERE t1.SysCode = t2.SysCode AND t1.IsMenu = 0 AND t1.SysCode = ? AND t2.IsMenu = 1 group by t1.Name order by t1.MenuCode,t1.Id asc", SysCode).QueryRows(&result)
 	return result, err
 }

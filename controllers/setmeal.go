@@ -121,3 +121,27 @@ func (c *SetMealController) Delete() {
 	}
 	c.ServeJSON()
 }
+
+// UpdateSetMealInfo ...
+// @Title updateSetMealInfo
+// @Description 修改套餐的信息
+// @router /updateSetMealInfo [put]
+func (c *SetMealController) UpdateSetMealInfo() {
+	result := &out.OperResult{}
+	var v input.SetMeatInput
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
+		if _, err := models.UpdateSetMeal(&v); err == nil {
+			result.Result = 1
+			c.Data["json"] = result
+		} else {
+			result.Result = 0
+			result.Message = err.Error()
+			c.Data["json"] = result
+		}
+	} else {
+		result.Result = 0
+		result.Message = err.Error()
+		c.Data["json"] = result
+	}
+	c.ServeJSON()
+}

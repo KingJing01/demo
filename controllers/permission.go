@@ -200,3 +200,22 @@ func (c *PermissionController) GetPerInfoBySysCode() {
 	}
 	c.ServeJSON()
 }
+
+// 根据套餐编号和系统编号获取对应的权限
+// @router /getPerInfoBySysCodeUpdate [get]
+func (c *PermissionController) GetPerInfoBySysCodeUpdate() {
+	result := &out.OperResult{}
+	sysCode := c.GetString("sysCode")
+	setMealCode := c.GetString("setMealCode")
+	if data, err := models.GetPermBySetMealCode(setMealCode, sysCode); err == nil {
+		permissionList := tool.ParsePermissionDataForCheckboxUpdate(data)
+		result.Result = 1
+		result.Data = permissionList
+		c.Data["json"] = result
+	} else {
+		result.Result = 0
+		result.Message = err.Error()
+		c.Data["json"] = result
+	}
+	c.ServeJSON()
+}

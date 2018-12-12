@@ -36,7 +36,7 @@ func init() {
 // 获取套餐列表的信息
 func GetSetMealList(setMealName string, sysName string, offset int64, limit int64) (result []out.SetMealInfo, err error) {
 	o := orm.NewOrm()
-	var sql = "SELECT t1.Id id,t1.SetMealCode set_meal_code, t1.SetMealName set_meal_name, t2.SysName sys_name,t1.PermissionText permission_text,t1.IsDeleted is_deleted FROM setmeal t1 LEFT JOIN application t2 ON t1.SysCode = t2.SysCode "
+	var sql = "SELECT t1.Id id,t1.SetMealCode set_meal_code, t1.SetMealName set_meal_name, t2.SysName sys_name,t1.PermissionText permission_text,t1.IsDeleted is_deleted,t1.SysCode sys_code FROM setmeal t1 LEFT JOIN application t2 ON t1.SysCode = t2.SysCode "
 	conditions := []string{}
 	if setMealName != "" {
 		conditions = append(conditions, " t1.SetMealName like '%"+setMealName+"%'")
@@ -105,7 +105,7 @@ func AddSetMeal(setMeatInfo *input.SetMeatInput) (id int64, err error) {
 	return id, err
 }
 
-// 删除套餐信息
+// 禁用套餐信息
 func DeleteSetMeal(ids string) (err error) {
 	arr := strings.Split(ids, ",")
 	var param string
@@ -118,4 +118,21 @@ func DeleteSetMeal(ids string) (err error) {
 	o := orm.NewOrm()
 	_, err = o.Raw(sql, time.Now()).Exec()
 	return
+}
+
+func UpdateSetMeal(setMeatInfo *input.SetMeatInput) (id int64, err error) {
+	o := orm.NewOrm()
+	o.Raw("update setmeal set SetMealName=?,SysCode=?,LastModificationTime=?,PermissionText=? where Id=? ", setMeatInfo.SetMealName, setMeatInfo.SysCode, time.Now(), setMeatInfo.PerName, setMeatInfo.Id).Exec()
+	o.Raw("delete  from permissionpackage where SetMealCode= ?", setMeatInfo.SetMealCode).Exec()
+	//权限套餐关系数据录入
+	var permission []PermissionPackage
+	arr := strings.Split(setMeatInfo.PerId, ",")
+	for _, per := range arr {
+		var permObject PermissionPackage
+		permObject.PermissionCode = per
+		permObject.SetMealCode = setMeatInfo.SetMealCode
+		permission = append(permission, permObject)
+	}
+	id, err = o.InsertMulti(len(arr), permission)
+	return id, err
 }

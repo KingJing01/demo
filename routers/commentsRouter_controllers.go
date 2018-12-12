@@ -160,6 +160,15 @@ func init() {
             Filters: nil,
             Params: nil})
 
+    beego.GlobalControllerRouter["demo/controllers:PermissionController"] = append(beego.GlobalControllerRouter["demo/controllers:PermissionController"],
+        beego.ControllerComments{
+            Method: "GetPerInfoBySysCodeUpdate",
+            Router: `/getPerInfoBySysCodeUpdate`,
+            AllowHTTPMethods: []string{"get"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
     beego.GlobalControllerRouter["demo/controllers:RoleController"] = append(beego.GlobalControllerRouter["demo/controllers:RoleController"],
         beego.ControllerComments{
             Method: "Post",
@@ -228,6 +237,15 @@ func init() {
             Method: "Delete",
             Router: `/:id`,
             AllowHTTPMethods: []string{"delete"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
+    beego.GlobalControllerRouter["demo/controllers:SetMealController"] = append(beego.GlobalControllerRouter["demo/controllers:SetMealController"],
+        beego.ControllerComments{
+            Method: "UpdateSetMealInfo",
+            Router: `/updateSetMealInfo`,
+            AllowHTTPMethods: []string{"put"},
             MethodParams: param.Make(),
             Filters: nil,
             Params: nil})

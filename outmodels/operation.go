@@ -39,14 +39,16 @@ type SetMealInfo struct {
 	Id             int64
 	SetMealName    string
 	SetMealCode    string
+	SysCode        string
 	SysName        string
 	PermissionText string
 	IsDeleted      int64
 }
 
 type PermissionCheckInfo struct {
-	Name        string //菜单缩写 tms.order
+	Name        string // 菜单缩写 tms.order
 	DisplayName string // 菜单显示的中文名  订单管理
 	Code        string // 权限缩写  tms.order.update
 	CodeName    string // 权限中文  更新订单信息
+	Flag        string // 判断是否选中
 }

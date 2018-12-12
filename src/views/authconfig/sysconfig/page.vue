@@ -38,6 +38,7 @@
       :data="tableData"
       style="width: 90%"
       border
+      @row-dblclick="handleRowClick"
     >
       <el-table-column
         prop="SysCode"
@@ -90,9 +91,11 @@
       <!-- 弹出层 信息录入和修改  start -->
       <el-dialog
         :visible.sync="dialogFormVisible"
-        title="系统配置"
         width="40%"
-      >
+        @close="handleCloseDialog"
+      ><h4 v-if="type==='detail'" slot="title">系统详情</h4>
+        <h4 v-else-if="type==='update'" slot="title">修改系统</h4>
+        <h4 v-else slot="title">新增系统</h4>
         <el-form :model="form">
           <el-form-item
             :label-width="formLabelWidth"
@@ -109,6 +112,7 @@
             label="系统名称"
           >
             <el-input
+              :disabled="type=='detail'?true:false"
               v-model="form.sysName"
               autocomplete="off"
               @change="checkRepeat"
@@ -120,6 +124,7 @@
             label="系统地址"
           >
             <el-input
+              :disabled="type=='detail'?true:false"
               v-model="form.sysUrl"
               autocomplete="off"
             />
@@ -128,7 +133,7 @@
             :label-width="formLabelWidth"
             label=""
           >
-            <el-checkbox v-model="form.IsValid">是否有效</el-checkbox>
+            <el-checkbox v-model="form.IsValid" :disabled="type=='detail'?true:false">是否有效</el-checkbox>
           </el-form-item>
         </el-form>
         <div
@@ -169,7 +174,8 @@ export default {
       formLabelWidth: '120px',
       dialogInfoVisable: false,
       insertAct: true,
-      pageTotal: 0
+      pageTotal: 0,
+      type: 'insert'
     }
   },
   created() {
@@ -182,6 +188,7 @@ export default {
     },
     // 编辑事件
     handleClick(row) {
+      this.type = 'update'
       this.dialogFormVisible = true
       this.form.sysCode = row.SysCode
       this.form.sysName = row.SysName
@@ -238,7 +245,6 @@ export default {
             this.getList()
           })
         } else {
-          console.log('修改信息')
           updateSysInfo(this.form).then(response => {
             this.dialogFormVisible = false
             this.dialogInfoVisable = false
@@ -260,13 +266,28 @@ export default {
     },
     // dialog 取消按钮
     handleCancle() {
-      this.form.sysName = ''
-      this.form.sysCode = ''
-      this.form.IsValid = true
       this.dialogFormVisible = false
       this.dialogInfoVisable = false
+    },
+    // 双击点击事件
+    handleRowClick(row, event) {
+      this.type = 'detail'
+      this.dialogFormVisible = true
+      this.form.sysCode = row.SysCode
+      this.form.sysName = row.SysName
+      this.form.sysUrl = row.SysUrl
+      if (row.IsValid === 0) {
+        this.form.IsValid = true
+      } else {
+        this.form.IsValid = false
+      }
+    }, // 监听dialog的关闭事件
+    handleCloseDialog() {
+      this.form.sysName = ''
+      this.form.sysCode = ''
+      this.form.sysUrl = ''
+      this.form.IsValid = true
     }
-
   }
 }
 </script>

@@ -362,6 +362,7 @@ export default {
       this.form.sysCode = ''
       this.form.setMealName = ''
       this.authData = []
+      this.type = 'insert'
     },
     // 双击点击事件
     handleRowClick(row, event) {

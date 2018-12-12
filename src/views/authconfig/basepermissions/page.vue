@@ -105,7 +105,6 @@
           label="菜单编码"
         >
           <el-input
-            :disabled="true"
             v-model="form.menuCode"
             autocomplete="off"
           />

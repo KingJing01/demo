@@ -37,6 +37,7 @@ export function uniqueCheck(sysName) {
 
 // 修改系统信息
 export function updateSysInfo(info) {
+  debugger
   return request({
     url: '/application/' + info.id,
     method: 'put',

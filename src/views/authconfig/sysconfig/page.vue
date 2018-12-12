@@ -50,11 +50,15 @@
         align="center"
       />
       <el-table-column
+        prop="SysUrl"
+        label="系统地址"
+        align="center"
+      />
+      <el-table-column
         :formatter="formatText"
         prop="IsValid"
         label="是否有效"
         align="center"
-
       />
       <el-table-column
         prop="address"

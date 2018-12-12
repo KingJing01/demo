@@ -3,7 +3,7 @@
  */
 import request from '@/utils/request'
 
-// 获取菜单列表信息
+// 获取套餐列表信息
 export function getSetMealList(info) {
   return request({
     url: '/setmeal',
@@ -11,12 +11,18 @@ export function getSetMealList(info) {
     params: info
   })
 }
-
+// 新增套餐信息
 export function addSetMealInfo(info) {
   return request({
     url: '/setmeal',
     method: 'post',
-    data: info
+    data: {
+      'setMealName': info.setMealName,
+      'setMealCode': info.setMealCode,
+      'perId': info.perId,
+      'perName': info.perName,
+      'sysCode': info.sysCode
+    }
   })
 }
 

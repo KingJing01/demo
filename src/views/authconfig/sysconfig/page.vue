@@ -80,7 +80,6 @@
     <template>
       <div class="block">
         <el-pagination
-          :current-page.sync="currentPage1"
           :page-size="search.pageSize"
           :total="search.pageTotal"
           layout="total, prev, pager, next"
@@ -173,7 +172,6 @@ export default {
       dialogFormVisible: false,
       formLabelWidth: '120px',
       dialogInfoVisable: false,
-      insertAct: true,
       type: 'insert'
     }
   },
@@ -193,7 +191,6 @@ export default {
       this.form.sysName = row.SysName
       this.form.id = row.Id
       this.form.sysUrl = row.SysUrl
-      this.insertAct = false
       if (row.IsValid === 0) {
         this.form.IsValid = true
       } else {
@@ -206,13 +203,6 @@ export default {
         this.tableData = response.Data.list
         this.search.pageTotal = response.Data.total
       })
-    },
-    handleClose(done) {
-      this.form.sysName = ''
-      this.form.sysCode = ''
-      this.form.IsValid = true
-      this.dialogInfoVisable = false
-      done()
     },
     // 文本格式转换
     formatText(row, column) {
@@ -242,7 +232,7 @@ export default {
     // 保存系统信息
     saveData() {
       if (this.dialogInfoVisable === false) {
-        if (this.insertAct === true) {
+        if (this.type === 'insert') {
           saveSysInfo(this.form).then(response => {
             this.dialogFormVisible = false
             this.dialogInfoVisable = false
@@ -252,7 +242,6 @@ export default {
           updateSysInfo(this.form).then(response => {
             this.dialogFormVisible = false
             this.dialogInfoVisable = false
-            this.insertAct = true
             this.getList()
           })
         }
@@ -291,6 +280,7 @@ export default {
       this.form.sysCode = ''
       this.form.sysUrl = ''
       this.form.IsValid = true
+      this.type = 'insert'
     }
   }
 }

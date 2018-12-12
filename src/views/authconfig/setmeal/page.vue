@@ -91,10 +91,11 @@
     <!-- 分页控件  start -->
     <div class="block">
       <el-pagination
-        :page-size="20"
-        :pager-count="11"
-        :total="1000"
-        layout="prev, pager, next"/>
+        :page-size="search.pageSize"
+        :total="search.pageTotal"
+        layout="total, prev, pager, next"
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"/>
     </div>
     <el-row id="action_line">
       <el-button @click="dialogFormVisible = true">新增套餐</el-button>
@@ -124,7 +125,7 @@
 
           <el-form-item
             :label-width="formLabelWidth"
-            label="菜单编码"
+            label="系统名称"
           >
             <el-select v-model="form.sysCode" placeholder="请选择" @change="changeSysSelect">
               <el-option
@@ -182,12 +183,12 @@ import { transPermisionCheckedData } from '@/api/utils'
 export default {
   data() {
     return {
-      type: '',
+      type: 'insert',
       tableData: [],
       search: {
         setMealName: '',
         sysName: '',
-        pageSize: 10,
+        pageSize: 5,
         offset: 0
       },
       form: {
@@ -202,7 +203,6 @@ export default {
       dialogFormVisible: false,
       formLabelWidth: '120px',
       dialogInfoVisable: false,
-      insertAct: true,
       options: [],
       authData: [],
       multipleSelection: []
@@ -225,7 +225,6 @@ export default {
       this.form.setMealCode = row.SetMealCode
       this.form.sysCode = row.SysCode
       this.form.id = row.Id
-      this.insertAct = false
       getPerInfoBySysCodeUpdate(row.SysCode, row.SetMealCode).then(response => {
         this.authData = response.Data
       })
@@ -234,6 +233,7 @@ export default {
     getList() {
       getSetMealList(this.search).then(response => {
         this.tableData = response.Data.list
+        this.search.pageTotal = response.Data.total
       })
     },
     handleClose(done) {
@@ -254,7 +254,12 @@ export default {
       console.log(`每页 ${val} 条`)
     },
     handleCurrentChange(val) {
-      console.log(`当前页: ${val}`)
+      var pageSize = this.search.pageSize
+      this.search.offset = (val > 1 ? (val - 1) * pageSize : 0)
+      getSetMealList(this.search).then(response => {
+        this.tableData = response.Data.list
+        this.search.pageTotal = response.Data.total
+      })
     },
     // 保存系统信息
     saveData() {
@@ -270,7 +275,7 @@ export default {
       this.form.perName = transData.perName
       if (this.dialogInfoVisable === false) {
         // 新增操作
-        if (this.insertAct === true) {
+        if (this.type === 'insert') {
           addSetMealInfo(this.form).then(response => {
             this.dialogFormVisible = false
             this.getList()
@@ -281,7 +286,6 @@ export default {
             this.getList()
           })
         }
-        this.type = 'new'
       } else {
         console.log('修改信息')
       }

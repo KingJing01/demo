@@ -20,7 +20,8 @@ export function saveSysInfo(info) {
     method: 'post',
     data: {
       'SysName': info.sysName,
-      'IsValid': info.IsValid === true ? 0 : 1
+      'IsValid': info.IsValid === true ? 0 : 1,
+      'SysUrl': info.sysUrl
     }
   })
 }
@@ -37,7 +38,6 @@ export function uniqueCheck(sysName) {
 
 // 修改系统信息
 export function updateSysInfo(info) {
-  debugger
   return request({
     url: '/application/' + info.id,
     method: 'put',

@@ -29,9 +29,10 @@ type SelectInfo struct {
 // 权限系统 系统配置返回结构
 type SysInfo struct {
 	Id      int64
-	IsValid string
+	IsValid int
 	SysCode string
 	SysName string
+	SysUrl  string
 }
 
 //套餐返回结构

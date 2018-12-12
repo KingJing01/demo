@@ -182,3 +182,34 @@ func (c *ApplicationController) GetSelectData() {
 	}
 	c.ServeJSON()
 }
+
+// Put ...
+// @Title Put
+// @Description update the Application
+// @Param	id		path 	string	true		"The id you want to update"
+// @Param	body		body 	models.Application	true		"body for Application content"
+// @Success 200 {object} models.Application
+// @Failure 403 :id is not int
+// @router /:id [put]
+func (c *ApplicationController) Put() {
+	result := &out.OperResult{}
+	idStr := c.Ctx.Input.Param(":id")
+	id, _ := strconv.Atoi(idStr)
+	v := models.Application{Id: id}
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
+		v.LastModificationTime = time.Now()
+		if err := models.UpdateApplicationById(&v); err == nil {
+			result.Result = 1
+			c.Data["json"] = result
+		} else {
+			result.Result = 0
+			result.Message = err.Error()
+			c.Data["json"] = result
+		}
+	} else {
+		result.Result = 0
+		result.Message = err.Error()
+		c.Data["json"] = result
+	}
+	c.ServeJSON()
+}

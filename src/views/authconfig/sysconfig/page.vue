@@ -81,8 +81,8 @@
       <div class="block">
         <el-pagination
           :current-page.sync="currentPage1"
-          :page-size="5"
-          :total="pageTotal"
+          :page-size="search.pageSize"
+          :total="search.pageTotal"
           layout="total, prev, pager, next"
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"/>
@@ -159,7 +159,7 @@ export default {
       search: {
         sysCode: '',
         sysName: '',
-        pageSize: 10,
+        pageSize: 5,
         offset: 0
       },
       form: {
@@ -174,7 +174,6 @@ export default {
       formLabelWidth: '120px',
       dialogInfoVisable: false,
       insertAct: true,
-      pageTotal: 0,
       type: 'insert'
     }
   },
@@ -205,7 +204,7 @@ export default {
     getList() {
       getListData(this.search).then(response => {
         this.tableData = response.Data.list
-        this.pageTotal = response.Data.total
+        this.search.pageTotal = response.Data.total
       })
     },
     handleClose(done) {
@@ -233,7 +232,12 @@ export default {
       console.log(`每页 ${val} 条`)
     },
     handleCurrentChange(val) {
-      console.log(`当前页: ${val}`)
+      var pageSize = this.search.pageSize
+      this.search.offset = (val > 1 ? (val - 1) * pageSize : 0)
+      getListData(this.search).then(response => {
+        this.tableData = response.Data.list
+        this.search.pageTotal = response.Data.total
+      })
     },
     // 保存系统信息
     saveData() {

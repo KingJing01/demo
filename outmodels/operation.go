@@ -53,3 +53,13 @@ type PermissionCheckInfo struct {
 	CodeName    string // 权限中文  更新订单信息
 	Flag        string // 判断是否选中
 }
+
+// 平台用户管理 列表
+type UserManageInfo struct {
+	Id         int
+	TenantName string
+	SysName    string
+	SysCode    string
+	MenuText   string
+	Operator   string
+}

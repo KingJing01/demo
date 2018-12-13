@@ -1,9 +1,9 @@
 package models
 
 import (
-	"errors"
+	out "demo/outmodels"
 	"fmt"
-	"reflect"
+	"strconv"
 	"strings"
 	"time"
 
@@ -11,19 +11,22 @@ import (
 )
 
 type Tenant struct {
-	Id                   int       `orm:"column(id);auto"`
-	ConnectionString     string    `orm:"column(ConnectionString);size(1024);null"`
+	Id                   int       `orm:"column(Id);auto"`
+	TenancyName          string    `orm:"column(TenancyName);size(64)"`
+	TenantAddress        string    `orm:"column(TenantAddress);size(200)"`
+	OrganizationCode     string    `orm:"column(OrganizationCode);size(45)"`
+	BusinessLisenceUrl   string    `orm:"column(BusinessLisenceUrl);size(200)"`
+	TaxFileNumber        string    `orm:"column(TaxFileNumber);size(40)"`
+	LinkMan              string    `orm:"column(LinkMan);size(45)"`
+	LinkPhone            string    `orm:"column(LinkPhone);size(45)"`
+	Email                string    `orm:"column(Email);size(45)"`
+	IsDeleted            int8      `orm:"column(IsDeleted);0"`
 	CreationTime         time.Time `orm:"column(CreationTime);type(datetime)"`
 	CreatorUserId        int64     `orm:"column(CreatorUserId);null"`
-	DeleterUserId        int64     `orm:"column(DeleterUserId);null"`
-	DeletionTime         time.Time `orm:"column(DeletionTime);type(datetime);null"`
-	EditionId            int64     `orm:"column(EditionId);null"`
-	IsActive             int8      `orm:"column(IsActive)"`
-	IsDeleted            int8      `orm:"column(IsDeleted);0"`
-	LastModificationTime time.Time `orm:"column(LastModificationTime);type(datetime);null"`
+	LastModificationTime time.Time `orm:"column(LastModificationTime);type(datetime);"`
 	LastModifierUserId   int64     `orm:"column(LastModifierUserId);null"`
-	Name                 string    `orm:"column(Name);size(128)"`
-	TenancyName          string    `orm:"column(TenancyName);size(64)"`
+	DeleterUserId        int64     `orm:"column(DeleterUserId);null"`
+	DeletionTime         time.Time `orm:"column(DeletionTime);type(datetime);"`
 }
 
 func (t *Tenant) TableName() string {
@@ -54,102 +57,6 @@ func GetTenantById(id int) (v *Tenant, err error) {
 	return nil, err
 }
 
-//获取筛选条件下的数据总量
-func GetTotalTenant(query map[string]string) (total int64, err error) {
-	o := orm.NewOrm()
-	qs := o.QueryTable(new(Tenant))
-	// query k=v
-	for k, v := range query {
-		// rewrite dot-notation to Object__Attribute
-		k = strings.Replace(k, ".", "__", -1)
-		if strings.Contains(k, "isnull") {
-			qs = qs.Filter(k, (v == "true" || v == "1"))
-		} else {
-			qs = qs.Filter(k, v)
-		}
-	}
-	total, err = qs.Count()
-	return total, err
-}
-
-// GetAllTenant retrieves all Tenant matches certain condition. Returns empty list if
-// no records exist
-func GetAllTenant(query map[string]string, fields []string, sortby []string, order []string,
-	offset int64, limit int64) (ml []interface{}, err error) {
-	o := orm.NewOrm()
-	qs := o.QueryTable(new(Tenant))
-	// query k=v
-	for k, v := range query {
-		// rewrite dot-notation to Object__Attribute
-		k = strings.Replace(k, ".", "__", -1)
-		if strings.Contains(k, "isnull") {
-			qs = qs.Filter(k, (v == "true" || v == "1"))
-		} else {
-			qs = qs.Filter(k, v)
-		}
-	}
-	// order by:
-	var sortFields []string
-	if len(sortby) != 0 {
-		if len(sortby) == len(order) {
-			// 1) for each sort field, there is an associated order
-			for i, v := range sortby {
-				orderby := ""
-				if order[i] == "desc" {
-					orderby = "-" + v
-				} else if order[i] == "asc" {
-					orderby = v
-				} else {
-					return nil, errors.New("Error: Invalid order. Must be either [asc|desc]")
-				}
-				sortFields = append(sortFields, orderby)
-			}
-			qs = qs.OrderBy(sortFields...)
-		} else if len(sortby) != len(order) && len(order) == 1 {
-			// 2) there is exactly one order, all the sorted fields will be sorted by this order
-			for _, v := range sortby {
-				orderby := ""
-				if order[0] == "desc" {
-					orderby = "-" + v
-				} else if order[0] == "asc" {
-					orderby = v
-				} else {
-					return nil, errors.New("Error: Invalid order. Must be either [asc|desc]")
-				}
-				sortFields = append(sortFields, orderby)
-			}
-		} else if len(sortby) != len(order) && len(order) != 1 {
-			return nil, errors.New("Error: 'sortby', 'order' sizes mismatch or 'order' size is not 1")
-		}
-	} else {
-		if len(order) != 0 {
-			return nil, errors.New("Error: unused 'order' fields")
-		}
-	}
-
-	var l []Tenant
-	qs = qs.OrderBy(sortFields...)
-	if _, err = qs.Limit(limit, offset).All(&l, fields...); err == nil {
-		if len(fields) == 0 {
-			for _, v := range l {
-				ml = append(ml, v)
-			}
-		} else {
-			// trim unused fields
-			for _, v := range l {
-				m := make(map[string]interface{})
-				val := reflect.ValueOf(v)
-				for _, fname := range fields {
-					m[fname] = val.FieldByName(fname).Interface()
-				}
-				ml = append(ml, m)
-			}
-		}
-		return ml, nil
-	}
-	return nil, err
-}
-
 // UpdateTenant updates Tenant by Id and returns error if
 // the record to be updated doesn't exist
 func UpdateTenantById(m *Tenant) (err error) {
@@ -176,4 +83,45 @@ func DeleteTenant(id int) (err error) {
 		_, err = o.Raw("update tenant set IsDeleted=1 ,DeletionTime = ?  where Id= ? ", time.Now(), id).Exec()
 	}
 	return
+}
+
+// 获取列表的信息
+func GetTenantList(tenantName string, sysName string, offset int64, limit int64) (result []out.UserManageInfo, err error) {
+	o := orm.NewOrm()
+	var sql = `SELECT t1.Id id,t1.TenantName tenant_name,t3.SysName sys_name,t2.MenuText menu_text,t4.Name operator,t2.SysCode sys_code FROM tenant t1 LEFT JOIN tenantapplication t2 ON t1.Id = t2.TenantId
+		left join application t3 on t2.SysCode = t3.SysCode LEFT JOIN user t4 on t1.CreatorUserId = t4.id `
+	conditions := []string{}
+	if tenantName != "" {
+		conditions = append(conditions, " t1.TenantName like '%"+tenantName+"%'")
+	}
+	if sysName != "" {
+		conditions = append(conditions, " t3.SysName  like '%"+sysName+"%'")
+	}
+	if len(conditions) > 0 {
+		sql = sql + " where " + strings.Join(conditions, " and ")
+	}
+	sql = sql + " limit " + strconv.FormatInt(limit, 10) + "  offset " + strconv.FormatInt(offset, 10)
+	_, err = o.Raw(sql).QueryRows(&result)
+	return result, err
+}
+
+// 统计查询条件的数量
+func CountTenantInfo(tenantName string, sysName string) (total int64) {
+	o := orm.NewOrm()
+	conditions := []string{}
+	var sql = `SELECT count(0) total FROM tenant t1 LEFT JOIN tenantapplication t2 ON t1.Id = t2.TenantId
+	left join application t3 on t2.SysCode = t3.SysCode LEFT JOIN user t4 on t1.CreatorUserId = t4.id `
+	if tenantName != "" {
+		conditions = append(conditions, " t1.TenantName like '%"+tenantName+"%'")
+	}
+	if sysName != "" {
+		conditions = append(conditions, " t3.SysName  like '%"+sysName+"%'")
+	}
+	if len(conditions) > 0 {
+		sql = sql + " where " + strings.Join(conditions, " and ")
+	}
+	var maps []orm.Params
+	o.Raw(sql).Values(&maps)
+	total, _ = strconv.ParseInt(maps[0]["total"].(string), 10, 64)
+	return total
 }

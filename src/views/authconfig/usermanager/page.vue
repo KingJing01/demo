@@ -140,7 +140,6 @@ export default {
       },
       dialogTableVisible: false,
       dialogFormVisible: false,
-      formLabelWidth: '120px',
       dialogInfoVisable: false,
       type: 'insert'
     }

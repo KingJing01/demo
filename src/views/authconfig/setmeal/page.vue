@@ -191,7 +191,7 @@ export default {
       form: { },
       dialogTableVisible: false,
       dialogFormVisible: false,
-      formLabelWidth: '120px',
+      formLabelWidth: '100px',
       dialogInfoVisable: false,
       options: [],
       authData: [],

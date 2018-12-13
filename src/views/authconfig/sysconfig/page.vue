@@ -141,6 +141,7 @@
         >
           <el-button @click="handleCancle">取 消</el-button>
           <el-button
+            v-show="type!='detail'"
             type="primary"
             @click="saveData"
           >确 定</el-button>
@@ -213,7 +214,7 @@ export default {
     onReset() {
       this.search.sysCode = ''
       this.search.sysName = ''
-      this.search.pageSize = 10
+      this.search.pageSize = 5
       this.search.offset = 0
       this.dialogInfoVisable = false
       this.getList()

@@ -245,7 +245,7 @@ export default {
     onReset() {
       this.search.setMealName = ''
       this.search.sysName = ''
-      this.search.pageSize = 10
+      this.search.pageSize = 5
       this.search.offset = 0
       this.dialogInfoVisable = false
       this.getList()

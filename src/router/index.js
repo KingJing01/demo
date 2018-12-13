@@ -36,7 +36,7 @@ export const constantRouterMap = [
       component: () => import('@/views/dashboard/index')
     }]
   },
-  {
+  /* {
     path: '/example',
     component: Layout,
     redirect: '/example/table',
@@ -69,7 +69,7 @@ export const constantRouterMap = [
         meta: { title: 'Form', icon: 'form' }
       }
     ]
-  },
+  },*/
   {
     path: '/authconfig',
     component: Layout,
@@ -82,7 +82,7 @@ export const constantRouterMap = [
       }
     ]
   },
-  {
+  /* {
     path: '/nested',
     component: Layout,
     redirect: '/nested/menu1',
@@ -149,7 +149,7 @@ export const constantRouterMap = [
         meta: { title: 'External Link', icon: 'link' }
       }
     ]
-  },
+  },*/
 
   { path: '*', redirect: '/404', hidden: true }
 ]

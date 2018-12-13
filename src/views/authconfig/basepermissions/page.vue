@@ -72,10 +72,11 @@
     <!-- 分页控件  start -->
     <div class="block">
       <el-pagination
-        :page-size="20"
-        :pager-count="11"
-        :total="1000"
-        layout="prev, pager, next"/>
+        :page-size="search.pageSize"
+        :total="search.pageTotal"
+        layout="total, prev, pager, next"
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"/>
     </div>
     <el-row id="action_line">
       <el-button @click="dialogFormVisible = true"> 新增菜单</el-button>
@@ -86,9 +87,10 @@
     <!-- 弹出层 信息录入和修改  start -->
     <el-dialog
       :visible.sync="dialogFormVisible"
-      title="菜单配置"
       width="40%"
-    >
+    ><h4 v-if="type==='detail'" slot="title">菜单详情</h4>
+      <h4 v-else-if="type==='update'" slot="title">修改菜单</h4>
+      <h4 v-else slot="title">新增菜单</h4>
       <el-form :model="form">
         <el-form-item
           :label-width="formLabelWidth"
@@ -148,11 +150,12 @@ import { getMenuList } from '@/api/permission'
 export default {
   data() {
     return {
+      type: 'insert',
       tableData: [],
       search: {
         menuName: '',
         sysName: '',
-        pageSize: 10,
+        pageSize: 5,
         offset: 0
       },
       form: {
@@ -165,8 +168,7 @@ export default {
       dialogTableVisible: false,
       dialogFormVisible: false,
       formLabelWidth: '120px',
-      dialogInfoVisable: false,
-      insertAct: true
+      dialogInfoVisable: false
     }
   },
   created() {
@@ -179,12 +181,12 @@ export default {
     },
     // 编辑事件
     handleClick(row) {
+      this.type = 'update'
       this.dialogFormVisible = true
       this.form.sysCode = row.SysCode
       this.form.sysName = row.SysName
       this.form.id = row.Id
       this.form.sysUrl = row.SysUrl
-      this.insertAct = false
       if (row.IsValid === 0) {
         this.form.IsValid = true
       } else {
@@ -195,6 +197,7 @@ export default {
     getList() {
       getMenuList(this.search).then(response => {
         this.tableData = response.Data.list
+        this.search.pageTotal = response.Data.total
       })
     },
     handleClose(done) {
@@ -209,7 +212,7 @@ export default {
     onReset() {
       this.search.menuName = ''
       this.search.sysName = ''
-      this.search.pageSize = 10
+      this.search.pageSize = 5
       this.search.offset = 0
       this.dialogInfoVisable = false
       this.getList()
@@ -223,8 +226,8 @@ export default {
     // 保存系统信息
     saveData() {
       if (this.dialogInfoVisable === false) {
-        if (this.insertAct === true) {
-          console.log('修改信息')
+        if (this.type === 'insert') {
+          console.log('新增信息')
         } else {
           console.log('修改信息')
         }
@@ -236,11 +239,14 @@ export default {
     },
     // dialog 取消按钮
     handleCancle() {
-      this.form.sysName = ''
-      this.form.sysCode = ''
-      this.form.IsValid = true
       this.dialogFormVisible = false
       this.dialogInfoVisable = false
+    },
+    // 监听dialog的关闭事件
+    handleCloseDialog() {
+      this.form.sysName = ''
+      this.form.sysCode = ''
+      this.type = 'insert'
     }
 
   }

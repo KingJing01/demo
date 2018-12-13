@@ -94,104 +94,9 @@
       ><h4 v-if="type==='detail'" slot="title">用户详情</h4>
         <h4 v-else-if="type==='update'" slot="title">修改用户信息</h4>
         <h4 v-else slot="title">新增用户信息</h4>
-        <el-form :model="form">
-          <el-form-item
-            :label-width="formLabelWidth"
-            label="公司名称"
-          >
-            <el-input
-              v-model="form.tenantName"
-              auto-complete="off"
-            />
-          </el-form-item>
-          <el-form-item
-            :label-width="formLabelWidth"
-            label="公司地址"
-          >
-            <el-input
-              v-model="form.tenantAddress"
-              auto-complete="off"
-              @change="checkRepeat"
-            />
-          </el-form-item>
-          <el-form-item
-            :label-width="formLabelWidth"
-            label="系统地址"
-          >
-            <el-input
-              v-model="form.sysUrl"
-              auto-complete="off"
-            />
-          </el-form-item>
-          <el-row>
-            <el-col :span="12"><div class="grid-content bg-purple">  <el-form-item
-              :label-width="formLabelWidth"
-              label="组织机构代码"
-            >
-              <el-input
-                v-model="form.sysUrl"
-                auto-complete="off"
-              />
-            </el-form-item></div>
-            </el-col>
-            <el-col :span="12"><div class="grid-content bg-purple-light">  <el-form-item
-              :label-width="formLabelWidth"
-              label="营业执照"
-            >
-              <el-input
-                :disabled="type=='detail'?true:false"
-                v-model="form.sysUrl"
-                auto-complete="off"
-              />
-            </el-form-item></div></el-col>
-          </el-row>
-          <el-row>
-            <el-col :span="12"><div class="grid-content bg-purple">  <el-form-item
-              :label-width="formLabelWidth"
-              label="公司税号"
-            >
-              <el-input
-                :disabled="type=='detail'?true:false"
-                v-model="form.sysUrl"
-                auto-complete="off"
-              />
-            </el-form-item></div>
-            </el-col>
-            <el-col :span="12"><div class="grid-content bg-purple-light">  <el-form-item
-              :label-width="formLabelWidth"
-              label="公司联系人"
-            >
-              <el-input
-                :disabled="type=='detail'?true:false"
-                v-model="form.sysUrl"
-                auto-complete="off"
-              />
-            </el-form-item></div></el-col>
-          </el-row>
-          <el-row>
-            <el-col :span="12"><div class="grid-content bg-purple">  <el-form-item
-              :label-width="formLabelWidth"
-              label="联系电话"
-            >
-              <el-input
-                :disabled="type=='detail'?true:false"
-                v-model="form.sysUrl"
-                auto-complete="off"
-              />
-            </el-form-item></div>
-            </el-col>
-            <el-col :span="12"><div class="grid-content bg-purple-light">  <el-form-item
-              :label-width="formLabelWidth"
-              label="联系邮箱"
-            >
-              <el-input
-                :disabled="type=='detail'?true:false"
-                v-model="form.sysUrl"
-                auto-complete="off"
-              />
-            </el-form-item></div></el-col>
-          </el-row>
-        </el-form>
+        <div v-if="type==='detail'"><DetailPage :data="form"/></div>
+        <div v-else-if="type==='update'"><UpdatePage :data="form"/></div>
+        <div v-else><SavePage :data="form"/></div>
         <div
           slot="footer"
           class="dialog-footer"
@@ -210,7 +115,13 @@
 <script>
 import { getListData, saveSysInfo, uniqueCheck, updateSysInfo } from '@/api/sysconfig'
 import { getUserList } from '@/api/usermanage'
+
+import DetailPage from './dialogview/detail'
+import SavePage from './dialogview/save'
+import UpdatePage from './dialogview/update'
+
 export default {
+  components: { DetailPage, SavePage, UpdatePage },
   data() {
     return {
       tableData: [],

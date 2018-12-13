@@ -56,7 +56,6 @@
         label="系统名称"
         align="center"
       /><el-table-column
-        v-if="hide"
         prop="SysCode"
         label="系统编码"
         align="center"
@@ -111,7 +110,7 @@
     > <h4 v-if="type==='detail'" slot="title">套餐详情</h4>
       <h4 v-else-if="type==='update'" slot="title">修改套餐</h4>
       <h4 v-else slot="title">新增套餐</h4>
-      <el-form :model="form">
+      <el-form :model="form" size="small">
         <div v-if="type!='detail'">
           <el-form-item
             :label-width="formLabelWidth"
@@ -119,7 +118,7 @@
           >
             <el-input
               v-model="form.setMealName"
-              autocomplete="off"
+              auto-complete="off"
             />
           </el-form-item>
 

@@ -95,7 +95,7 @@
       ><h4 v-if="type==='detail'" slot="title">系统详情</h4>
         <h4 v-else-if="type==='update'" slot="title">修改系统</h4>
         <h4 v-else slot="title">新增系统</h4>
-        <el-form :model="form">
+        <el-form :model="form" size="small">
           <el-form-item
             :label-width="formLabelWidth"
             label="系统代码"

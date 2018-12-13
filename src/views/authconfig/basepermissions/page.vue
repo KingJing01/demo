@@ -87,11 +87,11 @@
     <!-- 弹出层 信息录入和修改  start -->
     <el-dialog
       :visible.sync="dialogFormVisible"
-      width="40%"
+      width="30%"
     ><h4 v-if="type==='detail'" slot="title">菜单详情</h4>
       <h4 v-else-if="type==='update'" slot="title">修改菜单</h4>
       <h4 v-else slot="title">新增菜单</h4>
-      <el-form :model="form">
+      <el-form :model="form" size="small">
         <el-form-item
           :label-width="formLabelWidth"
           label="系统名称"

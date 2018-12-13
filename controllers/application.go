@@ -85,7 +85,7 @@ func (c *ApplicationController) GetOne() {
 // @Description get Application
 // @Param	sysCode	query	string	false	""
 // @Param	sysName	query	string	false	""
-// @Param	limit	query	string	false	"Limit the size of result set. Must be an integer"
+// @Param	pageSize	query	string	false	"Limit the size of result set. Must be an integer"
 // @Param	offset	query	string	false	"Start position of result set. Must be an integer"
 // @Success 200 {object} models.Application
 // @Failure 403

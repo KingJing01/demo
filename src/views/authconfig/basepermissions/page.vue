@@ -99,7 +99,7 @@
           <el-input
             :disabled="true"
             v-model="form.sysName"
-            autocomplete="off"
+            auto-complete="off"
           />
         </el-form-item>
         <el-form-item
@@ -108,7 +108,7 @@
         >
           <el-input
             v-model="form.menuCode"
-            autocomplete="off"
+            auto-complete="off"
           />
         </el-form-item>
         <el-form-item
@@ -117,7 +117,7 @@
         >
           <el-input
             v-model="form.menuName"
-            autocomplete="off"
+            auto-complete="off"
           />
         </el-form-item>
         <el-form-item
@@ -127,7 +127,7 @@
           <el-input
             :disabled="true"
             v-model="form.menuText"
-            autocomplete="off"
+            auto-complete="off"
           />
         </el-form-item>
       </el-form>
@@ -153,17 +153,10 @@ export default {
       type: 'insert',
       tableData: [],
       search: {
-        menuName: '',
-        sysName: '',
         pageSize: 5,
         offset: 0
       },
       form: {
-        id: '',
-        sysName: '',
-        menuCode: '',
-        sysUrl: '',
-        IsValid: true
       },
       dialogTableVisible: false,
       dialogFormVisible: false,
@@ -210,10 +203,7 @@ export default {
 
     // 重置按钮
     onReset() {
-      this.search.menuName = ''
-      this.search.sysName = ''
-      this.search.pageSize = 5
-      this.search.offset = 0
+      this.search = { pageSize: 5, offset: 0 }
       this.dialogInfoVisable = false
       this.getList()
     },
@@ -244,8 +234,7 @@ export default {
     },
     // 监听dialog的关闭事件
     handleCloseDialog() {
-      this.form.sysName = ''
-      this.form.sysCode = ''
+      this.form = {}
       this.type = 'insert'
     }
 

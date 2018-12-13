@@ -103,7 +103,7 @@
             <el-input
               :disabled="true"
               v-model="form.sysCode"
-              autocomplete="off"
+              auto-complete="off"
             />
           </el-form-item>
           <el-form-item
@@ -113,7 +113,7 @@
             <el-input
               :disabled="type=='detail'?true:false"
               v-model="form.sysName"
-              autocomplete="off"
+              auto-complete="off"
               @change="checkRepeat"
             />
             <span v-if= "dialogInfoVisable==true" id="dialogInfo">系统名称已经存在,请重新输入</span>
@@ -125,7 +125,7 @@
             <el-input
               :disabled="type=='detail'?true:false"
               v-model="form.sysUrl"
-              autocomplete="off"
+              auto-complete="off"
             />
           </el-form-item>
           <el-form-item
@@ -157,16 +157,10 @@ export default {
     return {
       tableData: [],
       search: {
-        sysCode: '',
-        sysName: '',
         pageSize: 5,
         offset: 0
       },
       form: {
-        id: '',
-        sysName: '',
-        sysCode: '',
-        sysUrl: '',
         IsValid: true
       },
       dialogTableVisible: false,
@@ -212,10 +206,7 @@ export default {
     },
     // 重置按钮
     onReset() {
-      this.search.sysCode = ''
-      this.search.sysName = ''
-      this.search.pageSize = 5
-      this.search.offset = 0
+      this.search = { pageSize: 5, offset: 0 }
       this.dialogInfoVisable = false
       this.getList()
     },
@@ -277,10 +268,7 @@ export default {
       }
     }, // 监听dialog的关闭事件
     handleCloseDialog() {
-      this.form.sysName = ''
-      this.form.sysCode = ''
-      this.form.sysUrl = ''
-      this.form.IsValid = true
+      this.form = { IsValid: true }
       this.type = 'insert'
     }
   }

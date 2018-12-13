@@ -62,10 +62,10 @@
         align="center"
       />
       <el-table-column
+        :show-overflow-tooltip="true"
         prop="PermissionText"
         label="操作名称"
         align="center"
-        show-overflow-tooltip="true"
       />
       <el-table-column
         :formatter="formatText"
@@ -186,19 +186,10 @@ export default {
       type: 'insert',
       tableData: [],
       search: {
-        setMealName: '',
-        sysName: '',
         pageSize: 5,
         offset: 0
       },
-      form: {
-        perName: '',
-        setMealName: '',
-        setMealCode: '',
-        perId: '',
-        sysCode: '',
-        id: ''
-      },
+      form: { },
       dialogTableVisible: false,
       dialogFormVisible: false,
       formLabelWidth: '120px',
@@ -243,10 +234,7 @@ export default {
 
     // 重置按钮
     onReset() {
-      this.search.setMealName = ''
-      this.search.sysName = ''
-      this.search.pageSize = 5
-      this.search.offset = 0
+      this.search = { pageSize: 5, offset: 0 }
       this.dialogInfoVisable = false
       this.getList()
     },
@@ -361,10 +349,7 @@ export default {
     },
     // 监听dialog的关闭事件
     handleCloseDialog() {
-      this.form.perName = ''
-      this.form.perId = ''
-      this.form.sysCode = ''
-      this.form.setMealName = ''
+      this.form = {}
       this.authData = []
       this.type = 'insert'
     },

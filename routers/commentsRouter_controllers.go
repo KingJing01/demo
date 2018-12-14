@@ -349,6 +349,15 @@ func init() {
             Filters: nil,
             Params: nil})
 
+    beego.GlobalControllerRouter["demo/controllers:TenantController"] = append(beego.GlobalControllerRouter["demo/controllers:TenantController"],
+        beego.ControllerComments{
+            Method: "GetTenantPermission",
+            Router: `/getTenantPermission`,
+            AllowHTTPMethods: []string{"get"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
     beego.GlobalControllerRouter["demo/controllers:UserController"] = append(beego.GlobalControllerRouter["demo/controllers:UserController"],
         beego.ControllerComments{
             Method: "Post",

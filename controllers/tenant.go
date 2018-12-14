@@ -3,6 +3,7 @@ package controllers
 import (
 	"demo/models"
 	out "demo/outmodels"
+	tool "demo/tools"
 	"encoding/json"
 	"strconv"
 	"time"
@@ -22,6 +23,7 @@ func (c *TenantController) URLMapping() {
 	c.Mapping("GetAll", c.GetAll)
 	c.Mapping("Put", c.Put)
 	c.Mapping("Delete", c.Delete)
+	c.Mapping("GetTenantPermission", c.GetTenantPermission)
 }
 
 // Post ...
@@ -61,7 +63,7 @@ func (c *TenantController) Post() {
 // @router /:id [get]
 func (c *TenantController) GetOne() {
 	result := &out.OperResult{}
-	sysCode := c.GetString("sysCode")
+	//sysCode := c.GetString("sysCode")
 	idStr := c.Ctx.Input.Param(":id")
 	id, _ := strconv.Atoi(idStr)
 	v, err := models.GetTenantById(id)
@@ -178,6 +180,33 @@ func (c *TenantController) Delete() {
 	} else {
 		result.Result = 0
 		result.Message = err.Error()
+		c.Data["json"] = result
+	}
+	c.ServeJSON()
+}
+
+// GetTenantPermission ...
+// @Title GetTenantPermission
+// @Description 获取企业所有的权限信息
+// @Param	sysCode path 	string	true		"The id you want to update"
+// @Param	tenId  path 	string	true		"The id you want to update"
+// @Success 200 {string} delete success!
+// @Failure 403 id is empty
+// @router /getTenantPermission [get]
+func (c *TenantController) GetTenantPermission() {
+	result := &out.OperResult{}
+	sysCode := c.GetString("sysCode")
+	idStr := c.GetString("tenId")
+	id, _ := strconv.Atoi(idStr)
+	v, err := models.GetPerInfoForTenant(sysCode, id)
+	if err != nil {
+		result.Result = 0
+		result.Message = err.Error()
+		c.Data["json"] = result
+	} else {
+		permissionList := tool.ParsePermissionDataForCheckboxUpdate(v)
+		result.Result = 1
+		result.Data = permissionList
 		c.Data["json"] = result
 	}
 	c.ServeJSON()

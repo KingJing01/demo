@@ -26,7 +26,7 @@ func AddPermissionPackage(p *PermissionPackage) (id int64, err error) {
 	return
 }
 
-func GetPermBySetMealCode(setMeatCode string, sysCode string) (result []out.PermissionCheckInfo, err error) {
+func gitGetPermBySetMealCode(setMeatCode string, sysCode string) (result []out.PermissionCheckInfo, err error) {
 	o := orm.NewOrm()
 	_, err = o.Raw(`SELECT t3.NAME name,t3.DisplayName display_name ,GROUP_CONCAT(t1. NAME) code,GROUP_CONCAT(t1.DisplayName) code_name,
 		GROUP_CONCAT(CASE WHEN t2.PermissionCode IS NULL THEN 	0 	ELSE 1 END ) flag FROM (SELECT  Id, NAME,DisplayName,MenuCode FROM

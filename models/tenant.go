@@ -12,7 +12,7 @@ import (
 
 type Tenant struct {
 	Id                   int       `orm:"column(Id);auto"`
-	TenancyName          string    `orm:"column(TenancyName);size(64)"`
+	TenantName           string    `orm:"column(TenantName);size(64)"`
 	TenantAddress        string    `orm:"column(TenantAddress);size(200)"`
 	OrganizationCode     string    `orm:"column(OrganizationCode);size(45)"`
 	BusinessLisenceUrl   string    `orm:"column(BusinessLisenceUrl);size(200)"`

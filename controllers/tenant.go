@@ -61,6 +61,7 @@ func (c *TenantController) Post() {
 // @router /:id [get]
 func (c *TenantController) GetOne() {
 	result := &out.OperResult{}
+	sysCode := c.GetString("sysCode")
 	idStr := c.Ctx.Input.Param(":id")
 	id, _ := strconv.Atoi(idStr)
 	v, err := models.GetTenantById(id)

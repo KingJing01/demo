@@ -94,7 +94,7 @@
       ><h4 v-if="type==='detail'" slot="title">用户详情</h4>
         <h4 v-else-if="type==='update'" slot="title">修改用户信息</h4>
         <h4 v-else slot="title">新增用户信息</h4>
-        <div v-if="type==='detail'"><DetailPage :data="form"/></div>
+        <div v-if="type==='detail'"><DetailPage :data="{id:form.id,sysCode:form.sysCode}"/></div>
         <div v-else-if="type==='update'"><UpdatePage :data="form"/></div>
         <div v-else><SavePage :data="form"/></div>
         <div

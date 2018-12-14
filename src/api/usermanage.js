@@ -10,12 +10,20 @@ export function getUserList(info) {
   })
 }
 
-export function getUserInfo(info) {
+export function getUserInfo(tenId) {
   return request({
-    url: '/tenant/' + info.tenId,
+    url: '/tenant/' + tenId,
+    method: 'get'
+  })
+}
+
+export function getUserPermission(info) {
+  return request({
+    url: '/tenant/getTenantPermission',
     method: 'get',
     params: {
-      sysCode: info.sysCode
+      sysCode: info.sysCode,
+      tenId: info.tenId
     }
   })
 }

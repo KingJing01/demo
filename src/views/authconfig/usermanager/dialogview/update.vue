@@ -19,7 +19,7 @@
       />
     </el-form-item>
     <el-row>
-      <el-col :span="12"><div class="grid-content bg-purple">  <el-form-item
+      <el-col :span="12"><div class="grid-content bg-purple"> <el-form-item
         :label-width="formLabelWidth"
         label="组织机构代码"
       >
@@ -37,7 +37,7 @@
           v-model="formData.BusinessLisenceUrl"
           auto-complete="off"
         />
-      </el-form-item></div></el-col>
+      </el-form-item></el-col>
     </el-row>
     <el-row>
       <el-col :span="12"> <el-form-item
@@ -92,10 +92,10 @@
           <el-row>
             <el-col :span="6">
               <p class="checkGroup" style="width:99%;">
-                <el-checkbox :indeterminate="permissionTop.indeterminate" :key="topIndex" v-model="permissionTop.mychecked" :label="permissionTop.permissionId" :disabled="type=='detail'?true:false" class="auth_check" @change="onChangeTop(topIndex, permissionTop.permissionId, $event)">{{ permissionTop.permissionName }}</el-checkbox>
+                <el-checkbox :indeterminate="permissionTop.indeterminate" :key="topIndex" v-model="permissionTop.mychecked" :label="permissionTop.permissionId" class="auth_check" @change="onChangeTop(topIndex, permissionTop.permissionId, $event)">{{ permissionTop.permissionName }}</el-checkbox>
             </p></el-col>
             <el-col :span="18">
-              <el-checkbox v-for="permissionSon in permissionTop.childrenList" v-model="permissionSon.mychecked" :label="permissionSon.permissionId" :key="permissionSon.permissionId" :disabled="type=='detail'?true:false" @change="onChangeSon(topIndex, permissionSon.permissionId, permissionTop.permissionId, $event)">{{ permissionSon.permissionName }}</el-checkbox>
+              <el-checkbox v-for="permissionSon in permissionTop.childrenList" v-model="permissionSon.mychecked" :label="permissionSon.permissionId" :key="permissionSon.permissionId" @change="onChangeSon(topIndex, permissionSon.permissionId, permissionTop.permissionId, $event)">{{ permissionSon.permissionName }}</el-checkbox>
             </el-col>
         </el-row></div>
       </div>
@@ -103,7 +103,7 @@
   </el-form>
 </template>
 <script>
-import { getUserInfo } from '@/api/usermanage'
+import { getUserInfo, getUserPermission } from '@/api/usermanage'
 export default {
   props: {
     data: {
@@ -127,9 +127,41 @@ export default {
   },
   methods: {
     getUserData() {
-      getUserInfo(this.search).then(response => {
+      getUserInfo(this.search.tenId).then(response => {
         this.formData = response.Data
       })
+      getUserPermission(this.search).then(response => {
+        this.authData = response.Data
+      })
+    },
+    onChangeTop(index, topId, e) { // 父级change事件
+      this.authData[index].mychecked = e// 父级勾选后，子级全部勾选或者取消
+      if (e === false) this.authData[index].indeterminate = false // 去掉不确定状态
+      var childrenArray = this.authData[index].childrenList
+      if (childrenArray) {
+        for (var i = 0, len = childrenArray.length; i < len; i++) { childrenArray[i].mychecked = e }
+      }
+    },
+    onChangeSon(topIndex, sonId, topId, e) { // 子级change事件
+      var childrenArray = this.authData[topIndex].childrenList
+      var tickCount = 0
+      var unTickCount = 0
+      var len = childrenArray.length
+      for (var i = 0; i < len; i++) {
+        if (sonId === childrenArray[i].permissionId) childrenArray[i].mychecked = e
+        if (childrenArray[i].mychecked === true) tickCount++
+        if (childrenArray[i].mychecked === false) unTickCount++
+      }
+      if (tickCount === len) { // 子级全勾选
+        this.authData[topIndex].mychecked = true
+        this.authData[topIndex].indeterminate = false
+      } else if (unTickCount === len) { // 子级全不勾选
+        this.authData[topIndex].mychecked = false
+        this.authData[topIndex].indeterminate = false
+      } else {
+        this.authData[topIndex].mychecked = true
+        this.authData[topIndex].indeterminate = true // 添加不确定状态
+      }
     }
   }
 }
@@ -140,5 +172,7 @@ export default {
     margin-bottom: 0;
   }
 }
-
+.el-checkbox{
+  margin:2% 5%
+}
 </style>

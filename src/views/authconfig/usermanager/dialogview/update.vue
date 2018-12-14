@@ -104,6 +104,7 @@
 </template>
 <script>
 import { getUserInfo, getUserPermission } from '@/api/usermanage'
+import { transPermisionCheckedData } from '@/api/utils'
 export default {
   props: {
     data: {
@@ -124,6 +125,7 @@ export default {
   },
   created() {
     this.getUserData()
+    this.returnData()
   },
   methods: {
     getUserData() {
@@ -162,6 +164,10 @@ export default {
         this.authData[topIndex].mychecked = true
         this.authData[topIndex].indeterminate = true // 添加不确定状态
       }
+    },
+    returnData() {
+      var transData = transPermisionCheckedData(this.authData)
+      this.$emit('returnData', { 'formData': this.formData, 'transData': transData })
     }
   }
 }

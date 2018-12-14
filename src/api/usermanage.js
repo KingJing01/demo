@@ -27,3 +27,11 @@ export function getUserPermission(info) {
     }
   })
 }
+
+export function updateTenantInfo(info) {
+  return request({
+    url: '/tenant/' + info.tenId,
+    method: 'post',
+    data: info
+  })
+}

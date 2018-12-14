@@ -94,9 +94,9 @@
       ><h4 v-if="type==='detail'" slot="title">用户详情</h4>
         <h4 v-else-if="type==='update'" slot="title">修改用户信息</h4>
         <h4 v-else slot="title">新增用户信息</h4>
-        <div v-if="type==='detail'"><DetailPage :data="{id:form.id,sysCode:form.sysCode}"/></div>
+        <div v-if="type==='detail'"><DetailPage :data="form" /></div>
         <div v-else-if="type==='update'"><UpdatePage :data="form"/></div>
-        <div v-else><SavePage :data="form"/></div>
+        <div v-else><SavePage /></div>
         <div
           slot="footer"
           class="dialog-footer"
@@ -113,8 +113,8 @@
   </template></div>
 </template>
 <script>
-import { getListData, saveSysInfo, uniqueCheck, updateSysInfo } from '@/api/sysconfig'
-import { getUserList } from '@/api/usermanage'
+import { getListData, saveSysInfo } from '@/api/sysconfig'
+import { getUserList, updateTenantInfo } from '@/api/usermanage'
 
 import DetailPage from './dialogview/detail'
 import SavePage from './dialogview/save'
@@ -131,13 +131,7 @@ export default {
         pageSize: 5,
         offset: 0
       },
-      form: {
-        id: '',
-        tenantName: '',
-        tenantAddress: '',
-        sysUrl: '',
-        IsValid: true
-      },
+      form: { },
       dialogTableVisible: false,
       dialogFormVisible: false,
       dialogInfoVisable: false,
@@ -155,16 +149,9 @@ export default {
     // 编辑事件
     handleClick(row) {
       this.type = 'update'
-      this.dialogFormVisible = true
-      this.form.sysCode = row.SysCode
-      this.form.sysName = row.SysName
       this.form.id = row.Id
-      this.form.sysUrl = row.SysUrl
-      if (row.IsValid === 0) {
-        this.form.IsValid = true
-      } else {
-        this.form.IsValid = false
-      }
+      this.form.sysCode = row.SysCode
+      this.dialogFormVisible = true
     },
     // 获取列表数据
     getList() {
@@ -172,11 +159,6 @@ export default {
         this.tableData = response.Data.list
         this.search.pageTotal = response.Data.total
       })
-    },
-    // 文本格式转换
-    formatText(row, column) {
-      const data = row[column.property]
-      return data === 0 ? '是' : '否'
     },
     // 重置按钮
     onReset() {
@@ -198,58 +180,39 @@ export default {
         this.search.pageTotal = response.Data.total
       })
     },
-    // 保存系统信息
+    // 保存/修改用户信息
     saveData() {
-      if (this.dialogInfoVisable === false) {
-        if (this.type === 'insert') {
-          saveSysInfo(this.form).then(response => {
-            this.dialogFormVisible = false
-            this.dialogInfoVisable = false
-            this.getList()
-          })
-        } else {
-          updateSysInfo(this.form).then(response => {
-            this.dialogFormVisible = false
-            this.dialogInfoVisable = false
-            this.getList()
-          })
-        }
+      debugger
+      if (this.type === 'insert') {
+        saveSysInfo(this.form).then(response => {
+          this.dialogFormVisible = false
+          this.getList()
+        })
+      } else {
+        updateTenantInfo(this.form).then(response => {
+          this.dialogFormVisible = false
+          this.getList()
+        })
       }
-    },
-    // 系统信息验重
-    checkRepeat() {
-      uniqueCheck(this.form.sysName).then(response => {
-        if (response.Result > 0) {
-          this.dialogInfoVisable = true
-        } else {
-          this.dialogInfoVisable = false
-        }
-      })
     },
     // dialog 取消按钮
     handleCancle() {
       this.dialogFormVisible = false
-      this.dialogInfoVisable = false
     },
     // 双击点击事件
     handleRowClick(row, event) {
-      this.type = 'detail'
       this.dialogFormVisible = true
+      this.type = 'detail'
       this.form.sysCode = row.SysCode
-      this.form.sysName = row.SysName
-      this.form.sysUrl = row.SysUrl
-      if (row.IsValid === 0) {
-        this.form.IsValid = true
-      } else {
-        this.form.IsValid = false
-      }
+      this.form.id = row.Id
     }, // 监听dialog的关闭事件
     handleCloseDialog() {
-      this.form.sysName = ''
-      this.form.sysCode = ''
-      this.form.sysUrl = ''
-      this.form.IsValid = true
+      this.form = {}
       this.type = 'insert'
+    },
+    // 子界面的返回数据
+    returnData() {
+
     }
   }
 }

@@ -198,9 +198,9 @@ func GetPermissionByUserAndPermission(userid int64, permissionName string) (p *P
 	return p, nil
 }
 
-func GetPermissionByUser(userid int64, sysId string) (permissions []Permission, num int64) {
+func GetPermissionByUser(userid int64, sysCode string) (permissions []Permission, num int64) {
 	o := orm.NewOrm()
-	num, _ = o.QueryTable("permission").Filter("UserId", userid).Filter("SysId", sysId).All(&permissions)
+	num, _ = o.QueryTable("permission").Filter("UserId", userid).Filter("SysCode", sysCode).All(&permissions)
 	return permissions, num
 }
 
@@ -247,4 +247,9 @@ func GetPerInfoBySysCode(SysCode string) (result []out.PermissionCheckInfo, err 
 	o := orm.NewOrm()
 	_, err = o.Raw("SELECT t1. NAME name ,t1.DisplayName display_name,GROUP_CONCAT(t2.NAME) code ,GROUP_CONCAT(t2.DisplayName) code_name FROM permission t1 LEFT JOIN permission t2 ON t1.MenuCode = t2.MenuCode WHERE t1.SysCode = t2.SysCode AND t1.IsMenu = 0 AND t1.SysCode = ? AND t2.IsMenu = 1 group by t1.Name order by t1.MenuCode,t1.Id asc", SysCode).QueryRows(&result)
 	return result, err
+}
+
+//根据租户id和系统编号 修改租户下的权限信息
+func UpdateTenantPerission(sysCode string, tenId string) {
+
 }

@@ -95,7 +95,7 @@ func (tc *AuthorityManageController) Login() {
 			tc.ServeJSON()
 			return
 		}
-		resultSysID := valid.Required(l.SysID, "sysId").Message("系统号不能为空")
+		resultSysID := valid.Required(l.SysCode, "sysCode").Message("系统号不能为空")
 		if resultSysID.Ok == false {
 			lresult.Result = 0
 			lresult.Message = resultSysID.Error.Message
@@ -103,7 +103,7 @@ func (tc *AuthorityManageController) Login() {
 			tc.ServeJSON()
 			return
 		}
-		result, user, err := models.LoginCheck(l.UserName, l.Password, l.SysID)
+		result, user, err := models.LoginCheck(l.UserName, l.Password, l.SysCode)
 		respmessage := ""
 		if result == false {
 			if err == nil {
@@ -125,7 +125,7 @@ func (tc *AuthorityManageController) Login() {
 		token.Claims = claims
 		tokenString, err := token.SignedString([]byte(SecretKey))
 		//获取用户对应的系统权限
-		permissions, _ := models.GetPermissionByUser(user.Id, l.SysID)
+		permissions, _ := models.GetPermissionByUser(user.Id, l.SysCode)
 		permissionData, err := json.Marshal(permissions)
 		// 设置 user 信息
 		/*var userOut out.UserInfoToken
@@ -136,11 +136,13 @@ func (tc *AuthorityManageController) Login() {
 		jsonUser, _ := json.Marshal(userOut)
 		tokenMap["userInfo"] = string(jsonUser)*/
 		tools.InitRedis()
-		skey := fmt.Sprintf("%s_%s", tokenString, l.SysID)
+		skey := fmt.Sprintf("%s_%s", tokenString, l.SysCode)
 		tools.Globalcluster.Do("set", skey, permissionData)
 		//tokenInfo, _ := json.Marshal(tokenMap)
-		tools.Globalcluster.Do("set", tokenString, user.SsoID)
-		tools.Globalcluster.Do("EXPIRE", tokenString, 12*3600)
+		_, err2 := tools.Globalcluster.Do("set", tokenString, user.SsoID)
+		fmt.Print(err2)
+		_, err1 := tools.Globalcluster.Do("EXPIRE", tokenString, 12*3600)
+		fmt.Print(err1)
 		tools.Globalcluster.Close()
 		lresult.Result = 1
 		lresult.Token = tokenString

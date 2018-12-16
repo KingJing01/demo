@@ -4,7 +4,7 @@ package inputmodels
 type LoginInfo struct {
 	UserName  string `form:"username"`
 	Password  string `form:"password"`
-	SysID     string `form:"sysId"`
+	SysCode   string `form:"sysCode"`
 	tokenTime int64  `form:"tokenTime"`
 }
 

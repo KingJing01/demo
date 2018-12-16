@@ -47,7 +47,7 @@ type SetMealInfo struct {
 }
 
 type PermissionCheckInfo struct {
-	Name        string // 菜单缩写 tms.order
+	Name        string // 菜单缩写 tms.order 或所属 菜单的编码
 	DisplayName string // 菜单显示的中文名  订单管理
 	Code        string // 权限缩写  tms.order.update
 	CodeName    string // 权限中文  更新订单信息

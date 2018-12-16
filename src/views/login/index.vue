@@ -56,7 +56,7 @@ export default {
       loginForm: {
         username: 'admin',
         password: '123456',
-        sysId: '1'
+        sysCode: '10001'
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],

@@ -94,7 +94,7 @@
       ><h4 v-if="type==='detail'" slot="title">用户详情</h4>
         <h4 v-else-if="type==='update'" slot="title">修改用户信息</h4>
         <h4 v-else slot="title">新增用户信息</h4>
-        <div v-if="type==='detail'"><DetailPage :data="form" /></div>
+        <div v-if="type==='detail'"><DetailPage :data="form"/></div>
         <div v-else-if="type==='update'"><UpdatePage :data="form"/></div>
         <div v-else><SavePage /></div>
         <div
@@ -115,6 +115,7 @@
 <script>
 import { getListData, saveSysInfo } from '@/api/sysconfig'
 import { getUserList, updateTenantInfo } from '@/api/usermanage'
+import { transPermisionCheckedData } from '@/api/utils'
 
 import DetailPage from './dialogview/detail'
 import SavePage from './dialogview/save'
@@ -135,7 +136,8 @@ export default {
       dialogTableVisible: false,
       dialogFormVisible: false,
       dialogInfoVisable: false,
-      type: 'insert'
+      type: 'insert',
+      tenant: {}
     }
   },
   created() {
@@ -162,10 +164,7 @@ export default {
     },
     // 重置按钮
     onReset() {
-      this.search.tenantName = ''
-      this.search.sysName = ''
-      this.search.pageSize = 5
-      this.search.offset = 0
+      this.search = { pageSize: 5, offset: 0 }
       this.dialogInfoVisable = false
       this.getList()
     },
@@ -182,6 +181,7 @@ export default {
     },
     // 保存/修改用户信息
     saveData() {
+      console.log(this.form)
       debugger
       if (this.type === 'insert') {
         saveSysInfo(this.form).then(response => {
@@ -189,9 +189,21 @@ export default {
           this.getList()
         })
       } else {
-        updateTenantInfo(this.form).then(response => {
+        var transData = transPermisionCheckedData(this.form.authData)
+        if (transData.perName === '') {
+          this.$message({
+            message: '请选择操作权限',
+            type: 'warning'
+          })
+          return false
+        }
+        this.tenant = this.form.formData
+        this.tenant.perId = transData.perId
+        this.tenant.perName = transData.perName
+        updateTenantInfo(this.tenant).then(response => {
           this.dialogFormVisible = false
           this.getList()
+          this.tenant = {}
         })
       }
     },
@@ -209,10 +221,6 @@ export default {
     handleCloseDialog() {
       this.form = {}
       this.type = 'insert'
-    },
-    // 子界面的返回数据
-    returnData() {
-
     }
   }
 }

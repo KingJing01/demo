@@ -131,9 +131,11 @@ export default {
     getUserData() {
       getUserInfo(this.search.tenId).then(response => {
         this.formData = response.Data
+        this.data.formData = response.Data
       })
       getUserPermission(this.search).then(response => {
         this.authData = response.Data
+        this.data.authData = response.Data
       })
     },
     onChangeTop(index, topId, e) { // 父级change事件

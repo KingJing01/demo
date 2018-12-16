@@ -1,13 +1,13 @@
 import request from '@/utils/request'
 
-export function login(username, password, sysId) {
+export function login(username, password, sysCode) {
   return request({
     url: '/authoritymanage/Login',
     method: 'post',
     data: {
       username,
       password,
-      sysId
+      sysCode
     }
   })
 }

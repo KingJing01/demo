@@ -145,9 +145,16 @@ func (c *TenantController) Put() {
 	idStr := c.Ctx.Input.Param(":id")
 	id, _ := strconv.Atoi(idStr)
 	v := models.Tenant{Id: id}
+	var mystruct map[string]interface{}
+	json.Unmarshal(c.Ctx.Input.RequestBody, &mystruct)
+	sysCode := mystruct["sysCode"].(string)
+	perIdStr := mystruct["perId"].(string)
+	perMenu := mystruct["perMenu"].(string)
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 		v.LastModificationTime = time.Now()
 		if err := models.UpdateTenantById(&v); err == nil {
+			// 更新权限信息
+			models.UpdateTenantPermission(sysCode, perIdStr, perMenu, v.Id)
 			result.Result = 1
 			c.Data["json"] = result
 		} else {

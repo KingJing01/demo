@@ -15,3 +15,10 @@ func (t *TenantApplication) TableName() string {
 func init() {
 	orm.RegisterModel(new(TenantApplication))
 }
+
+//更新套餐关系表的菜单字段
+func UpdateTenatMenuText(sysCode string, perMenu string, tenId int) (err error) {
+	o := orm.NewOrm()
+	_, err = o.Raw("UPDATE tenantapplication SET MenuText =? WHERE	TenantId =? AND SysCode =? ", perMenu, tenId, sysCode).Exec()
+	return err
+}

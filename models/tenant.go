@@ -2,7 +2,6 @@ package models
 
 import (
 	out "demo/outmodels"
-	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -29,10 +28,11 @@ type Tenant struct {
 	DeletionTime         time.Time `orm:"column(DeletionTime);type(datetime);"`
 }
 
-type TnenatInput struct {
-	Tenant
-	Pid   string
-	Pname string
+type TenantInput struct {
+	tenant  Tenant
+	perId   string
+	perName string
+	sysCode string
 }
 
 func (t *Tenant) TableName() string {
@@ -71,11 +71,11 @@ func UpdateTenantById(m *Tenant) (err error) {
 	// ascertain id exists in the database
 	if err = o.Read(&v); err == nil {
 		m.CreationTime = v.CreationTime
-		var num int64
-		if num, err = o.Update(m); err == nil {
-			fmt.Println("Number of records updated in database:", num)
-		}
+		_, err = o.Update(m)
 	}
+	// 删除原先已有的权限信息
+
+	//新增修改的权限信息
 	return
 }
 
@@ -142,4 +142,44 @@ func GetPerInfoForTenant(sysCode string, tenantId int) (result []out.PermissionC
 	LEFT JOIN ( SELECT	MenuCode,	DisplayName,NAME	FROM permission WHERE SysCode = ? 	AND IsMenu = 0 ) t3 ON t3.MenuCode = t1.MenuCode
 	GROUP BY 	t1. NAME ) t5 GROUP BY NAME`, sysCode, tenantId, sysCode).QueryRows(&result)
 	return result, err
+}
+
+func UpdateTenantPermission(sysCode string, perIdStr string, perMenu string, tenId int) (err error) {
+	err = DeleteTenatPermssion(sysCode, tenId)
+	if err != nil {
+		return err
+	}
+	err = InsertTenantPermission(perIdStr, tenId)
+	if err != nil {
+		return err
+	}
+	err = UpdateTenatMenuText(sysCode, perMenu, tenId)
+	if err != nil {
+		return err
+	}
+	return
+}
+
+//新增套餐已经勾选的信息
+func InsertTenantPermission(perIdStr string, tenId int) (err error) {
+	arr := strings.Split(perIdStr, ",")
+	var param string
+	for _, x := range arr {
+		param += "'" + x + "',"
+	}
+	length := len(param) - 1
+	params := param[0:length]
+	o := orm.NewOrm()
+	var sql = `INSERT INTO permission (NAME,tenantId,DisplayName,SysCode,MenuCode,CreationTime,IsMenu
+		) SELECT NAME,?,DisplayName,SysCode,MenuCode,?,IsMenu FROM permission t1
+		WHERE t1.TenantId = 0 AND IsMenu = 1 AND t1.Name IN (` + params + `)`
+	_, err = o.Raw(sql, tenId, time.Now()).Exec()
+	return err
+}
+
+//删除原先配置的权限信息
+func DeleteTenatPermssion(sysCode string, tenId int) (err error) {
+	o := orm.NewOrm()
+	_, err = o.Raw("DELETE FROM	permission WHERE TenantId = ? and SysCode=? and RoleId=0 ", tenId, sysCode).Exec()
+	return err
 }

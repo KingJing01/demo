@@ -17,7 +17,6 @@ type Permission struct {
 	CreationTime           time.Time `orm:"column(CreationTime);type(datetime)"`
 	CreatorUserId          int64     `orm:"column(CreatorUserId);null"`
 	Discriminator          string    `orm:"column(Discriminator);size(300)"`
-	IsGranted              int8      `orm:"column(IsGranted)"`
 	Name                   string    `orm:"column(Name);size(128)"`
 	TenantId               int       `orm:"column(TenantId);null"`
 	RoleId                 int       `orm:"column(RoleId);null"`

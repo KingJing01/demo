@@ -1,5 +1,5 @@
 <template>
-  <el-form :model="formData" size="small">
+  <el-form :model="formData" size="small" disabled>
     <el-form-item
       :label-width="formLabelWidth"
       label="公司名称"
@@ -104,7 +104,6 @@
 </template>
 <script>
 import { getUserInfo, getUserPermission } from '@/api/usermanage'
-import { transPermisionCheckedData } from '@/api/utils'
 export default {
   props: {
     data: {
@@ -125,7 +124,6 @@ export default {
   },
   created() {
     this.getUserData()
-    this.returnData()
   },
   methods: {
     getUserData() {
@@ -135,39 +133,6 @@ export default {
       getUserPermission(this.search).then(response => {
         this.authData = response.Data
       })
-    },
-    onChangeTop(index, topId, e) { // 父级change事件
-      this.authData[index].mychecked = e// 父级勾选后，子级全部勾选或者取消
-      if (e === false) this.authData[index].indeterminate = false // 去掉不确定状态
-      var childrenArray = this.authData[index].childrenList
-      if (childrenArray) {
-        for (var i = 0, len = childrenArray.length; i < len; i++) { childrenArray[i].mychecked = e }
-      }
-    },
-    onChangeSon(topIndex, sonId, topId, e) { // 子级change事件
-      var childrenArray = this.authData[topIndex].childrenList
-      var tickCount = 0
-      var unTickCount = 0
-      var len = childrenArray.length
-      for (var i = 0; i < len; i++) {
-        if (sonId === childrenArray[i].permissionId) childrenArray[i].mychecked = e
-        if (childrenArray[i].mychecked === true) tickCount++
-        if (childrenArray[i].mychecked === false) unTickCount++
-      }
-      if (tickCount === len) { // 子级全勾选
-        this.authData[topIndex].mychecked = true
-        this.authData[topIndex].indeterminate = false
-      } else if (unTickCount === len) { // 子级全不勾选
-        this.authData[topIndex].mychecked = false
-        this.authData[topIndex].indeterminate = false
-      } else {
-        this.authData[topIndex].mychecked = true
-        this.authData[topIndex].indeterminate = true // 添加不确定状态
-      }
-    },
-    returnData() {
-      var transData = transPermisionCheckedData(this.authData)
-      this.$emit('returnData', { 'formData': this.formData, 'transData': transData })
     }
   }
 }

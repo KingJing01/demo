@@ -178,7 +178,7 @@
 import { getSetMealList, addSetMealInfo, deleteSetMeal, updateSetMealInfo } from '@/api/setmeal'
 import { sysDataSelect } from '@/api/sysconfig'
 import { getPerInfoBySysCode, getPerInfoBySysCodeUpdate } from '@/api/permission'
-import { transPermisionCheckedData } from '@/api/utils'
+import { transPermissionCheckedData } from '@/api/utils'
 export default {
   data() {
     return {
@@ -250,7 +250,7 @@ export default {
     },
     // 保存系统信息
     saveData() {
-      var transData = transPermisionCheckedData(this.authData)
+      var transData = transPermissionCheckedData(this.authData)
       if (transData.perName === '') {
         this.$message({
           message: '请选择操作权限',

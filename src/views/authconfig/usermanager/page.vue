@@ -115,7 +115,7 @@
 <script>
 import { getListData, saveSysInfo } from '@/api/sysconfig'
 import { getUserList, updateTenantInfo } from '@/api/usermanage'
-import { transPermisionCheckedData } from '@/api/utils'
+import { transPermissionCheckedData } from '@/api/utils'
 
 import DetailPage from './dialogview/detail'
 import SavePage from './dialogview/save'
@@ -189,7 +189,7 @@ export default {
           this.getList()
         })
       } else {
-        var transData = transPermisionCheckedData(this.form.authData)
+        var transData = transPermissionCheckedData(this.form.authData)
         if (transData.perName === '') {
           this.$message({
             message: '请选择操作权限',
@@ -198,8 +198,9 @@ export default {
           return false
         }
         this.tenant = this.form.formData
+        this.tenant.perMenu = transData.perMenu
         this.tenant.perId = transData.perId
-        this.tenant.perName = transData.perName
+        this.tenant.sysCode = this.form.sysCode
         updateTenantInfo(this.tenant).then(response => {
           this.dialogFormVisible = false
           this.getList()

@@ -168,7 +168,7 @@
   </div>
 </template>
 <script>
-import { getMenuList, addPerInfo, getPerInfoByMenuId } from '@/api/permission'
+import { getMenuList, addPerInfo, getPerInfoByMenuId, updatePerInfo } from '@/api/permission'
 export default {
   data() {
     return {
@@ -221,8 +221,9 @@ export default {
     handleClick(row) {
       this.type = 'update'
       this.dialogFormVisible = true
-      this.form.SysName = row.SysName
-      this.form.id = row.Id
+      getPerInfoByMenuId(row.Id).then(response => {
+        this.form = response.Data
+      })
     },
     // 获取列表数据
     getList() {
@@ -252,10 +253,14 @@ export default {
     saveData() {
       if (this.type === 'insert') {
         addPerInfo(this.form).then(response => {
+          this.dialogFormVisible = false
           this.getList()
         })
       } else {
-        console.log('修改信息')
+        updatePerInfo(this.form).then(response => {
+          this.dialogFormVisible = false
+          this.getList()
+        })
       }
     },
     // 系统信息验重

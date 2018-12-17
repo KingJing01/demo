@@ -45,3 +45,12 @@ export function getPerInfoByMenuId(id) {
     method: 'get'
   })
 }
+
+//
+export function updatePerInfo(info) {
+  return request({
+    url: '/permission/' + info.Id,
+    method: 'put',
+    data: info
+  })
+}

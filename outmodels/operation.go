@@ -18,6 +18,7 @@ type MenuInfo struct {
 	Id       int64
 	MenuName string
 	SysName  string
+	SysCode  string
 	MenuText string
 }
 

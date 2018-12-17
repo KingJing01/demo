@@ -18,17 +18,18 @@ type Permission struct {
 	CreatorUserId          int64     `orm:"column(CreatorUserId);null"`
 	Discriminator          string    `orm:"column(Discriminator);size(300)"`
 	Name                   string    `orm:"column(Name);size(128)"`
-	TenantId               int       `orm:"column(TenantId);null"`
-	RoleId                 int       `orm:"column(RoleId);null"`
-	UserId                 int64     `orm:"column(UserId);null"`
+	TenantId               int       `orm:"column(TenantId);0"`
+	RoleId                 int       `orm:"column(RoleId);0"`
+	UserId                 int64     `orm:"column(UserId);0"`
 	DisplayName            string    `orm:"column(DisplayName);size(50)"`
-	SysCode                int       `orm:"column(SysCode);0"`
+	SysCode                int       `orm:"column(SysCode);"`
 	DeletionTime           time.Time `orm:"column(DeletionTime);type(datetime)"`
 	DeleterUserId          int64     `orm:"column(DeleterUserId);null"`
 	LastModificationTime   time.Time `orm:"column(LastModificationTime);type(datetime)"`
 	LastModificationUserId int64     `orm:"column(LastModificationUserId);null"`
 	IsDeleted              int       `orm:"column(IsDeleted);0"`
 	MenuCode               int       `orm:"column(MenuCode);null"`
+	MenuText               string    `orm:"column(MenuText);null"`
 	IsMenu                 int       `orm:"column(IsMenu);0"`
 }
 
@@ -42,9 +43,35 @@ func init() {
 
 // AddPermission insert a new Permission into database and returns
 // last inserted Id on success.
-func AddPermission(m *Permission) (id int64, err error) {
+func AddPermission(m map[string]interface{}) (id int64, err error) {
+	sysCodeStr := m["sysCode"].(string)
+	sysCode, _ := strconv.Atoi(sysCodeStr)
+	menuCode := GenerMenuCode()
 	o := orm.NewOrm()
-	id, err = o.Insert(m)
+	//批量插入数据组装菜单数据和菜单的权限
+	var permissionList []Permission
+	var permiss Permission
+	permiss.CreationTime = time.Now()
+	permiss.SysCode = sysCode
+	permiss.MenuCode = menuCode
+	arr := m["perData"].([]interface{})
+	var menuText string
+	for _, per := range arr {
+		value := per.(map[string]interface{})
+		menu := value["displayName"].(string)
+		menuText += "," + menu
+		permiss.DisplayName = menu
+		permiss.Name = value["name"].(string)
+		permiss.IsMenu = 1
+		permissionList = append(permissionList, permiss)
+	}
+	// 菜单数据的拼装
+	permiss.DisplayName = m["displayName"].(string)
+	permiss.Name = m["name"].(string)
+	permiss.IsMenu = 0
+	permiss.MenuText = string([]rune(menuText)[1:len(menuText)])
+	permissionList = append(permissionList, permiss)
+	id, err = o.InsertMulti(len(arr)+1, permissionList)
 	return
 }
 
@@ -206,7 +233,7 @@ func GetPermissionByUser(userid int64, sysCode string) (permissions []Permission
 // 获取列表的信息
 func GetPermissionList(menuName string, sysName string, offset int64, limit int64) (result []out.MenuInfo, err error) {
 	o := orm.NewOrm()
-	var sql = "SELECT t1.DisplayName menu_name,t2.SysName sys_name,t1.MenuText menu_text,t1.id FROM permission t1 LEFT JOIN application t2 ON t1.SysCode = t2.SysCode WHERE t1.isMenu=0 "
+	var sql = "SELECT t1.DisplayName menu_name,t2.SysName sys_name,t2.SysCode sys_code,t1.MenuText menu_text,t1.id FROM permission t1 LEFT JOIN application t2 ON t1.SysCode = t2.SysCode WHERE t1.isMenu=0 "
 	conditions := []string{}
 	if menuName != "" {
 		conditions = append(conditions, " t1.DisplayName like '%"+menuName+"%'")
@@ -248,7 +275,11 @@ func GetPerInfoBySysCode(SysCode string) (result []out.PermissionCheckInfo, err 
 	return result, err
 }
 
-//根据租户id和系统编号 修改租户下的权限信息
-func UpdateTenantPerission(sysCode string, tenId string) {
-
+//字段生成菜单号
+func GenerMenuCode() (menuCode int) {
+	var maps []orm.Params
+	o := orm.NewOrm()
+	o.Raw("select IFNULL(MAX(MenuCode),'2000')+1  menuCode from permission").Values(&maps)
+	menuCode, _ = strconv.Atoi(maps[0]["menuCode"].(string))
+	return menuCode
 }

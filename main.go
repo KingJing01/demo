@@ -11,7 +11,7 @@ import (
 
 func init() {
 	//orm.RegisterDataBase("default", "mysql", "root:Xsungroup333@tcp(rm-8vb2a06qoj31utdhnlo.mysql.zhangbei.rds.aliyuncs.com:3306)/godatabase?charset=utf8&loc=Asia%2FShanghai")
-	orm.RegisterDataBase("default", "mysql", "root:root@tcp(127.0.0.1:3306)/godatabase?charset=utf8&loc=Asia%2FShanghai")
+	orm.RegisterDataBase("default", "mysql", "root:root@tcp(127.0.0.1:3308)/godatabase?charset=utf8&loc=Asia%2FShanghai")
 	orm.Debug = true
 	beego.InsertFilter("*", beego.BeforeRouter, cors.Allow(&cors.Options{
 		AllowAllOrigins:  true,

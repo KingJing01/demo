@@ -35,11 +35,9 @@ func (c *PermissionController) URLMapping() {
 // @router / [post]
 func (c *PermissionController) Post() {
 	result := &out.OperResult{}
-	var v models.Permission
-	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
-		v.CreationTime = time.Now()
-
-		if _, err := models.AddPermission(&v); err == nil {
+	var mystruct map[string]interface{}
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &mystruct); err == nil {
+		if _, err := models.AddPermission(mystruct); err == nil {
 			result.Result = 1
 			c.Data["json"] = result
 		} else {

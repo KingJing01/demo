@@ -29,3 +29,12 @@ export function getPerInfoBySysCodeUpdate(sysCode, setMealCode) {
     }
   })
 }
+
+// 保存菜单信息
+export function addPerInfo(info) {
+  return request({
+    url: '/permission/',
+    method: 'Post',
+    data: info
+  })
+}

@@ -29,9 +29,11 @@
     <!-- 查询 form end -->
     <!-- 基础权限列表  start -->
     <el-table
+      ref="perTable"
       :data="tableData"
       style="width: 90%"
       border
+      @selection-change	="handleSelectionChange"
     >
       <el-table-column
         type="selection"
@@ -79,7 +81,7 @@
         @current-change="handleCurrentChange"/>
     </div>
     <el-row id="action_line">
-      <el-button @click="dialogFormVisible = true"> 新增菜单</el-button>
+      <el-button @click="handleInsert"> 新增菜单</el-button>
       <el-button type="primary">生成套餐</el-button>
     </el-row>
 
@@ -88,6 +90,7 @@
     <el-dialog
       :visible.sync="dialogFormVisible"
       width="30%"
+      @close="handleCloseDialog"
     ><h4 v-if="type==='detail'" slot="title">菜单详情</h4>
       <h4 v-else-if="type==='update'" slot="title">修改菜单</h4>
       <h4 v-else slot="title">新增菜单</h4>
@@ -107,7 +110,7 @@
           label="菜单编码"
         >
           <el-input
-            v-model="form.menuCode"
+            v-model="form.name"
             auto-complete="off"
           />
         </el-form-item>
@@ -116,7 +119,7 @@
           label="菜单名称"
         >
           <el-input
-            v-model="form.menuName"
+            v-model="form.displayName"
             auto-complete="off"
           />
         </el-form-item>
@@ -131,6 +134,24 @@
           />
         </el-form-item>
       </el-form>
+      <el-button type="primary" size="mini" icon="el-icon-circle-plus" @click="handlePerInsert"/>
+      <el-table :data="form.perData" class="tb-edit" style="width: 100%" highlight-current-row max-height="310" @row-click="handleTableCurrentChange">
+        <el-table-column label="权限名称">
+          <template scope="scope">
+            <el-input v-model="scope.row.displayName" size="mini" placeholder="请输入内容" @change="handleEdit(scope.$index, scope.row)"/>
+          </template>
+        </el-table-column>
+        <el-table-column label="权限缩写">
+          <template scope="scope">
+            <el-input v-model="scope.row.name" size="mini" placeholder="请输入内容" @change="handleEdit(scope.$index, scope.row)"/>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作">
+          <template scope="scope">
+            <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
       <div
         slot="footer"
         class="dialog-footer"
@@ -146,7 +167,7 @@
   </div>
 </template>
 <script>
-import { getMenuList } from '@/api/permission'
+import { getMenuList, addPerInfo } from '@/api/permission'
 export default {
   data() {
     return {
@@ -157,11 +178,13 @@ export default {
         offset: 0
       },
       form: {
+        perData: []
       },
       dialogTableVisible: false,
       dialogFormVisible: false,
       formLabelWidth: '100px',
-      dialogInfoVisable: false
+      dialogInfoVisable: false,
+      selection: [] // 列表选择框的信息
     }
   },
   created() {
@@ -171,6 +194,27 @@ export default {
     // 列表查询
     onSubmit() {
       this.getList()
+    },
+    // 新增事件
+    handleInsert() {
+      var select = this.selection
+      if (select.length === 1) {
+        this.form.sysCode = select[0].SysCode
+        this.form.sysName = select[0].SysName
+        this.dialogFormVisible = true
+      } else if (select.length === 0) {
+        this.$message({
+          message: '请选择一条记录',
+          type: 'warning'
+        })
+        return false
+      } else {
+        this.$message({
+          message: '新增操作只能选择一条记录',
+          type: 'warning'
+        })
+        return false
+      }
     },
     // 编辑事件
     handleClick(row) {
@@ -193,14 +237,6 @@ export default {
         this.search.pageTotal = response.Data.total
       })
     },
-    handleClose(done) {
-      this.form.sysName = ''
-      this.form.sysCode = ''
-      this.form.IsValid = true
-      this.dialogInfoVisable = false
-      done()
-    },
-
     // 重置按钮
     onReset() {
       this.search = { pageSize: 5, offset: 0 }
@@ -215,12 +251,10 @@ export default {
     },
     // 保存系统信息
     saveData() {
-      if (this.dialogInfoVisable === false) {
-        if (this.type === 'insert') {
-          console.log('新增信息')
-        } else {
-          console.log('修改信息')
-        }
+      if (this.type === 'insert') {
+        addPerInfo(this.form)
+      } else {
+        console.log('修改信息')
       }
     },
     // 系统信息验重
@@ -235,9 +269,26 @@ export default {
     // 监听dialog的关闭事件
     handleCloseDialog() {
       this.form = {}
+      this.form.perData = []
       this.type = 'insert'
+    },
+    handleTableCurrentChange(row, event, column) {
+      console.log(row, event, column, event.currentTarget)
+    },
+    handleEdit(index, row) {
+      console.log(index, row)
+    },
+    handleDelete(index, row) {
+      this.form.perData.splice(index, 1)
+    },
+    // 权限表上的新增点击事件
+    handlePerInsert(column, event) {
+      var data = { displayName: '', name: '' }
+      this.form.perData.push(data)
+    },
+    handleSelectionChange(selection) {
+      this.selection = selection
     }
-
   }
 }
 </script>

@@ -93,7 +93,7 @@ func (c *PermissionController) GetAll() {
 	var limit int64 = 10
 	var offset int64
 	// limit: 10 (default is 10)
-	if v, err := c.GetInt64("limit"); err == nil {
+	if v, err := c.GetInt64("pageSize"); err == nil {
 		limit = v
 	}
 	// offset: 0 (default is 0)

@@ -77,13 +77,13 @@ func AddPermission(m map[string]interface{}) (id int64, err error) {
 
 // GetPermissionById retrieves Permission by Id. Returns error if
 // Id doesn't exist
-func GetPermissionById(id int) (v *Permission, err error) {
+func GetPermissionById(id int) (v *out.PermissonInfo, err error) {
 	o := orm.NewOrm()
-	v = &Permission{Id: id}
-	if err = o.Read(v); err == nil {
-		return v, nil
-	}
-	return nil, err
+	err = o.Raw("select DisplayName display_name,Name name ,MenuText menu_text,MenuCode menu_code,t2.SysName sys_name from permission t1 LEFT JOIN application t2 on t1.SysCode = t2.SysCode where t1.Id = ?", id).QueryRow(&v)
+	var lists []out.PerInfo
+	_, err = o.Raw("select DisplayName display_name,Name name from permission where MenuCode = ? and IsMenu=1", v.MenuCode).QueryRows(&lists)
+	v.PerData = lists
+	return v, err
 }
 
 // GetAllPermission retrieves all Permission matches certain condition. Returns empty list if

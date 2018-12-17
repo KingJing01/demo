@@ -64,3 +64,17 @@ type UserManageInfo struct {
 	MenuText   string
 	Operator   string
 }
+
+type PermissonInfo struct {
+	SysName     string
+	DisplayName string
+	Name        string
+	MenuText    string
+	MenuCode    int
+	PerData     []PerInfo
+}
+
+type PerInfo struct {
+	DisplayName string
+	Name        string
+}

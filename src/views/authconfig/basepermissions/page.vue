@@ -29,11 +29,11 @@
     <!-- 查询 form end -->
     <!-- 基础权限列表  start -->
     <el-table
-      ref="perTable"
       :data="tableData"
       style="width: 90%"
       border
       @selection-change	="handleSelectionChange"
+      @row-dblclick="handleRowClick"
     >
       <el-table-column
         type="selection"
@@ -94,14 +94,14 @@
     ><h4 v-if="type==='detail'" slot="title">菜单详情</h4>
       <h4 v-else-if="type==='update'" slot="title">修改菜单</h4>
       <h4 v-else slot="title">新增菜单</h4>
-      <el-form :model="form" size="small">
+      <el-form :model="form" :disabled="type=='detail'?true:false" size="small">
         <el-form-item
           :label-width="formLabelWidth"
           label="系统名称"
         >
           <el-input
             :disabled="true"
-            v-model="form.sysName"
+            v-model="form.SysName"
             auto-complete="off"
           />
         </el-form-item>
@@ -110,7 +110,7 @@
           label="菜单编码"
         >
           <el-input
-            v-model="form.name"
+            v-model="form.Name"
             auto-complete="off"
           />
         </el-form-item>
@@ -119,7 +119,7 @@
           label="菜单名称"
         >
           <el-input
-            v-model="form.displayName"
+            v-model="form.DisplayName"
             auto-complete="off"
           />
         </el-form-item>
@@ -129,24 +129,24 @@
         >
           <el-input
             :disabled="true"
-            v-model="form.menuText"
+            v-model="form.MenuText"
             auto-complete="off"
           />
         </el-form-item>
       </el-form>
-      <el-button type="primary" size="mini" icon="el-icon-circle-plus" @click="handlePerInsert"/>
-      <el-table :data="form.perData" class="tb-edit" style="width: 100%" highlight-current-row max-height="310" @row-click="handleTableCurrentChange">
+      <el-button v-show="type=='detail'?false:true" type="primary" size="mini" icon="el-icon-circle-plus" @click="handlePerInsert"/>
+      <el-table :data="form.PerData" class="tb-edit" style="width: 100%" highlight-current-row max-height="310" @row-click="handleTableCurrentChange">
         <el-table-column label="权限名称">
           <template scope="scope">
-            <el-input v-model="scope.row.displayName" size="mini" placeholder="请输入内容" @change="handleEdit(scope.$index, scope.row)"/>
+            <el-input v-model="scope.row.DisplayName" :disabled="type=='detail'?true:false" size="mini" placeholder="请输入内容" @change="handleEdit(scope.$index, scope.row)"/>
           </template>
         </el-table-column>
         <el-table-column label="权限缩写">
           <template scope="scope">
-            <el-input v-model="scope.row.name" size="mini" placeholder="请输入内容" @change="handleEdit(scope.$index, scope.row)"/>
+            <el-input v-model="scope.row.Name" :disabled="type=='detail'?true:false" size="mini" placeholder="请输入内容" @change="handleEdit(scope.$index, scope.row)"/>
           </template>
         </el-table-column>
-        <el-table-column label="操作">
+        <el-table-column v-if="type!='detail'" label="操作">
           <template scope="scope">
             <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
           </template>
@@ -158,6 +158,7 @@
       >
         <el-button @click="handleCancle">取 消</el-button>
         <el-button
+          v-show="type=='detail'?false:true"
           type="primary"
           @click="saveData"
         >确 定</el-button>
@@ -167,7 +168,7 @@
   </div>
 </template>
 <script>
-import { getMenuList, addPerInfo } from '@/api/permission'
+import { getMenuList, addPerInfo, getPerInfoByMenuId } from '@/api/permission'
 export default {
   data() {
     return {
@@ -178,7 +179,7 @@ export default {
         offset: 0
       },
       form: {
-        perData: []
+        PerData: []
       },
       dialogTableVisible: false,
       dialogFormVisible: false,
@@ -199,8 +200,8 @@ export default {
     handleInsert() {
       var select = this.selection
       if (select.length === 1) {
-        this.form.sysCode = select[0].SysCode
-        this.form.sysName = select[0].SysName
+        this.form.SysCode = select[0].SysCode
+        this.form.SysName = select[0].SysName
         this.dialogFormVisible = true
       } else if (select.length === 0) {
         this.$message({
@@ -220,15 +221,8 @@ export default {
     handleClick(row) {
       this.type = 'update'
       this.dialogFormVisible = true
-      this.form.sysCode = row.SysCode
-      this.form.sysName = row.SysName
+      this.form.SysName = row.SysName
       this.form.id = row.Id
-      this.form.sysUrl = row.SysUrl
-      if (row.IsValid === 0) {
-        this.form.IsValid = true
-      } else {
-        this.form.IsValid = false
-      }
     },
     // 获取列表数据
     getList() {
@@ -276,7 +270,7 @@ export default {
     // 监听dialog的关闭事件
     handleCloseDialog() {
       this.form = {}
-      this.form.perData = []
+      this.form.PerData = []
       this.type = 'insert'
     },
     handleTableCurrentChange(row, event, column) {
@@ -286,15 +280,23 @@ export default {
       console.log(index, row)
     },
     handleDelete(index, row) {
-      this.form.perData.splice(index, 1)
+      this.form.PerData.splice(index, 1)
     },
     // 权限表上的新增点击事件
     handlePerInsert(column, event) {
       var data = { displayName: '', name: '' }
-      this.form.perData.push(data)
+      this.form.PerData.push(data)
     },
     handleSelectionChange(selection) {
       this.selection = selection
+    },
+    // 双击点击事件
+    handleRowClick(row, event) {
+      this.type = 'detail'
+      this.dialogFormVisible = true
+      getPerInfoByMenuId(row.Id).then(response => {
+        this.form = response.Data
+      })
     }
   }
 }

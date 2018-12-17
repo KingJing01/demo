@@ -38,3 +38,10 @@ export function addPerInfo(info) {
     data: info
   })
 }
+// 获取菜单下所属的权限  详情/修改 功能
+export function getPerInfoByMenuId(id) {
+  return request({
+    url: '/permission/' + id,
+    method: 'get'
+  })
+}

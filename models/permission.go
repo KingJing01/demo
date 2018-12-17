@@ -44,7 +44,7 @@ func init() {
 // AddPermission insert a new Permission into database and returns
 // last inserted Id on success.
 func AddPermission(m map[string]interface{}) (id int64, err error) {
-	sysCodeStr := m["sysCode"].(string)
+	sysCodeStr := m["SysCode"].(string)
 	sysCode, _ := strconv.Atoi(sysCodeStr)
 	menuCode := GenerMenuCode()
 	o := orm.NewOrm()
@@ -54,20 +54,20 @@ func AddPermission(m map[string]interface{}) (id int64, err error) {
 	permiss.CreationTime = time.Now()
 	permiss.SysCode = sysCode
 	permiss.MenuCode = menuCode
-	arr := m["perData"].([]interface{})
+	arr := m["PerData"].([]interface{})
 	var menuText string
 	for _, per := range arr {
 		value := per.(map[string]interface{})
-		menu := value["displayName"].(string)
+		menu := value["DisplayName"].(string)
 		menuText += "," + menu
 		permiss.DisplayName = menu
-		permiss.Name = value["name"].(string)
+		permiss.Name = value["Name"].(string)
 		permiss.IsMenu = 1
 		permissionList = append(permissionList, permiss)
 	}
 	// 菜单数据的拼装
-	permiss.DisplayName = m["displayName"].(string)
-	permiss.Name = m["name"].(string)
+	permiss.DisplayName = m["DisplayName"].(string)
+	permiss.Name = m["Name"].(string)
 	permiss.IsMenu = 0
 	permiss.MenuText = string([]rune(menuText)[1:len(menuText)])
 	permissionList = append(permissionList, permiss)
@@ -282,4 +282,28 @@ func GenerMenuCode() (menuCode int) {
 	o.Raw("select IFNULL(MAX(MenuCode),'2000')+1  menuCode from permission").Values(&maps)
 	menuCode, _ = strconv.Atoi(maps[0]["menuCode"].(string))
 	return menuCode
+}
+
+// 更新基本权限信息
+func UpdatePermission(m map[string]interface{}) (err error) {
+	sysCodeStr := m["SysCode"].(string)
+	sysCode, _ := strconv.Atoi(sysCodeStr)
+	var permissionList []Permission
+	var permiss Permission
+	permiss.CreationTime = time.Now()
+	permiss.SysCode = sysCode
+	arr := m["PerData"].([]interface{})
+	var menuText string
+	for _, per := range arr {
+		value := per.(map[string]interface{})
+		menu := value["DisplayName"].(string)
+		menuText += "," + menu
+		permiss.DisplayName = menu
+		permiss.Name = value["Name"].(string)
+		permiss.IsMenu = 1
+		permissionList = append(permissionList, permiss)
+	}
+	o := orm.NewOrm()
+	_, err = o.InsertMulti(len(arr)+1, permissionList)
+	return err
 }

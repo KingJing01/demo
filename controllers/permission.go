@@ -6,7 +6,6 @@ import (
 	tool "demo/tools"
 	"encoding/json"
 	"strconv"
-	"time"
 
 	"github.com/astaxie/beego"
 )
@@ -138,12 +137,9 @@ func (c *PermissionController) GetAll() {
 // @router /:id [put]
 func (c *PermissionController) Put() {
 	result := &out.OperResult{}
-	idStr := c.Ctx.Input.Param(":id")
-	id, _ := strconv.Atoi(idStr)
-	v := models.Permission{Id: id}
-	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
-		v.LastModificationTime = time.Now()
-		if err := models.UpdatePermissionById(&v); err == nil {
+	var mystruct map[string]interface{}
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &mystruct); err == nil {
+		if err := models.UpdatePermission(mystruct); err == nil {
 			result.Result = 1
 			c.Data["json"] = result
 		} else {

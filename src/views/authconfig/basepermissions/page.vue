@@ -247,12 +247,19 @@ export default {
       console.log(`每页 ${val} 条`)
     },
     handleCurrentChange(val) {
-      console.log(`当前页: ${val}`)
+      var pageSize = this.search.pageSize
+      this.search.offset = (val > 1 ? (val - 1) * pageSize : 0)
+      getMenuList(this.search).then(response => {
+        this.tableData = response.Data.list
+        this.search.pageTotal = response.Data.total
+      })
     },
     // 保存系统信息
     saveData() {
       if (this.type === 'insert') {
-        addPerInfo(this.form)
+        addPerInfo(this.form).then(response => {
+          this.getList()
+        })
       } else {
         console.log('修改信息')
       }

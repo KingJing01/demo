@@ -107,6 +107,7 @@
       :visible.sync="dialogFormVisible"
       width="40%"
       @close="handleCloseDialog"
+      @open="handleOpenDialog"
     > <h4 v-if="type==='detail'" slot="title">套餐详情</h4>
       <h4 v-else-if="type==='update'" slot="title">修改套餐</h4>
       <h4 v-else slot="title">新增套餐</h4>
@@ -200,7 +201,6 @@ export default {
   },
   created() {
     this.getList()
-    this.getSysData()
   },
   methods: {
     // 列表查询
@@ -286,12 +286,6 @@ export default {
       this.dialogFormVisible = false
       this.dialogInfoVisable = false
     },
-    // 系统下拉初始化方法
-    getSysData() {
-      sysDataSelect().then(response => {
-        this.options = response.Data
-      })
-    },
     // 绑定 系统下拉的值修改事件
     changeSysSelect(val) {
       getPerInfoBySysCode(val).then(response => {
@@ -351,6 +345,12 @@ export default {
       this.form = {}
       this.authData = []
       this.type = 'insert'
+    },
+    // 监听dialog的打开事件
+    handleOpenDialog() {
+      sysDataSelect().then(response => {
+        this.options = response.Data
+      })
     },
     // 双击点击事件
     handleRowClick(row, event) {

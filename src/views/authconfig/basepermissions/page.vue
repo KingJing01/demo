@@ -90,6 +90,7 @@
     <el-dialog
       :visible.sync="dialogFormVisible"
       width="30%"
+      @open="handleOpenDialog"
       @close="handleCloseDialog"
     ><h4 v-if="type==='detail'" slot="title">菜单详情</h4>
       <h4 v-else-if="type==='update'" slot="title">修改菜单</h4>
@@ -99,11 +100,13 @@
           :label-width="formLabelWidth"
           label="系统名称"
         >
-          <el-input
-            :disabled="true"
-            v-model="form.SysName"
-            auto-complete="off"
-          />
+          <el-select v-model="form.SysCode" placeholder="请选择" @change="changeSysSelect">
+            <el-option
+              v-for="item in options"
+              :key="item.SysCode"
+              :label="item.SysName"
+              :value="item.SysCode"/>
+          </el-select>
         </el-form-item>
         <el-form-item
           :label-width="formLabelWidth"
@@ -169,6 +172,7 @@
 </template>
 <script>
 import { getMenuList, addPerInfo, getPerInfoByMenuId, updatePerInfo } from '@/api/permission'
+import { sysDataSelect } from '@/api/sysconfig'
 export default {
   data() {
     return {
@@ -185,7 +189,8 @@ export default {
       dialogFormVisible: false,
       formLabelWidth: '100px',
       dialogInfoVisable: false,
-      selection: [] // 列表选择框的信息
+      selection: [], // 列表选择框的信息
+      options: []// 系统下拉数据
     }
   },
   created() {
@@ -198,24 +203,7 @@ export default {
     },
     // 新增事件
     handleInsert() {
-      var select = this.selection
-      if (select.length === 1) {
-        this.form.SysCode = select[0].SysCode
-        this.form.SysName = select[0].SysName
-        this.dialogFormVisible = true
-      } else if (select.length === 0) {
-        this.$message({
-          message: '请选择一条记录',
-          type: 'warning'
-        })
-        return false
-      } else {
-        this.$message({
-          message: '新增操作只能选择一条记录',
-          type: 'warning'
-        })
-        return false
-      }
+      this.dialogFormVisible = true
     },
     // 编辑事件
     handleClick(row) {
@@ -278,6 +266,12 @@ export default {
       this.form.PerData = []
       this.type = 'insert'
     },
+    // 监听dialog的打开事件
+    handleOpenDialog() {
+      sysDataSelect().then(response => {
+        this.options = response.Data
+      })
+    },
     handleTableCurrentChange(row, event, column) {
       console.log(row, event, column, event.currentTarget)
     },
@@ -302,6 +296,14 @@ export default {
       getPerInfoByMenuId(row.Id).then(response => {
         this.form = response.Data
       })
+    },
+    // 下拉框的数据
+    changeSysSelect(val) {
+      let obj = {}
+      obj = this.options.find((item) => {
+        return item.SysCode === val
+      })
+      this.form.SysName = obj.SysName
     }
   }
 }

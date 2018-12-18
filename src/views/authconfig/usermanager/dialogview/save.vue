@@ -116,11 +116,11 @@ export default {
       },
       formData: {},
       authData: [],
-      SysOptions: [],
+      SysOptions: [], // 系统checkbox数据
       checkedApplications: [],
       tabModel: '',
       editableTabs: [],
-      SelectData: [], // 记录选择的系统数据
+      SelectData: [], // 记录选择的系统数据 tab迭代使用
       lastSelect: ''
     }
   },
@@ -165,13 +165,17 @@ export default {
     },
     // 系统信息选择事件
     handlecheckedAppChange(val) {
-      this.SysOptions
-      // SelectData.push
-      // 根据信息动态展示套餐
-      // getSetMealRadio(val).then(response => { })
-      console.log('上次选择的值是' + this.lastSelect)
-      console.log('信息选择' + val)
-      this.lastSelect = val
+      this.SelectData = []
+      for (const i of val) {
+        for (const option of this.SysOptions) {
+          if (option.SysCode === i) {
+            var result = {}
+            result.SysName = option.SysName + '权限配置'
+            result.SysCode = option.SysCode
+            this.SelectData.push(result)
+          }
+        }
+      }
     }
   }
 }

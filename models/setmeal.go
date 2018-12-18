@@ -136,3 +136,10 @@ func UpdateSetMeal(setMeatInfo *input.SetMeatInput) (id int64, err error) {
 	id, err = o.InsertMulti(len(arr), permission)
 	return id, err
 }
+
+// 获取套餐信息 radio
+func GetSetMealRadio(sysCodes string) (data []map[string]interface{}, err error) {
+	o := orm.NewOrm()
+	_, err = o.Raw("select GROUP_CONCAT(SetMealCode) SetMealCode,GROUP_CONCAT(SetMealName) SetMealName,SysCode from setmeal group by SysCode").QueryRows(data)
+	return data, err
+}

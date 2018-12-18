@@ -20,6 +20,7 @@ func (c *SetMealController) URLMapping() {
 	c.Mapping("GetAll", c.GetAll)
 	c.Mapping("Put", c.Put)
 	c.Mapping("Delete", c.Delete)
+	c.Mapping("GetSetMealRadio", c.GetSetMealRadio)
 	//c.Mapping("check", c.CheckRepeat)
 }
 
@@ -138,6 +139,24 @@ func (c *SetMealController) UpdateSetMealInfo() {
 			result.Message = err.Error()
 			c.Data["json"] = result
 		}
+	} else {
+		result.Result = 0
+		result.Message = err.Error()
+		c.Data["json"] = result
+	}
+	c.ServeJSON()
+}
+
+// GetSetMealRadio ...
+// @Description 获取套餐信息
+// @router /getSetMealRadio
+func (c *SetMealController) GetSetMealRadio() {
+	sysCodesStr := c.GetString("sysCodes")
+	result := &out.OperResult{}
+	if data, err := models.GetSetMealRadio(sysCodesStr); err == nil {
+		result.Result = 1
+		result.Data = data
+		c.Data["json"] = result
 	} else {
 		result.Result = 0
 		result.Message = err.Error()

@@ -93,14 +93,16 @@
     </el-form-item>
     <template>
       <el-tabs type="card">
-        <el-tab-pane v-for="(sys, index) in SelectData" :label="sys.SysName" :key="index">{{ sys.SysName }}</el-tab-pane>
+        <el-tab-pane v-for="(sys, index) in SelectData" :label="sys.SysName" :key="index"><PermissionPage/></el-tab-pane>
       </el-tabs>
     </template>
   </el-form>
 </template>
 <script>
 import { sysDataSelect } from '@/api/sysconfig'
+import PermissionPage from './permission'
 export default {
+  components: { PermissionPage },
   props: {
     data: {
       type: Object,

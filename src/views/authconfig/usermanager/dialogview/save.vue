@@ -1,5 +1,5 @@
 <template>
-  <el-form :model="formData" size="small" disabled>
+  <el-form :model="formData" size="small">
     <el-form-item
       :label-width="formLabelWidth"
       label="公司名称"
@@ -81,29 +81,25 @@
         />
       </el-form-item></el-col>
     </el-row>
-    <div class="content">
-      <div class="power">
-        <h4>模块配置</h4>
-        <el-row>
-          <el-col :span="7">菜单功能</el-col>
-          <el-col :span="17">权限名称</el-col>
-        </el-row>
-        <div v-for="(permissionTop, topIndex) in authData" :key="topIndex">
-          <el-row>
-            <el-col :span="6">
-              <p class="checkGroup" style="width:99%;">
-                <el-checkbox :indeterminate="permissionTop.indeterminate" :key="topIndex" v-model="permissionTop.mychecked" :label="permissionTop.permissionId" class="auth_check" @change="onChangeTop(topIndex, permissionTop.permissionId, $event)">{{ permissionTop.permissionName }}</el-checkbox>
-            </p></el-col>
-            <el-col :span="18">
-              <el-checkbox v-for="permissionSon in permissionTop.childrenList" v-model="permissionSon.mychecked" :label="permissionSon.permissionId" :key="permissionSon.permissionId" @change="onChangeSon(topIndex, permissionSon.permissionId, permissionTop.permissionId, $event)">{{ permissionSon.permissionName }}</el-checkbox>
-            </el-col>
-        </el-row></div>
-      </div>
-    </div>
+    <el-form-item
+      :label-width="formLabelWidth"
+      label="系统名称"
+    >
+      <template>
+        <el-checkbox-group v-model="checkedApplications" @change="handlecheckedAppChange">
+          <el-checkbox v-for="(sys, index) in SysOptions" :label="sys.SysCode" :key="index">{{ sys.SysName }}</el-checkbox>
+        </el-checkbox-group>
+      </template>
+    </el-form-item>
+    <template>
+      <el-tabs type="card">
+        <el-tab-pane v-for="(sys, index) in SelectData" :label="sys.SysName" :key="index">{{ sys.SysName }}</el-tab-pane>
+      </el-tabs>
+    </template>
   </el-form>
 </template>
 <script>
-import { getUserInfo, getUserPermission } from '@/api/usermanage'
+import { sysDataSelect } from '@/api/sysconfig'
 export default {
   props: {
     data: {
@@ -119,20 +115,63 @@ export default {
         sysCode: this.data.sysCode
       },
       formData: {},
-      authData: []
+      authData: [],
+      SysOptions: [],
+      checkedApplications: [],
+      tabModel: '',
+      editableTabs: [],
+      SelectData: [], // 记录选择的系统数据
+      lastSelect: ''
     }
   },
   created() {
-    this.getUserData()
+    this.getSysData()
   },
   methods: {
-    getUserData() {
-      getUserInfo(this.search.tenId).then(response => {
-        this.formData = response.Data
+    // 获取企业checkbox和套餐的radio数据
+    getSysData() {
+      sysDataSelect().then(response => {
+        this.SysOptions = response.Data
       })
-      getUserPermission(this.search).then(response => {
-        this.authData = response.Data
-      })
+    },
+    onChangeTop(index, topId, e) { // 父级change事件
+      this.authData[index].mychecked = e// 父级勾选后，子级全部勾选或者取消
+      if (e === false) this.authData[index].indeterminate = false // 去掉不确定状态
+      var childrenArray = this.authData[index].childrenList
+      if (childrenArray) {
+        for (var i = 0, len = childrenArray.length; i < len; i++) { childrenArray[i].mychecked = e }
+      }
+    },
+    onChangeSon(topIndex, sonId, topId, e) { // 子级change事件
+      var childrenArray = this.authData[topIndex].childrenList
+      var tickCount = 0
+      var unTickCount = 0
+      var len = childrenArray.length
+      for (var i = 0; i < len; i++) {
+        if (sonId === childrenArray[i].permissionId) childrenArray[i].mychecked = e
+        if (childrenArray[i].mychecked === true) tickCount++
+        if (childrenArray[i].mychecked === false) unTickCount++
+      }
+      if (tickCount === len) { // 子级全勾选
+        this.authData[topIndex].mychecked = true
+        this.authData[topIndex].indeterminate = false
+      } else if (unTickCount === len) { // 子级全不勾选
+        this.authData[topIndex].mychecked = false
+        this.authData[topIndex].indeterminate = false
+      } else {
+        this.authData[topIndex].mychecked = true
+        this.authData[topIndex].indeterminate = true // 添加不确定状态
+      }
+    },
+    // 系统信息选择事件
+    handlecheckedAppChange(val) {
+      this.SysOptions
+      // SelectData.push
+      // 根据信息动态展示套餐
+      // getSetMealRadio(val).then(response => { })
+      console.log('上次选择的值是' + this.lastSelect)
+      console.log('信息选择' + val)
+      this.lastSelect = val
     }
   }
 }

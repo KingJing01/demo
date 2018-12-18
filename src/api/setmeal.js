@@ -40,3 +40,13 @@ export function updateSetMealInfo(info) {
     data: info
   })
 }
+
+export function getSetMealRadio(info) {
+  return request({
+    url: '/setmeal/getSetMealRadio',
+    method: 'post',
+    data: {
+      sysCodes: info
+    }
+  })
+}

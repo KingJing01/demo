@@ -97,7 +97,7 @@
         <h4 v-else slot="title">新增用户信息</h4>
         <div v-if="type==='detail'"><DetailPage :data="form"/></div>
         <div v-else-if="type==='update'"><UpdatePage :data="form"/></div>
-        <div v-else><SavePage /></div>
+        <div v-else><SavePage :data="form"/></div>
         <div
           slot="footer"
           class="dialog-footer"

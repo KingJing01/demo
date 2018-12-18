@@ -68,6 +68,7 @@ type UserManageInfo struct {
 type PermissonInfo struct {
 	Id          int
 	SysName     string
+	SysCode     string
 	DisplayName string
 	Name        string
 	MenuText    string

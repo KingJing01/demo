@@ -69,7 +69,10 @@ func AddPermission(m map[string]interface{}) (id int64, err error) {
 	permiss.DisplayName = m["DisplayName"].(string)
 	permiss.Name = m["Name"].(string)
 	permiss.IsMenu = 0
-	permiss.MenuText = string([]rune(menuText)[1:len(menuText)])
+	rs := []rune(menuText)
+	lth := len(rs)
+	menuText = string(rs[1:lth])
+	permiss.MenuText = menuText
 	permissionList = append(permissionList, permiss)
 	id, err = o.InsertMulti(len(arr)+1, permissionList)
 	return
@@ -79,7 +82,7 @@ func AddPermission(m map[string]interface{}) (id int64, err error) {
 // Id doesn't exist
 func GetPermissionById(id int) (v *out.PermissonInfo, err error) {
 	o := orm.NewOrm()
-	err = o.Raw("select DisplayName display_name,Name name ,MenuText menu_text,MenuCode menu_code,t2.SysName sys_name from permission t1 LEFT JOIN application t2 on t1.SysCode = t2.SysCode where t1.Id = ?", id).QueryRow(&v)
+	err = o.Raw("select t1.Id id ,DisplayName display_name,Name name ,MenuText menu_text,MenuCode menu_code,t2.SysName sys_name from permission t1 LEFT JOIN application t2 on t1.SysCode = t2.SysCode where t1.Id = ?", id).QueryRow(&v)
 	var lists []out.PerInfo
 	_, err = o.Raw("select DisplayName display_name,Name name from permission where MenuCode = ? and IsMenu=1", v.MenuCode).QueryRows(&lists)
 	v.PerData = lists
@@ -285,13 +288,14 @@ func GenerMenuCode() (menuCode int) {
 }
 
 // 更新基本权限信息
-func UpdatePermission(m map[string]interface{}) (err error) {
-	sysCodeStr := m["SysCode"].(string)
-	sysCode, _ := strconv.Atoi(sysCodeStr)
+func UpdatePermission(m map[string]interface{}, id int) (err error) {
+	o := orm.NewOrm()
+	v := Permission{Id: id}
+	o.Read(&v)
 	var permissionList []Permission
 	var permiss Permission
 	permiss.CreationTime = time.Now()
-	permiss.SysCode = sysCode
+	permiss.SysCode = v.SysCode
 	arr := m["PerData"].([]interface{})
 	var menuText string
 	for _, per := range arr {
@@ -301,9 +305,16 @@ func UpdatePermission(m map[string]interface{}) (err error) {
 		permiss.DisplayName = menu
 		permiss.Name = value["Name"].(string)
 		permiss.IsMenu = 1
+		permiss.MenuCode = v.MenuCode
 		permissionList = append(permissionList, permiss)
 	}
-	o := orm.NewOrm()
-	_, err = o.InsertMulti(len(arr)+1, permissionList)
+	displayName := m["DisplayName"].(string)
+	name := m["Name"].(string)
+	rs := []rune(menuText)
+	lth := len(rs)
+	menuText = string(rs[1:lth])
+	_, err = o.Raw("UPDATE permission set DisplayName=?,Name=?,LastModificationTime=?,MenuText=? where Id=?", displayName, name, time.Now(), menuText, id).Exec()
+	_, err = o.Raw("DELETE FROM  permission where TenantId = 0 and IsMenu = 1  and  MenuCode=? ", v.MenuCode).Exec()
+	_, err = o.InsertMulti(len(arr), permissionList)
 	return err
 }

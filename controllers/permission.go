@@ -137,9 +137,11 @@ func (c *PermissionController) GetAll() {
 // @router /:id [put]
 func (c *PermissionController) Put() {
 	result := &out.OperResult{}
+	idStr := c.Ctx.Input.Param(":id")
+	id, _ := strconv.Atoi(idStr)
 	var mystruct map[string]interface{}
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &mystruct); err == nil {
-		if err := models.UpdatePermission(mystruct); err == nil {
+		if err := models.UpdatePermission(mystruct, id); err == nil {
 			result.Result = 1
 			c.Data["json"] = result
 		} else {

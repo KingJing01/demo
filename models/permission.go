@@ -43,7 +43,7 @@ func init() {
 
 // AddPermission insert a new Permission into database and returns
 // last inserted Id on success.
-func AddPermission(m map[string]interface{}) (id int64, err error) {
+func AddPermission(m map[string]interface{}, userID int64) (id int64, err error) {
 	sysCodeStr := m["SysCode"].(string)
 	sysCode, _ := strconv.Atoi(sysCodeStr)
 	menuCode := GenerMenuCode()
@@ -54,6 +54,7 @@ func AddPermission(m map[string]interface{}) (id int64, err error) {
 	permiss.CreationTime = time.Now()
 	permiss.SysCode = sysCode
 	permiss.MenuCode = menuCode
+	permiss.CreatorUserId = userID
 	arr := m["PerData"].([]interface{})
 	var menuText string
 	for _, per := range arr {
@@ -288,13 +289,14 @@ func GenerMenuCode() (menuCode int) {
 }
 
 // 更新基本权限信息
-func UpdatePermission(m map[string]interface{}, id int) (err error) {
+func UpdatePermission(m map[string]interface{}, id int, userID int64) (err error) {
 	o := orm.NewOrm()
 	v := Permission{Id: id}
 	o.Read(&v)
 	var permissionList []Permission
 	var permiss Permission
 	permiss.CreationTime = time.Now()
+	permiss.CreatorUserId = userID
 	permiss.SysCode = v.SysCode
 	arr := m["PerData"].([]interface{})
 	var menuText string
@@ -313,8 +315,8 @@ func UpdatePermission(m map[string]interface{}, id int) (err error) {
 	rs := []rune(menuText)
 	lth := len(rs)
 	menuText = string(rs[1:lth])
-	_, err = o.Raw("UPDATE permission set DisplayName=?,Name=?,LastModificationTime=?,MenuText=? where Id=?", displayName, name, time.Now(), menuText, id).Exec()
-	_, err = o.Raw("DELETE FROM  permission where TenantId = 0 and IsMenu = 1  and  MenuCode=? ", v.MenuCode).Exec()
+	_, err = o.Raw("UPDATE permission set DisplayName=?,Name=?,LastModificationTime=?,MenuText=?,LastModificationUserId=? where Id=?", displayName, name, time.Now(), menuText, userID, id).Exec()
+	_, err = o.Raw("DELETE FROM  permission where TenantId = 0 and IsMenu = 1  and  MenuCode=?  ", v.MenuCode).Exec()
 	_, err = o.InsertMulti(len(arr), permissionList)
 	return err
 }

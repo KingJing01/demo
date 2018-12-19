@@ -34,9 +34,15 @@ func (c *PermissionController) URLMapping() {
 // @router / [post]
 func (c *PermissionController) Post() {
 	result := &out.OperResult{}
+	userID := c.GetSession("userId")
+	if userID == nil {
+		result.Result = 0
+		result.Message = "seesion失效"
+		c.Data["json"] = result
+	}
 	var mystruct map[string]interface{}
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &mystruct); err == nil {
-		if _, err := models.AddPermission(mystruct); err == nil {
+		if _, err := models.AddPermission(mystruct, userID.(int64)); err == nil {
 			result.Result = 1
 			c.Data["json"] = result
 		} else {
@@ -137,11 +143,17 @@ func (c *PermissionController) GetAll() {
 // @router /:id [put]
 func (c *PermissionController) Put() {
 	result := &out.OperResult{}
+	userID := c.GetSession("userId")
+	if userID == nil {
+		result.Result = 0
+		result.Message = "seesion失效"
+		c.Data["json"] = result
+	}
 	idStr := c.Ctx.Input.Param(":id")
 	id, _ := strconv.Atoi(idStr)
 	var mystruct map[string]interface{}
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &mystruct); err == nil {
-		if err := models.UpdatePermission(mystruct, id); err == nil {
+		if err := models.UpdatePermission(mystruct, id, userID.(int64)); err == nil {
 			result.Result = 1
 			c.Data["json"] = result
 		} else {

@@ -93,7 +93,7 @@
     </el-form-item>
     <template>
       <el-tabs type="card">
-        <el-tab-pane v-for="(sys, index) in SelectData" :label="sys.SysName" :key="index"><PermissionPage/></el-tab-pane>
+        <el-tab-pane v-for="(sys, index) in SelectData" :label="sys.SysName" :key="index"><PermissionPage :sys-code="sys.SysCode" @listen="getChildEvent"/></el-tab-pane>
       </el-tabs>
     </template>
   </el-form>
@@ -112,10 +112,6 @@ export default {
   data() {
     return {
       formLabelWidth: '100px',
-      search: {
-        tenId: this.data.id,
-        sysCode: this.data.sysCode
-      },
       formData: {},
       authData: [],
       SysOptions: [], // 系统checkbox数据
@@ -123,7 +119,7 @@ export default {
       tabModel: '',
       editableTabs: [],
       SelectData: [], // 记录选择的系统数据 tab迭代使用
-      lastSelect: ''
+      childPerSelect: []// 记录历史选择的套餐及权限信息
     }
   },
   created() {
@@ -175,6 +171,25 @@ export default {
             result.SysName = option.SysName + '权限配置'
             result.SysCode = option.SysCode
             this.SelectData.push(result)
+          }
+        }
+      }
+    },
+    getChildEvent(val) {
+      if (this.childPerSelect.length === 0) {
+        this.childPerSelect.push(val)
+      } else {
+        var data = this.childPerSelect.filter(function(item) {
+          return item.sysCode === val.sysCode
+        })
+        if (!data) {
+          this.childPerSelect.push(val)
+        } else {
+          for (const index in this.childPerSelect) {
+            if (this.childPerSelect[index].sysCode === val.sysCode) {
+              this.childPerSelect[index].data = val.data
+              return
+            }
           }
         }
       }

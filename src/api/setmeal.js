@@ -44,8 +44,8 @@ export function updateSetMealInfo(info) {
 export function getSetMealRadio(info) {
   return request({
     url: '/setmeal/getSetMealRadio',
-    method: 'post',
-    data: {
+    method: 'get',
+    params: {
       sysCodes: info
     }
   })

@@ -13,35 +13,23 @@ import (
 
 type User struct {
 	Id                     int64     `orm:"column(Id);auto"`
-	AccessFailedCount      int       `orm:"column(AccessFailedCount)"`
-	AuthenticationSource   string    `orm:"column(AuthenticationSource);size(64);null"`
-	ConcurrencyStamp       string    `orm:"column(ConcurrencyStamp);size(128);null"`
 	CreationTime           time.Time `orm:"column(CreationTime);type(datetime)"`
 	CreatorUserId          int64     `orm:"column(CreatorUserId);null"`
 	DeleterUserId          int64     `orm:"column(DeleterUserId);null"`
 	DeletionTime           time.Time `orm:"column(DeletionTime);type(datetime);null"`
 	EmailAddress           string    `orm:"column(EmailAddress);size(256)"`
 	EmailConfirmationCode  string    `orm:"column(EmailConfirmationCode);size(328);null"`
-	IsActive               int8      `orm:"column(IsActive)"`
 	IsDeleted              int8      `orm:"column(IsDeleted)"`
 	IsEmailConfirmed       int8      `orm:"column(IsEmailConfirmed)"`
-	IsLockoutEnabled       int8      `orm:"column(IsLockoutEnabled)"`
 	IsPhoneNumberConfirmed int8      `orm:"column(IsPhoneNumberConfirmed)"`
-	IsTwoFactorEnabled     int8      `orm:"column(IsTwoFactorEnabled)"`
-	LastLoginTime          time.Time `orm:"column(LastLoginTime);type(datetime);null"`
 	LastModificationTime   time.Time `orm:"column(LastModificationTime);type(datetime);null"`
 	LastModifierUserId     int64     `orm:"column(LastModifierUserId);null"`
-	LockoutEndDateUtc      time.Time `orm:"column(LockoutEndDateUtc);type(datetime);null"`
 	Name                   string    `orm:"column(Name);size(32)"`
-	NormalizedEmailAddress string    `orm:"column(NormalizedEmailAddress);size(256)"`
-	NormalizedUserName     string    `orm:"column(NormalizedUserName);size(32)"`
+	UserName               string    `orm:"column(UserName);size(32)"`
 	PasswordResetCode      string    `orm:"column(PasswordResetCode);size(328);null"`
 	PhoneNumber            string    `orm:"column(PhoneNumber);size(32);null"`
-	SecurityStamp          string    `orm:"column(SecurityStamp);size(128);null"`
-	Surname                string    `orm:"column(Surname);size(32)"`
 	TenantId               int       `orm:"column(TenantId);null"`
-	UserName               string    `orm:"column(UserName);size(32)"`
-	SysCode                int       `orm:"column(SysCode)"`
+	SysCode                string    `orm:"column(SysCode)"`
 	SsoID                  int       `orm:"column(SsoId)"`
 }
 

@@ -89,3 +89,12 @@ func ParsePermissionDataForCheckboxUpdate(data []out.PermissionCheckInfo) (resul
 	}
 	return result
 }
+
+// 将前台的字符串数组转化 []interface{} 转 []string
+func ParseInterfaceArr(params []interface{}) (param []string) {
+	strArray := make([]string, len(params))
+	for i, arg := range params {
+		strArray[i] = arg.(string)
+	}
+	return strArray
+}

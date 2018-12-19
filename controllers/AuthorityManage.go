@@ -6,7 +6,6 @@ import (
 	out "demo/outmodels"
 	"demo/tools"
 	"encoding/json"
-	"fmt"
 	"strconv"
 	"time"
 
@@ -125,8 +124,8 @@ func (tc *AuthorityManageController) Login() {
 		token.Claims = claims
 		tokenString, err := token.SignedString([]byte(SecretKey))
 		//获取用户对应的系统权限
-		permissions, _ := models.GetPermissionByUser(user.Id, l.SysCode)
-		permissionData, err := json.Marshal(permissions)
+		//permissions, _ := models.GetPermissionByUser(user.Id, l.SysCode)
+		//permissionData, err := json.Marshal(permissions)
 		// 设置 user 信息
 		/*var userOut out.UserInfoToken
 		userOut.UserName = user.UserName
@@ -135,15 +134,13 @@ func (tc *AuthorityManageController) Login() {
 		tokenMap["ssoId"] = string(user.SsoID)
 		jsonUser, _ := json.Marshal(userOut)
 		tokenMap["userInfo"] = string(jsonUser)*/
-		tools.InitRedis()
-		skey := fmt.Sprintf("%s_%s", tokenString, l.SysCode)
-		tools.Globalcluster.Do("set", skey, permissionData)
+		//tools.InitRedis()
+		//skey := fmt.Sprintf("%s_%s", tokenString, l.SysCode)
+		//tools.Globalcluster.Do("set", skey, permissionData)
 		//tokenInfo, _ := json.Marshal(tokenMap)
-		_, err2 := tools.Globalcluster.Do("set", tokenString, user.SsoID)
-		fmt.Print(err2)
-		_, err1 := tools.Globalcluster.Do("EXPIRE", tokenString, 12*3600)
-		fmt.Print(err1)
-		tools.Globalcluster.Close()
+		//tools.Globalcluster.Do("set", tokenString, user.SsoID)
+		//tools.Globalcluster.Do("EXPIRE", tokenString, 12*3600)
+		//tools.Globalcluster.Close()
 		lresult.Result = 1
 		lresult.Token = tokenString
 		tc.Data["json"] = lresult

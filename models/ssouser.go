@@ -9,23 +9,24 @@ import (
 	"github.com/astaxie/beego/orm"
 )
 
-type Ssouser struct {
+type SsoUser struct {
 	Id     int    `orm:"column(Id);auto"`
 	Phone  string `orm:"column(Phone);size(20)"`
 	Passwd string `orm:"column(Passwd);size(45)"`
+	Email  string `orm:"column(Email);size(50)"`
 }
 
-func (t *Ssouser) TableName() string {
+func (t *SsoUser) TableName() string {
 	return "ssouser"
 }
 
 func init() {
-	orm.RegisterModel(new(Ssouser))
+	orm.RegisterModel(new(SsoUser))
 }
 
-// AddSsouser insert a new Ssouser into database and returns
+// AddSsoUser insert a new SsoUser into database and returns
 // last inserted Id on success.
-func AddSsouser(m *Ssouser) (id int64, err error) {
+func AddSsoUser(m *SsoUser) (id int64, err error) {
 	o := orm.NewOrm()
 	id, err = o.Insert(m)
 	return
@@ -33,21 +34,21 @@ func AddSsouser(m *Ssouser) (id int64, err error) {
 
 // GetSsouserById retrieves Ssouser by Id. Returns error if
 // Id doesn't exist
-func GetSsouserById(id int) (v *Ssouser, err error) {
+func GetSsouserById(id int) (v *SsoUser, err error) {
 	o := orm.NewOrm()
-	v = &Ssouser{Id: id}
+	v = &SsoUser{Id: id}
 	if err = o.Read(v); err == nil {
 		return v, nil
 	}
 	return nil, err
 }
 
-// GetAllSsouser retrieves all Ssouser matches certain condition. Returns empty list if
+// GetAllSsoUser retrieves all SsoUser matches certain condition. Returns empty list if
 // no records exist
-func GetAllSsouser(query map[string]string, fields []string, sortby []string, order []string,
+func GetAllSsoUser(query map[string]string, fields []string, sortby []string, order []string,
 	offset int64, limit int64) (ml []interface{}, err error) {
 	o := orm.NewOrm()
-	qs := o.QueryTable(new(Ssouser))
+	qs := o.QueryTable(new(SsoUser))
 	// query k=v
 	for k, v := range query {
 		// rewrite dot-notation to Object__Attribute
@@ -97,7 +98,7 @@ func GetAllSsouser(query map[string]string, fields []string, sortby []string, or
 		}
 	}
 
-	var l []Ssouser
+	var l []SsoUser
 	qs = qs.OrderBy(sortFields...)
 	if _, err = qs.Limit(limit, offset).All(&l, fields...); err == nil {
 		if len(fields) == 0 {
@@ -122,9 +123,9 @@ func GetAllSsouser(query map[string]string, fields []string, sortby []string, or
 
 // UpdateSsouser updates Ssouser by Id and returns error if
 // the record to be updated doesn't exist
-func UpdateSsouserById(m *Ssouser) (err error) {
+func UpdateSsouserById(m *SsoUser) (err error) {
 	o := orm.NewOrm()
-	v := Ssouser{Id: m.Id}
+	v := SsoUser{Id: m.Id}
 	// ascertain id exists in the database
 	if err = o.Read(&v); err == nil {
 		var num int64
@@ -135,15 +136,15 @@ func UpdateSsouserById(m *Ssouser) (err error) {
 	return
 }
 
-// DeleteSsouser deletes Ssouser by Id and returns error if
+// DeleteSsoUser deletes Ssouser by Id and returns error if
 // the record to be deleted doesn't exist
-func DeleteSsouser(id int) (err error) {
+func DeleteSsoUser(id int) (err error) {
 	o := orm.NewOrm()
-	v := Ssouser{Id: id}
+	v := SsoUser{Id: id}
 	// ascertain id exists in the database
 	if err = o.Read(&v); err == nil {
 		var num int64
-		if num, err = o.Delete(&Ssouser{Id: id}); err == nil {
+		if num, err = o.Delete(&SsoUser{Id: id}); err == nil {
 			fmt.Println("Number of records deleted in database:", num)
 		}
 	}

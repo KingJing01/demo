@@ -45,9 +45,71 @@ func init() {
 
 // AddTenant insert a new Tenant into database and returns
 // last inserted Id on success.
-func AddTenant(m *Tenant) (id int64, err error) {
+func AddTenant(m *Tenant, syScode []string, perId []string, perMenu []string) (err error) {
 	o := orm.NewOrm()
-	id, err = o.Insert(m)
+	//开启事务
+	o.Begin()
+	// 创建租户信息
+	_, err = o.Insert(m)
+	if err != nil {
+		//回滚
+		o.Rollback()
+		return err
+	}
+	//新增一个ssouer
+	ssoUser := SsoUser{}
+	ssoUser.Passwd = "123456"
+	ssoUser.Phone = m.LinkPhone
+	ssoUser.Email = m.Email
+	ssoId, err := AddSsoUser(&ssoUser)
+	if err != nil {
+		//回滚
+		o.Rollback()
+		return err
+	}
+	user := User{}
+	var userList []User
+	user.CreationTime = time.Now()
+	user.SsoID = int(ssoId)
+	user.EmailAddress = m.Email
+	user.PhoneNumber = m.LinkPhone
+	user.TenantId = m.Id
+	//循环
+	permissionStr := ""
+	tenApp := TenantApplication{}
+	var tenAppList []TenantApplication
+	tenApp.TenantId = m.Id
+	for i, arg := range syScode {
+		user.SysCode = arg
+		userList = append(userList, user)
+		permissionStr += perId[i]
+		tenApp.SysCode = arg
+		tenApp.MenuText = perMenu[i]
+		tenAppList = append(tenAppList, tenApp)
+	}
+	// 新增user 多系统会生成多个记录
+	_, err = o.InsertMulti(len(syScode), userList)
+	if err != nil {
+		//回滚
+		o.Rollback()
+		return err
+	}
+	// permission 表 插入租户拥有的权限
+	err = InsertTenantPermission(permissionStr, m.Id)
+	if err != nil {
+		//回滚
+		o.Rollback()
+		return err
+	}
+	// 插入租户应用关联信息表
+	_, err = o.InsertMulti(len(syScode), tenAppList)
+	if err != nil {
+		//回滚
+		o.Rollback()
+		return err
+	}
+	//事务提交
+	o.Commit()
 	return
 }
 
@@ -65,17 +127,21 @@ func GetTenantById(id int) (v *Tenant, err error) {
 
 // UpdateTenant updates Tenant by Id and returns error if
 // the record to be updated doesn't exist
-func UpdateTenantById(m *Tenant) (err error) {
+func UpdateTenantById(m *Tenant, sysCode string, perIdStr string, perMenu string, tenId int) (err error) {
 	o := orm.NewOrm()
+	o.Begin()
 	v := Tenant{Id: m.Id}
 	// ascertain id exists in the database
 	if err = o.Read(&v); err == nil {
 		m.CreationTime = v.CreationTime
 		_, err = o.Update(m)
 	}
-	// 删除原先已有的权限信息
-
-	//新增修改的权限信息
+	//权限信息修改
+	err = UpdateTenantPermission(sysCode, perIdStr, perMenu, v.Id)
+	if err != nil {
+		o.Rollback()
+	}
+	o.Commit()
 	return
 }
 

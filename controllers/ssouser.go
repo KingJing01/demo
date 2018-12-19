@@ -32,9 +32,9 @@ func (c *SsouserController) URLMapping() {
 // @Failure 403 body is empty
 // @router / [post]
 func (c *SsouserController) Post() {
-	var v models.Ssouser
+	var v models.SsoUser
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
-		if _, err := models.AddSsouser(&v); err == nil {
+		if _, err := models.AddSsoUser(&v); err == nil {
 			c.Ctx.Output.SetStatus(201)
 			c.Data["json"] = v
 		} else {
@@ -119,7 +119,7 @@ func (c *SsouserController) GetAll() {
 		}
 	}
 
-	l, err := models.GetAllSsouser(query, fields, sortby, order, offset, limit)
+	l, err := models.GetAllSsoUser(query, fields, sortby, order, offset, limit)
 	if err != nil {
 		c.Data["json"] = err.Error()
 	} else {
@@ -139,7 +139,7 @@ func (c *SsouserController) GetAll() {
 func (c *SsouserController) Put() {
 	idStr := c.Ctx.Input.Param(":id")
 	id, _ := strconv.Atoi(idStr)
-	v := models.Ssouser{Id: id}
+	v := models.SsoUser{Id: id}
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 		if err := models.UpdateSsouserById(&v); err == nil {
 			c.Data["json"] = "OK"
@@ -162,7 +162,7 @@ func (c *SsouserController) Put() {
 func (c *SsouserController) Delete() {
 	idStr := c.Ctx.Input.Param(":id")
 	id, _ := strconv.Atoi(idStr)
-	if err := models.DeleteSsouser(id); err == nil {
+	if err := models.DeleteSsoUser(id); err == nil {
 		c.Data["json"] = "OK"
 	} else {
 		c.Data["json"] = err.Error()

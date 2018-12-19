@@ -36,9 +36,14 @@ func (c *TenantController) URLMapping() {
 func (c *TenantController) Post() {
 	result := &out.OperResult{}
 	var v models.Tenant
+	var mystruct map[string]interface{}
+	json.Unmarshal(c.Ctx.Input.RequestBody, &mystruct)
+	sysCode := tool.ParseInterfaceArr(mystruct["sysCode"].([]interface{}))
+	perId := tool.ParseInterfaceArr(mystruct["perId"].([]interface{}))
+	perMenu := tool.ParseInterfaceArr(mystruct["perMenu"].([]interface{}))
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
-		v.CreationTime = time.Now()
-		if _, err := models.AddTenant(&v); err == nil {
+		v.LastModificationTime = time.Now()
+		if err := models.AddTenant(&v, sysCode, perId, perMenu); err == nil {
 			result.Result = 1
 			c.Data["json"] = result
 		} else {
@@ -151,9 +156,7 @@ func (c *TenantController) Put() {
 	perMenu := mystruct["perMenu"].(string)
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 		v.LastModificationTime = time.Now()
-		if err := models.UpdateTenantById(&v); err == nil {
-			// 更新权限信息
-			models.UpdateTenantPermission(sysCode, perIdStr, perMenu, v.Id)
+		if err := models.UpdateTenantById(&v, sysCode, perIdStr, perMenu, v.Id); err == nil {
 			result.Result = 1
 			c.Data["json"] = result
 		} else {

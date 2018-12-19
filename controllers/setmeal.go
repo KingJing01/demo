@@ -149,7 +149,7 @@ func (c *SetMealController) UpdateSetMealInfo() {
 
 // GetSetMealRadio ...
 // @Description 获取套餐信息
-// @router /getSetMealRadio
+// @router /getSetMealRadio [get]
 func (c *SetMealController) GetSetMealRadio() {
 	sysCodesStr := c.GetString("sysCodes")
 	result := &out.OperResult{}

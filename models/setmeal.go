@@ -79,7 +79,7 @@ func GenerateSetMeatCode() (SetMealCode string) {
 	return maps[0]["setMealCode"].(string)
 }
 
-func AddSetMeal(setMeatInfo *input.SetMeatInput) (id int64, err error) {
+func AddSetMeal(setMeatInfo *input.SetMeatInput, userID int64) (id int64, err error) {
 	//生成套餐编号
 	setMeatCode := GenerateSetMeatCode()
 	// 套餐表
@@ -88,6 +88,7 @@ func AddSetMeal(setMeatInfo *input.SetMeatInput) (id int64, err error) {
 	setMeal.SetMealCode = setMeatCode
 	setMeal.PermissionText = setMeatInfo.PerName
 	setMeal.CreationTime = time.Now()
+	setMeal.CreatorUserId = userID
 	setMeal.SysCode = setMeatInfo.SysCode
 	o := orm.NewOrm()
 	id, err = o.Insert(setMeal)
@@ -106,7 +107,7 @@ func AddSetMeal(setMeatInfo *input.SetMeatInput) (id int64, err error) {
 }
 
 // 禁用套餐信息
-func DeleteSetMeal(ids string) (err error) {
+func DeleteSetMeal(ids string, userID int64) (err error) {
 	arr := strings.Split(ids, ",")
 	var param string
 	for _, x := range arr {
@@ -114,15 +115,15 @@ func DeleteSetMeal(ids string) (err error) {
 	}
 	length := len(param) - 1
 	params := param[0:length]
-	var sql = "update setmeal set IsDeleted=1 , DeletionTime = ?  where Id in ( " + params + ")"
+	var sql = "update setmeal set IsDeleted=1 , DeletionTime = ? ,DeleterUserId = ? where Id in ( " + params + ")"
 	o := orm.NewOrm()
-	_, err = o.Raw(sql, time.Now()).Exec()
+	_, err = o.Raw(sql, time.Now(), userID).Exec()
 	return
 }
 
-func UpdateSetMeal(setMeatInfo *input.SetMeatInput) (id int64, err error) {
+func UpdateSetMeal(setMeatInfo *input.SetMeatInput, userID int64) (id int64, err error) {
 	o := orm.NewOrm()
-	o.Raw("update setmeal set SetMealName=?,SysCode=?,LastModificationTime=?,PermissionText=? where Id=? ", setMeatInfo.SetMealName, setMeatInfo.SysCode, time.Now(), setMeatInfo.PerName, setMeatInfo.Id).Exec()
+	o.Raw("update setmeal set SetMealName=?,SysCode=?,LastModificationTime=?,PermissionText=?,LastModificationUserId=? where Id=? ", setMeatInfo.SetMealName, setMeatInfo.SysCode, time.Now(), userID, setMeatInfo.PerName, setMeatInfo.Id).Exec()
 	o.Raw("delete  from permissionpackage where SetMealCode= ?", setMeatInfo.SetMealCode).Exec()
 	//权限套餐关系数据录入
 	var permission []PermissionPackage

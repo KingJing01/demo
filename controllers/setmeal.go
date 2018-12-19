@@ -84,9 +84,15 @@ func (c *SetMealController) GetAll() {
 // @router / [post]
 func (c *SetMealController) Post() {
 	result := &out.OperResult{}
+	userID := c.GetSession("userId")
+	if userID == nil {
+		result.Result = 0
+		result.Message = "seesion失效"
+		c.Data["json"] = result
+	}
 	var v input.SetMeatInput
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
-		if _, err := models.AddSetMeal(&v); err == nil {
+		if _, err := models.AddSetMeal(&v, userID.(int64)); err == nil {
 			result.Result = 1
 			c.Data["json"] = result
 		} else {
@@ -111,8 +117,14 @@ func (c *SetMealController) Post() {
 // @router /:id [delete]
 func (c *SetMealController) Delete() {
 	result := &out.OperResult{}
+	userID := c.GetSession("userId")
+	if userID == nil {
+		result.Result = 0
+		result.Message = "seesion失效"
+		c.Data["json"] = result
+	}
 	ids := c.Ctx.Input.Param(":id")
-	if err := models.DeleteSetMeal(ids); err == nil {
+	if err := models.DeleteSetMeal(ids, userID.(int64)); err == nil {
 		result.Result = 1
 		c.Data["json"] = result
 	} else {
@@ -129,9 +141,15 @@ func (c *SetMealController) Delete() {
 // @router /updateSetMealInfo [put]
 func (c *SetMealController) UpdateSetMealInfo() {
 	result := &out.OperResult{}
+	userID := c.GetSession("userId")
+	if userID == nil {
+		result.Result = 0
+		result.Message = "seesion失效"
+		c.Data["json"] = result
+	}
 	var v input.SetMeatInput
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
-		if _, err := models.UpdateSetMeal(&v); err == nil {
+		if _, err := models.UpdateSetMeal(&v, userID.(int64)); err == nil {
 			result.Result = 1
 			c.Data["json"] = result
 		} else {

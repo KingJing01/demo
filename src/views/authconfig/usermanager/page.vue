@@ -114,9 +114,8 @@
   </template></div>
 </template>
 <script>
-import { getListData, saveSysInfo } from '@/api/sysconfig'
-import { getUserList, updateTenantInfo } from '@/api/usermanage'
-import { transPermissionCheckedData } from '@/api/utils'
+import { getUserList, updateTenantInfo, saveTenantInfo } from '@/api/usermanage'
+import { transPermissionCheckedData, transPermissionCheckedDataArr } from '@/api/utils'
 
 import DetailPage from './dialogview/detail'
 import SavePage from './dialogview/save'
@@ -175,7 +174,7 @@ export default {
     handleCurrentChange(val) {
       var pageSize = this.search.pageSize
       this.search.offset = (val > 1 ? (val - 1) * pageSize : 0)
-      getListData(this.search).then(response => {
+      getUserList(this.search).then(response => {
         this.tableData = response.Data.list
         this.search.pageTotal = response.Data.total
       })
@@ -183,14 +182,38 @@ export default {
     // 保存/修改用户信息
     saveData() {
       console.log(this.form)
-      debugger
       if (this.type === 'insert') {
-        saveSysInfo(this.form).then(response => {
+        const transData = transPermissionCheckedDataArr(this.form.authData)
+        var perId = []
+        var perName = []
+        var perMenu = []
+        var sysCode = []
+        for (const index in transData) {
+          var arrIndexData = transData[index]
+          if (arrIndexData.perName === '') {
+            this.$message({
+              message: '系统中必须选择操作权限',
+              type: 'warning'
+            })
+            return false
+          } else {
+            perId.push(arrIndexData.perId)
+            perName.push(arrIndexData.perName)
+            perMenu.push(arrIndexData.perMenu)
+            sysCode.push(arrIndexData.sysCode)
+          }
+        }
+        this.tenant = this.form.formData
+        this.tenant.perMenu = perMenu
+        this.tenant.perId = perId
+        this.tenant.sysCode = sysCode
+        saveTenantInfo(this.tenant).then(response => {
           this.dialogFormVisible = false
           this.getList()
+          this.tenant = {}
         })
       } else {
-        var transData = transPermissionCheckedData(this.form.authData)
+        const transData = transPermissionCheckedData(this.form.authData)
         if (transData.perName === '') {
           this.$message({
             message: '请选择操作权限',

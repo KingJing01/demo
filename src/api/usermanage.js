@@ -10,6 +10,7 @@ export function getUserList(info) {
   })
 }
 
+// 获取租户表的信息
 export function getUserInfo(tenId) {
   return request({
     url: '/tenant/' + tenId,
@@ -17,6 +18,7 @@ export function getUserInfo(tenId) {
   })
 }
 
+// 获取租户下对应的系统权限
 export function getUserPermission(info) {
   return request({
     url: '/tenant/getTenantPermission',
@@ -28,10 +30,20 @@ export function getUserPermission(info) {
   })
 }
 
+// 更新租户信息
 export function updateTenantInfo(info) {
   return request({
     url: '/tenant/' + info.Id,
     method: 'put',
+    data: info
+  })
+}
+
+// 保存租户信息
+export function saveTenantInfo(info) {
+  return request({
+    url: '/tenant',
+    method: 'post',
     data: info
   })
 }

@@ -132,35 +132,6 @@ export default {
         this.SysOptions = response.Data
       })
     },
-    onChangeTop(index, topId, e) { // 父级change事件
-      this.authData[index].mychecked = e// 父级勾选后，子级全部勾选或者取消
-      if (e === false) this.authData[index].indeterminate = false // 去掉不确定状态
-      var childrenArray = this.authData[index].childrenList
-      if (childrenArray) {
-        for (var i = 0, len = childrenArray.length; i < len; i++) { childrenArray[i].mychecked = e }
-      }
-    },
-    onChangeSon(topIndex, sonId, topId, e) { // 子级change事件
-      var childrenArray = this.authData[topIndex].childrenList
-      var tickCount = 0
-      var unTickCount = 0
-      var len = childrenArray.length
-      for (var i = 0; i < len; i++) {
-        if (sonId === childrenArray[i].permissionId) childrenArray[i].mychecked = e
-        if (childrenArray[i].mychecked === true) tickCount++
-        if (childrenArray[i].mychecked === false) unTickCount++
-      }
-      if (tickCount === len) { // 子级全勾选
-        this.authData[topIndex].mychecked = true
-        this.authData[topIndex].indeterminate = false
-      } else if (unTickCount === len) { // 子级全不勾选
-        this.authData[topIndex].mychecked = false
-        this.authData[topIndex].indeterminate = false
-      } else {
-        this.authData[topIndex].mychecked = true
-        this.authData[topIndex].indeterminate = true // 添加不确定状态
-      }
-    },
     // 系统信息选择事件
     handlecheckedAppChange(val) {
       this.SelectData = []
@@ -182,17 +153,19 @@ export default {
         var data = this.childPerSelect.filter(function(item) {
           return item.sysCode === val.sysCode
         })
-        if (!data) {
+        if (data.length === 0) {
           this.childPerSelect.push(val)
         } else {
           for (const index in this.childPerSelect) {
             if (this.childPerSelect[index].sysCode === val.sysCode) {
               this.childPerSelect[index].data = val.data
-              return
+              break
             }
           }
         }
       }
+      this.data.authData = this.childPerSelect
+      this.data.formData = this.formData
     }
   }
 }

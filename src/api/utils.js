@@ -34,3 +34,17 @@ export function transPermissionCheckedData(data) {
   return permission
 }
 
+/*
+* 转换权限数据 多套餐数组数据
+* 返回 数组对象
+*/
+export function transPermissionCheckedDataArr(data) {
+  var permission = []
+  for (const index in data) {
+    const result = transPermissionCheckedData(data[index].data)
+    result.sysCode = data[index].sysCode
+    permission.push(result)
+  }
+  return permission
+}
+

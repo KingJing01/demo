@@ -116,6 +116,7 @@ func (tc *AuthorityManageController) Login() {
 			tc.ServeJSON()
 			return
 		}
+		tc.SetSession("userId", user.Id)
 		token := jwt.New(jwt.SigningMethodHS256)
 		claims := make(jwt.MapClaims)
 		claims["jti"] = user.Id

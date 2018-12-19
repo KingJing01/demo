@@ -162,20 +162,21 @@ func UpdateApplicationById(m *Application) (err error) {
 	if err = o.Read(&v); err == nil {
 		var num int64
 		m.CreationTime = v.CreationTime
+		m.CreatorUserId = v.CreatorUserId
 		if num, err = o.Update(m); err == nil {
 			fmt.Println("Number of records updated in database:", num)
 		}
 	}
-	return
+	return err
 }
 
 // 逻辑删除应用
 // the record to be deleted doesn't exist
-func DeleteApplication(id int) (err error) {
+func DeleteApplication(id int, actorID int64) (err error) {
 	o := orm.NewOrm()
 	v := Application{Id: id}
 	if err = o.Read(&v); err == nil {
-		_, err = o.Raw("update application set IsDeleted=1 , DeletionTime = ?  where Id= ?  ", time.Now(), id).Exec()
+		_, err = o.Raw("update application set IsDeleted=1 , DeletionTime = ? ,DeletionUserId =? where Id= ?  ", time.Now(), id, actorID).Exec()
 	}
 	return
 }

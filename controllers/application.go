@@ -35,9 +35,16 @@ func (c *ApplicationController) URLMapping() {
 // @router / [post]
 func (c *ApplicationController) Post() {
 	result := &out.OperResult{}
+	userID := c.GetSession("userId")
+	if userID == nil {
+		result.Result = 0
+		result.Message = "seesion失效"
+		c.Data["json"] = result
+	}
 	var v models.Application
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 		v.CreationTime = time.Now()
+		v.CreatorUserId = userID.(int64)
 		//生成系统编号
 		v.SysCode = models.GenerateSysCode()
 		if _, err := models.AddApplication(&v); err == nil {
@@ -140,9 +147,15 @@ func (c *ApplicationController) GetAll() {
 // @router /:id [delete]
 func (c *ApplicationController) Delete() {
 	result := &out.OperResult{}
+	userID := c.GetSession("userId")
+	if userID == nil {
+		result.Result = 0
+		result.Message = "seesion失效"
+		c.Data["json"] = result
+	}
 	idStr := c.Ctx.Input.Param(":id")
 	id, _ := strconv.Atoi(idStr)
-	if err := models.DeleteApplication(id); err == nil {
+	if err := models.DeleteApplication(id, userID.(int64)); err == nil {
 		result.Result = 1
 		c.Data["json"] = result
 	} else {
@@ -193,11 +206,18 @@ func (c *ApplicationController) GetSelectData() {
 // @router /:id [put]
 func (c *ApplicationController) Put() {
 	result := &out.OperResult{}
+	userID := c.GetSession("userId")
+	if userID == nil {
+		result.Result = 0
+		result.Message = "seesion失效"
+		c.Data["json"] = result
+	}
 	idStr := c.Ctx.Input.Param(":id")
 	id, _ := strconv.Atoi(idStr)
 	v := models.Application{Id: id}
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 		v.LastModificationTime = time.Now()
+		v.LastModificationUserId = userID.(int64)
 		if err := models.UpdateApplicationById(&v); err == nil {
 			result.Result = 1
 			c.Data["json"] = result

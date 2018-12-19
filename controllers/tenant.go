@@ -35,6 +35,12 @@ func (c *TenantController) URLMapping() {
 // @router / [post]
 func (c *TenantController) Post() {
 	result := &out.OperResult{}
+	userID := c.GetSession("userId")
+	if userID == nil {
+		result.Result = 0
+		result.Message = "seesion失效"
+		c.Data["json"] = result
+	}
 	var v models.Tenant
 	var mystruct map[string]interface{}
 	json.Unmarshal(c.Ctx.Input.RequestBody, &mystruct)
@@ -43,7 +49,7 @@ func (c *TenantController) Post() {
 	perMenu := tool.ParseInterfaceArr(mystruct["perMenu"].([]interface{}))
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 		v.LastModificationTime = time.Now()
-		if err := models.AddTenant(&v, sysCode, perId, perMenu); err == nil {
+		if err := models.AddTenant(&v, sysCode, perId, perMenu, userID.(int64)); err == nil {
 			result.Result = 1
 			c.Data["json"] = result
 		} else {
@@ -146,6 +152,12 @@ func (c *TenantController) GetAll() {
 // @router /:id [put]
 func (c *TenantController) Put() {
 	result := &out.OperResult{}
+	userID := c.GetSession("userId")
+	if userID == nil {
+		result.Result = 0
+		result.Message = "seesion失效"
+		c.Data["json"] = result
+	}
 	idStr := c.Ctx.Input.Param(":id")
 	id, _ := strconv.Atoi(idStr)
 	v := models.Tenant{Id: id}
@@ -156,7 +168,7 @@ func (c *TenantController) Put() {
 	perMenu := mystruct["perMenu"].(string)
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 		v.LastModificationTime = time.Now()
-		if err := models.UpdateTenantById(&v, sysCode, perIdStr, perMenu, v.Id); err == nil {
+		if err := models.UpdateTenantById(&v, sysCode, perIdStr, perMenu, v.Id, userID.(int64)); err == nil {
 			result.Result = 1
 			c.Data["json"] = result
 		} else {
@@ -181,9 +193,15 @@ func (c *TenantController) Put() {
 // @router /:id [delete]
 func (c *TenantController) Delete() {
 	result := &out.OperResult{}
+	userID := c.GetSession("userId")
+	if userID == nil {
+		result.Result = 0
+		result.Message = "seesion失效"
+		c.Data["json"] = result
+	}
 	idStr := c.Ctx.Input.Param(":id")
 	id, _ := strconv.Atoi(idStr)
-	if err := models.DeleteTenant(id); err == nil {
+	if err := models.DeleteTenant(id, userID.(int64)); err == nil {
 		result.Result = 1
 		c.Data["json"] = result
 	} else {

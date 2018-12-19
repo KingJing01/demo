@@ -45,11 +45,13 @@ func init() {
 
 // AddTenant insert a new Tenant into database and returns
 // last inserted Id on success.
-func AddTenant(m *Tenant, syScode []string, perId []string, perMenu []string) (err error) {
+func AddTenant(m *Tenant, syScode []string, perId []string, perMenu []string, userID int64) (err error) {
 	o := orm.NewOrm()
 	//开启事务
 	o.Begin()
 	// 创建租户信息
+	m.CreatorUserId = userID
+	m.CreationTime = time.Now()
 	_, err = o.Insert(m)
 	if err != nil {
 		//回滚
@@ -70,6 +72,7 @@ func AddTenant(m *Tenant, syScode []string, perId []string, perMenu []string) (e
 	user := User{}
 	var userList []User
 	user.CreationTime = time.Now()
+	user.CreatorUserId = userID
 	user.SsoID = int(ssoId)
 	user.EmailAddress = m.Email
 	user.PhoneNumber = m.LinkPhone
@@ -127,13 +130,14 @@ func GetTenantById(id int) (v *Tenant, err error) {
 
 // UpdateTenant updates Tenant by Id and returns error if
 // the record to be updated doesn't exist
-func UpdateTenantById(m *Tenant, sysCode string, perIdStr string, perMenu string, tenId int) (err error) {
+func UpdateTenantById(m *Tenant, sysCode string, perIdStr string, perMenu string, tenId int, userID int64) (err error) {
 	o := orm.NewOrm()
 	o.Begin()
 	v := Tenant{Id: m.Id}
 	// ascertain id exists in the database
 	if err = o.Read(&v); err == nil {
 		m.CreationTime = v.CreationTime
+		m.CreatorUserId = userID
 		_, err = o.Update(m)
 	}
 	//权限信息修改
@@ -147,12 +151,12 @@ func UpdateTenantById(m *Tenant, sysCode string, perIdStr string, perMenu string
 
 // DeleteTenant deletes Tenant by Id and returns error if
 // the record to be deleted doesn't exist
-func DeleteTenant(id int) (err error) {
+func DeleteTenant(id int, userID int64) (err error) {
 	o := orm.NewOrm()
 	v := Tenant{Id: id}
 	// ascertain id exists in the database
 	if err = o.Read(&v); err == nil {
-		_, err = o.Raw("update tenant set IsDeleted=1 ,DeletionTime = ?  where Id= ? ", time.Now(), id).Exec()
+		_, err = o.Raw("update tenant set IsDeleted=1 ,DeletionTime = ?,DeleterUserId=?  where Id= ? ", time.Now(), userID, id).Exec()
 	}
 	return
 }

@@ -12,12 +12,19 @@ import (
 func init() {
 	//tools.InitRedis()
 	//orm.RegisterDataBase("default", "mysql", "root:Xsungroup333@tcp(rm-8vb2a06qoj31utdhnlo.mysql.zhangbei.rds.aliyuncs.com:3306)/godatabase?charset=utf8&loc=Asia%2FShanghai")
-	orm.RegisterDataBase("default", "mysql", "root:root@tcp(127.0.0.1:3306)/godatabase?charset=utf8&loc=Asia%2FShanghai")
+	//orm.RegisterDataBase("default", "mysql", "root:root@tcp(127.0.0.1:3306)/godatabase?charset=utf8&loc=Asia%2FShanghai")
+	mysqluser := beego.AppConfig.String("mysqluser")
+	mysqlpass := beego.AppConfig.String("mysqlpass")
+	mysqlurls := beego.AppConfig.String("mysqlurls")
+	mysqldb := beego.AppConfig.String("mysqldb")
+	mysqlport := beego.AppConfig.String("mysqlport")
+
+	orm.RegisterDataBase("default", "mysql", mysqluser+":"+mysqlpass+"@tcp("+mysqlurls+":"+mysqlport+")/"+mysqldb+"?charset=utf8&loc=Local")
 	orm.Debug = true
 	beego.InsertFilter("*", beego.BeforeRouter, cors.Allow(&cors.Options{
 		AllowAllOrigins:  true,
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Authorization", "Access-Control-Allow-Origin", "Access-Control-Allow-Headers", "Content-Type"},
+		AllowHeaders:     []string{"Origin", "Authorization", "SysCode", "Access-Control-Allow-Origin", "Access-Control-Allow-Headers", "Content-Type"},
 		ExposeHeaders:    []string{"Content-Length", "Access-Control-Allow-Origin", "Access-Control-Allow-Headers", "Content-Type"},
 		AllowCredentials: true,
 	}))

@@ -74,6 +74,7 @@ func (tc *AuthorityManageController) SysLogin() {
 func (tc *AuthorityManageController) Login() {
 	lresult := &out.LoginResult{}
 	originToken := tc.Ctx.Request.Header.Get("Authorization")
+	sysCode := tc.Ctx.Request.Header.Get("SysCode")
 	// 判断 token 是否有值  token为空表示第一次登陆  不为空验证 token是否有效
 	if originToken == "" {
 		l := &input.LoginInfo{}
@@ -95,7 +96,7 @@ func (tc *AuthorityManageController) Login() {
 			tc.ServeJSON()
 			return
 		}
-		resultSysID := valid.Required(l.SysCode, "sysCode").Message("系统号不能为空")
+		resultSysID := valid.Required(sysCode, "sysCode").Message("系统号不能为空")
 		if resultSysID.Ok == false {
 			lresult.Result = 0
 			lresult.Message = resultSysID.Error.Message
@@ -103,7 +104,7 @@ func (tc *AuthorityManageController) Login() {
 			tc.ServeJSON()
 			return
 		}
-		result, user, err := models.LoginCheck(l.UserName, l.Password, l.SysCode)
+		result, user, err := models.LoginCheck(l.UserName, l.Password, sysCode)
 		respmessage := ""
 		if result == false {
 			if err == nil {
@@ -174,12 +175,10 @@ func (tc *AuthorityManageController) Login() {
 // @Success 200 {object} controllers.UserInfo
 // @Failure 400 Invalid email supplied
 // @Failure 404 User not found
-// @router /GetUserInfo [post]
+// @router /GetUserInfo [get]
 func (tc *AuthorityManageController) GetUserInfo() {
 	token := tc.Ctx.Request.Header.Get("Authorization")
 	sysCode := tc.Ctx.Request.Header.Get("SysCode")
-	var mystruct map[string]interface{}
-	json.Unmarshal(tc.Ctx.Input.RequestBody, &mystruct)
 	result := &out.OperResult{}
 	ok, claims, err := tools.CheckLogin(token)
 	if !ok {

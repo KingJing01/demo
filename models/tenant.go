@@ -137,7 +137,8 @@ func UpdateTenantById(m *Tenant, sysCode string, perIdStr string, perMenu string
 	// ascertain id exists in the database
 	if err = o.Read(&v); err == nil {
 		m.CreationTime = v.CreationTime
-		m.CreatorUserId = userID
+		m.CreatorUserId = v.CreatorUserId
+		m.LastModifierUserId = userID
 		_, err = o.Update(m)
 	}
 	//权限信息修改

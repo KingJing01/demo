@@ -83,7 +83,7 @@ func init() {
         beego.ControllerComments{
             Method: "GetUserInfo",
             Router: `/GetUserInfo`,
-            AllowHTTPMethods: []string{"get"},
+            AllowHTTPMethods: []string{"post"},
             MethodParams: param.Make(),
             Filters: nil,
             Params: nil})

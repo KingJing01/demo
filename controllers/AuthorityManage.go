@@ -6,6 +6,7 @@ import (
 	out "demo/outmodels"
 	"demo/tools"
 	"encoding/json"
+	"fmt"
 	"strconv"
 	"time"
 
@@ -125,23 +126,22 @@ func (tc *AuthorityManageController) Login() {
 		token.Claims = claims
 		tokenString, err := token.SignedString([]byte(SecretKey))
 		//获取用户对应的系统权限
-		//permissions, _ := models.GetPermissionByUser(user.Id, l.SysCode)
-		//permissionData, err := json.Marshal(permissions)
+		permissions, _ := models.GetPermissionByUser(user.Id, l.SysCode)
+		permissionData, err := json.Marshal(permissions)
 		// 设置 user 信息
-		/*var userOut out.UserInfoToken
+		var userOut out.UserInfoToken
 		userOut.UserName = user.UserName
 		userOut.Phone = user.PhoneNumber
 		tokenMap := make(map[string]string)
 		tokenMap["ssoId"] = string(user.SsoID)
 		jsonUser, _ := json.Marshal(userOut)
-		tokenMap["userInfo"] = string(jsonUser)*/
-		//tools.InitRedis()
-		//skey := fmt.Sprintf("%s_%s", tokenString, l.SysCode)
-		//tools.Globalcluster.Do("set", skey, permissionData)
-		//tokenInfo, _ := json.Marshal(tokenMap)
-		//tools.Globalcluster.Do("set", tokenString, user.SsoID)
-		//tools.Globalcluster.Do("EXPIRE", tokenString, 12*3600)
-		//tools.Globalcluster.Close()
+		tokenMap["userInfo"] = string(jsonUser)
+		tools.InitRedis()
+		skey := fmt.Sprintf("%s_%s", tokenString, l.SysCode)
+		tools.Globalcluster.Do("set", skey, permissionData)
+		tools.Globalcluster.Do("set", tokenString, user.SsoID)
+		tools.Globalcluster.Do("EXPIRE", tokenString, 3600)
+		tools.Globalcluster.Close()
 		lresult.Result = 1
 		lresult.Token = tokenString
 		tc.Data["json"] = lresult
@@ -174,36 +174,35 @@ func (tc *AuthorityManageController) Login() {
 // @Success 200 {object} controllers.UserInfo
 // @Failure 400 Invalid email supplied
 // @Failure 404 User not found
-// @router /GetUserInfo [get]
+// @router /GetUserInfo [post]
 func (tc *AuthorityManageController) GetUserInfo() {
 	token := tc.Ctx.Request.Header.Get("Authorization")
-	oResult := UserInfo{}
+	sysCode := tc.Ctx.Request.Header.Get("SysCode")
+	var mystruct map[string]interface{}
+	json.Unmarshal(tc.Ctx.Input.RequestBody, &mystruct)
+	result := &out.OperResult{}
 	ok, claims, err := tools.CheckLogin(token)
 	if !ok {
-		oResult.Result = 0
-		oResult.Message = err.Error()
-		tc.Data["json"] = oResult
+		result.Result = 0
+		result.Message = err.Error()
+		tc.Data["json"] = result
 		tc.ServeJSON()
 		return
 	}
 	tmp := strconv.FormatFloat(claims["jti"].(float64), 'f', -1, 64)
 	userid, _ := strconv.ParseInt(tmp, 10, 64)
 	u, _ := models.GetUserById(userid)
-	if u != nil {
-		oResult.UserName = u.UserName
-		oResult.Name = u.Name
-		oResult.EmailAddress = u.EmailAddress
-		oResult.PhoneNumber = u.PhoneNumber
-	}
-	permissions, _ := models.GetPermissionByUser(userid, "0")
+	permissions, _ := models.GetPermissionByUser(userid, sysCode)
 	var arrPermission []string
 	for _, v := range permissions {
 		arrPermission = append(arrPermission, v.Name)
 	}
-	oResult.Permissions = arrPermission
-	oResult.Result = 1
-
-	tc.Data["json"] = oResult
+	data := make(map[string]interface{})
+	data["userInfo"] = u
+	data["permissions"] = arrPermission
+	result.Result = 1
+	result.Data = data
+	tc.Data["json"] = result
 	tc.ServeJSON()
 }
 

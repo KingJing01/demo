@@ -123,7 +123,7 @@ func DeleteSetMeal(ids string, userID int64) (err error) {
 
 func UpdateSetMeal(setMeatInfo *input.SetMeatInput, userID int64) (id int64, err error) {
 	o := orm.NewOrm()
-	o.Raw("update setmeal set SetMealName=?,SysCode=?,LastModificationTime=?,PermissionText=?,LastModificationUserId=? where Id=? ", setMeatInfo.SetMealName, setMeatInfo.SysCode, time.Now(), userID, setMeatInfo.PerName, setMeatInfo.Id).Exec()
+	o.Raw("update setmeal set SetMealName=?,SysCode=?,LastModificationTime=?,PermissionText=?,LastModificationUserId=? where Id=? ", setMeatInfo.SetMealName, setMeatInfo.SysCode, time.Now(), setMeatInfo.PerName, userID, setMeatInfo.Id).Exec()
 	o.Raw("delete  from permissionpackage where SetMealCode= ?", setMeatInfo.SetMealCode).Exec()
 	//权限套餐关系数据录入
 	var permission []PermissionPackage

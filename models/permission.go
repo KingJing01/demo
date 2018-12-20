@@ -230,7 +230,9 @@ func GetPermissionByUserAndPermission(userid int64, permissionName string) (p *P
 
 func GetPermissionByUser(userid int64, sysCode string) (permissions []Permission, num int64) {
 	o := orm.NewOrm()
-	num, _ = o.QueryTable("permission").Filter("UserId", userid).Filter("SysCode", sysCode).All(&permissions)
+	/* 获取用户信息下的操作权限
+	num, _ = o.QueryTable("permission").Filter("UserId", userid).Filter("SysCode", sysCode).All(&permissions) */
+	o.Raw("select * from permission where MenuCode in (select MenuCode from permission where UserId=? and IsMenu=1 group by MenuCode) and IsMenu=0", userid).QueryRows(&permissions)
 	return permissions, num
 }
 

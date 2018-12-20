@@ -78,17 +78,17 @@ func AddTenant(m *Tenant, syScode []string, perId []string, perMenu []string, us
 	user.PhoneNumber = m.LinkPhone
 	user.TenantId = m.Id
 	//循环
-	permissionStr := ""
 	tenApp := TenantApplication{}
 	var tenAppList []TenantApplication
 	tenApp.TenantId = m.Id
 	for i, arg := range syScode {
 		user.SysCode = arg
 		userList = append(userList, user)
-		permissionStr += perId[i]
 		tenApp.SysCode = arg
 		tenApp.MenuText = perMenu[i]
 		tenAppList = append(tenAppList, tenApp)
+		//安装系统循环插入数据
+		InsertTenantPermission(arg, perId[i], m.Id, user.Id)
 	}
 	// 新增user 多系统会生成多个记录
 	_, err = o.InsertMulti(len(syScode), userList)
@@ -98,7 +98,7 @@ func AddTenant(m *Tenant, syScode []string, perId []string, perMenu []string, us
 		return err
 	}
 	// permission 表 插入租户拥有的权限
-	err = InsertTenantPermission(permissionStr, m.Id)
+
 	if err != nil {
 		//回滚
 		o.Rollback()
@@ -220,7 +220,7 @@ func UpdateTenantPermission(sysCode string, perIdStr string, perMenu string, ten
 	if err != nil {
 		return err
 	}
-	err = InsertTenantPermission(perIdStr, tenId)
+	err = InsertTenantPermission(sysCode, perIdStr, tenId, '0')
 	if err != nil {
 		return err
 	}
@@ -232,7 +232,7 @@ func UpdateTenantPermission(sysCode string, perIdStr string, perMenu string, ten
 }
 
 //新增套餐已经勾选的信息
-func InsertTenantPermission(perIdStr string, tenId int) (err error) {
+func InsertTenantPermission(sysCode string, perIdStr string, tenId int, ownerID int64) (err error) {
 	arr := strings.Split(perIdStr, ",")
 	var param string
 	for _, x := range arr {
@@ -241,10 +241,10 @@ func InsertTenantPermission(perIdStr string, tenId int) (err error) {
 	length := len(param) - 1
 	params := param[0:length]
 	o := orm.NewOrm()
-	var sql = `INSERT INTO permission (NAME,tenantId,DisplayName,SysCode,MenuCode,CreationTime,IsMenu
-		) SELECT NAME,?,DisplayName,SysCode,MenuCode,?,IsMenu FROM permission t1
+	var sql = `INSERT INTO permission (NAME,tenantId,DisplayName,SysCode,MenuCode,CreationTime,IsMenu,UserId
+		) SELECT NAME,?,DisplayName,?,MenuCode,?,IsMenu,? FROM permission t1
 		WHERE t1.TenantId = 0 AND IsMenu = 1 AND t1.Name IN (` + params + `)`
-	_, err = o.Raw(sql, tenId, time.Now()).Exec()
+	_, err = o.Raw(sql, tenId, sysCode, time.Now(), ownerID).Exec()
 	return err
 }
 

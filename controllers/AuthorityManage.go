@@ -205,6 +205,25 @@ func (tc *AuthorityManageController) GetUserInfo() {
 	tc.ServeJSON()
 }
 
+// 注册新用户 app
+// @router /registUser [put]
+func (tc *AuthorityManageController) RegistUser() {
+	sysCode := tc.Ctx.Request.Header.Get("SysCode")
+	l := &input.LoginInfo{}
+	json.Unmarshal(tc.Ctx.Input.RequestBody, l)
+	lresult := &out.OperResult{}
+	if err := models.RegistUser(l, sysCode); err == nil {
+		lresult.Result = 1
+		lresult.Message = "创建用户成功"
+		tc.Data["json"] = lresult
+	} else {
+		lresult.Result = 1
+		lresult.Message = "创建用户失败"
+		tc.Data["json"] = lresult
+	}
+	tc.ServeJSON()
+}
+
 //登出
 // @Title Logout
 // @Description 登出
@@ -215,5 +234,24 @@ func (tc *AuthorityManageController) Logout() {
 	lresult.Token = ""
 	lresult.Message = "登出成功"
 	tc.Data["json"] = lresult
+	tc.ServeJSON()
+}
+
+// 修改密码 app
+// @router /passwdUpdate [put]
+func (tc *AuthorityManageController) PasswdUpdate() {
+	sysCode := tc.Ctx.Request.Header.Get("SysCode")
+	l := &input.LoginInfo{}
+	json.Unmarshal(tc.Ctx.Input.RequestBody, l)
+	lresult := &out.OperResult{}
+	if err := models.PasswdUpdate(l, sysCode); err == nil {
+		lresult.Result = 1
+		lresult.Message = "修改用户密码成功"
+		tc.Data["json"] = lresult
+	} else {
+		lresult.Result = 0
+		lresult.Message = "修改用户密码失败"
+		tc.Data["json"] = lresult
+	}
 	tc.ServeJSON()
 }

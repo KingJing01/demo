@@ -1,6 +1,7 @@
 package models
 
 import (
+	input "demo/inputmodels"
 	"errors"
 	"fmt"
 	"reflect"
@@ -31,6 +32,7 @@ type User struct {
 	TenantId               int       `orm:"column(TenantId);null"`
 	SysCode                string    `orm:"column(SysCode)"`
 	SsoID                  int       `orm:"column(SsoId)"`
+	UserUrl                string    `orm:"column(UserUrl)"`
 }
 
 func (t *User) TableName() string {
@@ -177,9 +179,9 @@ func LoginCheck(username string, password string, SysCode string) (result bool, 
 	result = true
 	//登录名格式分析  手机号码直接 ssoUser验证 其他的使用user--->sso关联
 	if resultMobile.Ok {
-		err = o.Raw("select t2.*, t1.Phone  SsoPhone from ssouser t1 left join user t2 on t1.id = t2.SsoId and t2.SysCode=? and t1.Phone=? and t1.Passwd=? ", SysCode, username, password).QueryRow(&u)
+		err = o.Raw("select t2.*, t1.Phone  SsoPhone from ssouser t1 left join user t2 on t1.id = t2.SsoId where t2.SysCode=? and t1.Phone=? and t1.Passwd=? ", SysCode, username, password).QueryRow(&u)
 	} else {
-		err = o.Raw("select t2.*,t1.Phone SsoPhone from ssouser t1 left join user t2 on t1.id = t2.SsoId and t2.SysCode=? and t2.UserName=? and t1.Passwd=? ", SysCode, username, password).QueryRow(&u)
+		err = o.Raw("select t2.*,t1.Phone SsoPhone from ssouser t1 left join user t2 on t1.id = t2.SsoId where t2.SysCode=? and t2.UserName=? and t1.Passwd=? ", SysCode, username, password).QueryRow(&u)
 	}
 	user = *u
 	// 判断是否有错误的返回
@@ -188,4 +190,34 @@ func LoginCheck(username string, password string, SysCode string) (result bool, 
 		return result, user, err
 	}
 	return true, user, nil
+}
+
+func RegistUser(loginInfo *input.LoginInfo, SysCode string) (err error) {
+	o := orm.NewOrm()
+	o.Begin()
+	ssoUser := new(SsoUser)
+	ssoUser.Phone = loginInfo.UserName
+	ssoUser.Passwd = loginInfo.Password
+	_, err = o.Insert(ssoUser)
+	if err != nil {
+		o.Rollback()
+	}
+	user := new(User)
+	user.Name = loginInfo.UserName
+	user.PhoneNumber = loginInfo.UserName
+	user.SsoID = ssoUser.Id
+	user.SysCode = SysCode
+	user.CreationTime = time.Now()
+	_, err = o.Insert(user)
+	if err != nil {
+		o.Rollback()
+	}
+	o.Commit()
+	return
+}
+
+func PasswdUpdate(info *input.LoginInfo, SysCode string) (err error) {
+	o := orm.NewOrm()
+	_, err = o.Raw("update ssouser set Passwd=? where Phone=? or Email=?", info.Password, info.UserName, info.UserName).Exec()
+	return err
 }

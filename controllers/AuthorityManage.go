@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/orm"
 	"github.com/astaxie/beego/validation"
 	jwt "github.com/dgrijalva/jwt-go"
 )
@@ -110,7 +111,11 @@ func (tc *AuthorityManageController) Login() {
 			if err == nil {
 				respmessage = "用户名和密码不匹配，重新登陆"
 			} else {
-				respmessage = err.Error()
+				if err == orm.ErrNoRows {
+					respmessage = "用户名和密码不匹配，重新登陆"
+				} else {
+					respmessage = err.Error()
+				}
 			}
 			lresult.Result = 0
 			lresult.Message = respmessage
@@ -250,7 +255,7 @@ func (tc *AuthorityManageController) PasswdUpdate() {
 		tc.Data["json"] = lresult
 	} else {
 		lresult.Result = 0
-		lresult.Message = "修改用户密码失败"
+		lresult.Message = "修改用户密码"
 		tc.Data["json"] = lresult
 	}
 	tc.ServeJSON()

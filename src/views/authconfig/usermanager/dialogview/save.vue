@@ -134,8 +134,10 @@ export default {
     },
     // 系统信息选择事件
     handlecheckedAppChange(val) {
+      console.log('转换前' + this.childPerSelect)
       this.SelectData = []
       for (const i of val) {
+        // 添加动态tab
         for (const option of this.SysOptions) {
           if (option.SysCode === i) {
             var result = {}
@@ -144,7 +146,21 @@ export default {
             this.SelectData.push(result)
           }
         }
+        if (val.length < this.childPerSelect.length) {
+          var tempChildSelect = []
+          for (const child of this.childPerSelect) {
+            debugger
+            if (child.sysCode === i) {
+              var temp = {}
+              temp.data = child.data
+              temp.sysCode = child.sysCode
+              tempChildSelect.push(temp)
+            }
+          }
+          this.childPerSelect = tempChildSelect
+        }
       }
+      console.log('转换后' + this.childPerSelect)
     },
     getChildEvent(val) {
       if (this.childPerSelect.length === 0) {

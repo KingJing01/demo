@@ -104,6 +104,7 @@
     <!-- 分页控件  end -->
     <!-- 弹出层 信息录入和修改  start -->
     <el-dialog
+      :close-on-click-modal="false"
       :visible.sync="dialogFormVisible"
       width="40%"
       @close="handleCloseDialog"

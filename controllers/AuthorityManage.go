@@ -144,7 +144,7 @@ func (tc *AuthorityManageController) Login() {
 		tokenMap["userInfo"] = string(jsonUser)
 		tools.InitRedis()
 		skey := fmt.Sprintf("%s_%s", tokenString, l.SysCode)
-		tools.Globalcluster.Do("set", skey, permissionData)
+		tools.Globalcluster.Do("set", skey, permissionData)  
 		tools.Globalcluster.Do("set", tokenString, user.SsoID)
 		tools.Globalcluster.Do("EXPIRE", tokenString, 3600)
 		tools.Globalcluster.Close()

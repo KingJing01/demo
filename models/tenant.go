@@ -46,12 +46,13 @@ func init() {
 // AddTenant insert a new Tenant into database and returns
 // last inserted Id on success.
 func AddTenant(m *Tenant, syScode []string, perId []string, perMenu []string, userID int64) (err error) {
+	currTime := time.Now()
 	o := orm.NewOrm()
 	//开启事务
 	o.Begin()
 	// 创建租户信息
 	m.CreatorUserId = userID
-	m.CreationTime = time.Now()
+	m.CreationTime = currTime
 	_, err = o.Insert(m)
 	if err != nil {
 		//回滚
@@ -71,7 +72,7 @@ func AddTenant(m *Tenant, syScode []string, perId []string, perMenu []string, us
 	}
 	user := User{}
 	var userList []User
-	user.CreationTime = time.Now()
+	user.CreationTime = currTime
 	user.CreatorUserId = userID
 	user.SsoID = int(ssoId)
 	user.EmailAddress = m.Email
@@ -81,28 +82,25 @@ func AddTenant(m *Tenant, syScode []string, perId []string, perMenu []string, us
 	tenApp := TenantApplication{}
 	var tenAppList []TenantApplication
 	tenApp.TenantId = m.Id
+	//用户 租户 角色关联关系表插入
+	userRole := Userrole{}
+	userRole.TenantId = m.Id
+	userRole.RoleId = 32
+	userRole.CreationTime = currTime
+	userRole.CreatorUserId = userID
 	for i, arg := range syScode {
 		user.SysCode = arg
 		userList = append(userList, user)
 		tenApp.SysCode = arg
 		tenApp.MenuText = perMenu[i]
 		tenAppList = append(tenAppList, tenApp)
-		//安装系统循环插入数据
+		userRole.SysCode = arg
+		// 新增user
+		o.Insert(user)
+		userRole.UserId = user.Id
+		o.Insert(userRole)
+		// permission 表 插入租户拥有的权限
 		InsertTenantPermission(arg, perId[i], m.Id, user.Id)
-	}
-	// 新增user 多系统会生成多个记录
-	_, err = o.InsertMulti(len(syScode), userList)
-	if err != nil {
-		//回滚
-		o.Rollback()
-		return err
-	}
-	// permission 表 插入租户拥有的权限
-
-	if err != nil {
-		//回滚
-		o.Rollback()
-		return err
 	}
 	// 插入租户应用关联信息表
 	_, err = o.InsertMulti(len(syScode), tenAppList)
@@ -215,6 +213,7 @@ func GetPerInfoForTenant(sysCode string, tenantId int) (result []out.PermissionC
 	return result, err
 }
 
+// 更新权限信息
 func UpdateTenantPermission(sysCode string, perIdStr string, perMenu string, tenId int) (err error) {
 	err = DeleteTenatPermssion(sysCode, tenId)
 	if err != nil {

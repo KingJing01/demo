@@ -64,14 +64,13 @@ func AddTenant(m *Tenant, syScode []string, perId []string, perMenu []string, us
 	ssoUser.Passwd = "123456"
 	ssoUser.Phone = m.LinkPhone
 	ssoUser.Email = m.Email
-	ssoId, err := AddSsoUser(&ssoUser)
+	ssoId, err := o.Insert(&ssoUser)
 	if err != nil {
 		//回滚
 		o.Rollback()
 		return err
 	}
 	user := User{}
-	var userList []User
 	user.CreationTime = currTime
 	user.CreatorUserId = userID
 	user.SsoID = int(ssoId)
@@ -90,17 +89,33 @@ func AddTenant(m *Tenant, syScode []string, perId []string, perMenu []string, us
 	userRole.CreatorUserId = userID
 	for i, arg := range syScode {
 		user.SysCode = arg
-		userList = append(userList, user)
+		// 新增user
+		_, err = o.Insert(&user)
+		if err != nil {
+			//回滚
+			o.Rollback()
+			return err
+		}
 		tenApp.SysCode = arg
 		tenApp.MenuText = perMenu[i]
 		tenAppList = append(tenAppList, tenApp)
 		userRole.SysCode = arg
-		// 新增user
-		o.Insert(user)
 		userRole.UserId = user.Id
-		o.Insert(userRole)
+		_, err = o.Insert(&userRole)
+		if err != nil {
+			//回滚
+			o.Rollback()
+			return err
+		}
 		// permission 表 插入租户拥有的权限
-		InsertTenantPermission(arg, perId[i], m.Id, user.Id)
+		err = InsertTenantPermission(arg, perId[i], m.Id, user.Id)
+		if err != nil {
+			//回滚
+			o.Rollback()
+			return err
+		}
+		user.Id = 0
+		userRole.Id = 0
 	}
 	// 插入租户应用关联信息表
 	_, err = o.InsertMulti(len(syScode), tenAppList)

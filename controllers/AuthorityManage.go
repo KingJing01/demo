@@ -265,7 +265,13 @@ func (tc *AuthorityManageController) Logout() {
 	tc.ServeJSON()
 }
 
-// 修改密码 app
+// PasswdUpdate...
+// @Title Login
+// @Description 修改密码
+// @Param   body     body    inputmodels.LoginInfo  true        "新用户信息  用户名和密码"
+// @Param   Authorization     header    string  true        "Token信息"
+// @Param   SysCode     header    string  true        "系统编码"
+// @Success 200  result:1(success)  0(false)
 // @router /passwdUpdate [put]
 func (tc *AuthorityManageController) PasswdUpdate() {
 	sysCode := tc.Ctx.Request.Header.Get("SysCode")

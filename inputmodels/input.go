@@ -2,10 +2,8 @@ package inputmodels
 
 //user login  from info
 type LoginInfo struct {
-	UserName  string `form:"username"`
-	Password  string `form:"password"`
-	SysCode   string `form:"sysCode"`
-	tokenTime int64  `form:"tokenTime"`
+	UserName string `form:"username"`
+	Password string `form:"password"`
 }
 
 type SetMeatInput struct {

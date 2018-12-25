@@ -56,6 +56,11 @@ func (tc *AuthorityManageController) AuthorityError() {
 	tc.ServeJSON()
 }
 
+// SysLogin...
+// @Title SysLogin
+// @Description  系统登陆跳转
+// @Success 200  login.html
+// @Failure 404  异常信息
 // @router /xsunLogin  [get]
 func (tc *AuthorityManageController) SysLogin() {
 	/*returnUrl := tc.GetString("ReturnUrl")
@@ -65,11 +70,13 @@ func (tc *AuthorityManageController) SysLogin() {
 	tc.TplName = "login.html"
 }
 
+// Login...
 // @Title Login
-// @Description 登入接口
-// @Param   key     path    string  true        "The email for login"
-// @Success 200 {object} controllers.LoginResult
-// @Failure 400 Invalid email supplied
+// @Description  系统登陆
+// @Param   body     body    inputmodels.LoginInfo  true        "登陆信息  username password"
+// @Param   Authorization     header    string  false        "Token信息"
+// @Param   SysCode     header    string  true        "系统编码"
+// @Success 200  result:1(success)  0(false)
 // @Failure 404 User not found
 // @router /Login [post]
 func (tc *AuthorityManageController) Login() {
@@ -132,7 +139,7 @@ func (tc *AuthorityManageController) Login() {
 		token.Claims = claims
 		tokenString, err := token.SignedString([]byte(SecretKey))
 		//获取用户对应的系统权限
-		permissions, _ := models.GetPermissionByUser(user.Id, l.SysCode)
+		permissions, _ := models.GetPermissionByUser(user.Id, sysCode)
 		permissionData, err := json.Marshal(permissions)
 		// 设置 user 信息
 		var userOut out.UserInfoToken
@@ -143,8 +150,8 @@ func (tc *AuthorityManageController) Login() {
 		jsonUser, _ := json.Marshal(userOut)
 		tokenMap["userInfo"] = string(jsonUser)
 		tools.InitRedis()
-		skey := fmt.Sprintf("%s_%s", tokenString, l.SysCode)
-		tools.Globalcluster.Do("set", skey, permissionData)  
+		skey := fmt.Sprintf("%s%s", tokenString, sysCode)
+		tools.Globalcluster.Do("set", skey, permissionData)
 		tools.Globalcluster.Do("set", tokenString, user.SsoID)
 		tools.Globalcluster.Do("EXPIRE", tokenString, 3600)
 		tools.Globalcluster.Close()
@@ -173,13 +180,13 @@ func (tc *AuthorityManageController) Login() {
 
 }
 
-//获取用户信息
+// GetUserInfo...
 // @Title GetUserInfo
 // @Description 根据TOKEN获取用户信息
 // @Param   Authorization     header    string  true        "Token信息"
-// @Success 200 {object} controllers.UserInfo
-// @Failure 400 Invalid email supplied
-// @Failure 404 User not found
+// @Param   SysCode     header    string  true        "系统编码"
+// @Success 200  result:1(success)  0(false)
+// @Failure 404  User not found
 // @router /GetUserInfo [get]
 func (tc *AuthorityManageController) GetUserInfo() {
 	token := tc.Ctx.Request.Header.Get("Authorization")
@@ -210,7 +217,13 @@ func (tc *AuthorityManageController) GetUserInfo() {
 	tc.ServeJSON()
 }
 
-// 注册新用户 app
+// RegistUser...
+// @Title 注册新用户 app
+// @Description  APP注册用户
+// @Param   body     body    inputmodels.LoginInfo  true        "登陆信息  useraname password"
+// @Param   SysCode     header    string  true        "系统编码"
+// @Success 200  result:1(success)  0(false)
+// @Failure 400
 // @router /registUser [put]
 func (tc *AuthorityManageController) RegistUser() {
 	sysCode := tc.Ctx.Request.Header.Get("SysCode")
@@ -229,15 +242,25 @@ func (tc *AuthorityManageController) RegistUser() {
 	tc.ServeJSON()
 }
 
-//登出
-// @Title Logout
-// @Description 登出
+// Logout...
+// @Title Login
+// @Description  退出系统 清除redis保存的token信息
+// @Param   Authorization     header    string  true        "Token信息"
+// @Param   SysCode     header    string  true        "系统编码"
+// @Success 200  result:1(success)  0(false)
 // @router /Logout [post]
 func (tc *AuthorityManageController) Logout() {
 	lresult := &out.LoginResult{}
+	sysCode := tc.Ctx.Request.Header.Get("SysCode")
+	authorization := tc.Ctx.Request.Header.Get("Authorization")
+	skey := fmt.Sprintf("%s%s", authorization, sysCode)
+	tools.InitRedis()
+	tools.Globalcluster.Do("DEL", authorization)
+	tools.Globalcluster.Do("DEL", skey)
+	tools.Globalcluster.Close()
 	lresult.Result = 1
 	lresult.Token = ""
-	lresult.Message = "登出成功"
+	lresult.Message = "退出系统"
 	tc.Data["json"] = lresult
 	tc.ServeJSON()
 }

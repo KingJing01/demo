@@ -271,7 +271,7 @@ func init() {
     beego.GlobalControllerRouter["demo/controllers:SetMealController"] = append(beego.GlobalControllerRouter["demo/controllers:SetMealController"],
         beego.ControllerComments{
             Method: "GetSetMealRadio",
-            Router: `/getSetMealRadio`,
+            Router: `/getSetMealRadio/:sysCode`,
             AllowHTTPMethods: []string{"get"},
             MethodParams: param.Make(),
             Filters: nil,

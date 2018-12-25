@@ -9,6 +9,7 @@ import (
 	"github.com/astaxie/beego"
 )
 
+// 套餐信息管理
 type SetMealController struct {
 	beego.Controller
 }
@@ -26,16 +27,16 @@ func (c *SetMealController) URLMapping() {
 
 // GetAll ...
 // @Title Get All
-// @Description get Application
-// @Param	setMealNAme	query	string	false	""
-// @Param	sysName	query	string	false	""
-// @Param	pageSize	query	string	false	"Limit the size of result set. Must be an integer"
-// @Param	offset	query	string	false	"Start position of result set. Must be an integer"
-// @Success 200 {object} models.Application
+// @Description 获取套餐信息
+// @Param	setMealName 	query	string	false	"套餐名称"
+// @Param	sysName	query	string	false	"系统名称"
+// @Param	pageSize	query	string	false	 "一页显示数据量 后台默认为10 "
+// @Param	offset	query	string	false	"数据下标"
+// @Success 200 [object] models.SetMeal
 // @Failure 403
 // @router / [get]
 func (c *SetMealController) GetAll() {
-	var setMealNAme string
+	var setMealName string
 	var sysName string
 	var limit int64 = 10
 	var offset int64
@@ -47,17 +48,17 @@ func (c *SetMealController) GetAll() {
 	if v, err := c.GetInt64("offset"); err == nil {
 		offset = v
 	}
-	// setMealNAme
+	// setMealName
 	if v := c.GetString("setMealName"); v != "" {
-		setMealNAme = v
+		setMealName = v
 	}
 	// sysName
 	if v := c.GetString("sysName"); v != "" {
 		sysName = v
 	}
 	result := &out.OperResult{}
-	data, err := models.GetSetMealList(setMealNAme, sysName, offset, limit)
-	total := models.CountSetMealInfo(setMealNAme, sysName)
+	data, err := models.GetSetMealList(setMealName, sysName, offset, limit)
+	total := models.CountSetMealInfo(setMealName, sysName)
 	if err != nil {
 		c.Data["json"] = err.Error()
 	} else {
@@ -78,8 +79,8 @@ func (c *SetMealController) GetAll() {
 // Post ...
 // @Title Post
 // @Description create SetMeat
-// @Param	body		body 	models.Application	true		"body for Application content"
-// @Success 201 {int} models.Application
+// @Param	body		body 	models.SetMeal	true		"body for SetMeal content"
+// @Success 201 {int} models.SetMeal
 // @Failure 403 body is empty
 // @router / [post]
 func (c *SetMealController) Post() {
@@ -110,10 +111,10 @@ func (c *SetMealController) Post() {
 
 // Delete ...
 // @Title Delete
-// @Description delete the setmeal
-// @Param	id		path 	string	true		"The id you want to delete"
-// @Success 200 {string} delete success!
-// @Failure 403 id is empty
+// @Description  禁用套餐
+// @Param	id	path 	models.SetMeal	true	"需要禁用的套餐ID 例a,b,c 或 a"
+// @Success 200  result:1(success)  0(false)
+// @Failure 403 ids is empty
 // @router /:id [delete]
 func (c *SetMealController) Delete() {
 	result := &out.OperResult{}
@@ -138,6 +139,8 @@ func (c *SetMealController) Delete() {
 // UpdateSetMealInfo ...
 // @Title updateSetMealInfo
 // @Description 修改套餐的信息
+// @param  body    body    inputmodels.SetMeatInput  true      "套餐实体"
+// @Success 200  result:1(success)  0(false)
 // @router /updateSetMealInfo [put]
 func (c *SetMealController) UpdateSetMealInfo() {
 	result := &out.OperResult{}
@@ -166,12 +169,15 @@ func (c *SetMealController) UpdateSetMealInfo() {
 }
 
 // GetSetMealRadio ...
-// @Description 获取套餐信息
-// @router /getSetMealRadio [get]
+// @Title GetSetMealRadio
+// @Description 获取套餐单选数据
+// @Param   sysCode  path 	string	true	"根据系统编号获取单选按钮数据"
+// @Success 200  result:1(success)  0(false)
+// @router /getSetMealRadio/:sysCode [get]
 func (c *SetMealController) GetSetMealRadio() {
-	sysCodesStr := c.GetString("sysCodes")
+	sysCodeStr := c.Ctx.Input.Param(":sysCode")
 	result := &out.OperResult{}
-	if data, err := models.GetSetMealRadio(sysCodesStr); err == nil {
+	if data, err := models.GetSetMealRadio(sysCodeStr); err == nil {
 		result.Result = 1
 		result.Data = data
 		c.Data["json"] = result

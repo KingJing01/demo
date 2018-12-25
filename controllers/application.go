@@ -10,7 +10,7 @@ import (
 	"github.com/astaxie/beego"
 )
 
-// ApplicationController operations for Application
+// 应用系统管理模块
 type ApplicationController struct {
 	beego.Controller
 }
@@ -28,16 +28,16 @@ func (c *ApplicationController) URLMapping() {
 
 // Post ...
 // @Title Post
-// @Description create Application
-// @Param	body		body 	models.Application	true		"body for Application content"
-// @Success 201 {int} models.Application
+// @Description 新增应用
+// @Param	body		body 	models.Application	true		"新增的应用信息 SysName   SysUrl  IsValid "
+// @Success 200   result:1(success)  0(false)  2 session失效
 // @Failure 403 body is empty
 // @router / [post]
 func (c *ApplicationController) Post() {
 	result := &out.OperResult{}
 	userID := c.GetSession("userId")
 	if userID == nil {
-		result.Result = 0
+		result.Result = 2
 		result.Message = "seesion失效"
 		c.Data["json"] = result
 	}
@@ -65,8 +65,8 @@ func (c *ApplicationController) Post() {
 
 // GetOne ...
 // @Title Get One
-// @Description get Application by id
-// @Param	id		path 	string	true		"The key for staticblock"
+// @Description 根据ID获取应用信息
+// @Param	id		path 	string	true		"主键ID"
 // @Success 200 {object} models.Application
 // @Failure 403 :id is empty
 // @router /:id [get]
@@ -90,11 +90,11 @@ func (c *ApplicationController) GetOne() {
 // GetAll ...
 // @Title Get All
 // @Description get Application
-// @Param	sysCode	query	string	false	""
-// @Param	sysName	query	string	false	""
-// @Param	pageSize	query	string	false	"Limit the size of result set. Must be an integer"
-// @Param	offset	query	string	false	"Start position of result set. Must be an integer"
-// @Success 200 {object} models.Application
+// @Param	sysCode	query	string	false	"系统编码"
+// @Param	sysName	query	string	false	"系统名称"
+// @Param	pageSize	query	string	false	"一页显示数据量 后台默认为10 "
+// @Param	offset	query	string	false	"数据下标"
+// @Success 200 [object] models.Application
 // @Failure 403
 // @router / [get]
 func (c *ApplicationController) GetAll() {
@@ -140,7 +140,7 @@ func (c *ApplicationController) GetAll() {
 
 // Delete ...
 // @Title Delete
-// @Description delete the Application
+// @Description delete the Application 逻辑删除
 // @Param	id		path 	string	true		"The id you want to delete"
 // @Success 200 {string} delete success!
 // @Failure 403 id is empty
@@ -166,7 +166,12 @@ func (c *ApplicationController) Delete() {
 	c.ServeJSON()
 }
 
-// check ...
+// CheckRepeat ...
+// @Title CheckRepeat
+// @Description  应用名称验重
+// @Param	SysName		path 	string	true		"需要验重的系统名"
+// @Success 200 {string} valid success!
+// @Failure 403 SysName is empty
 // @router /checkRepeat [get]
 func (c *ApplicationController) CheckRepeat() {
 	result := &out.OperResult{}
@@ -181,7 +186,10 @@ func (c *ApplicationController) CheckRepeat() {
 	c.ServeJSON()
 }
 
-// 获取下拉框的数据...
+// GetSelectData ...
+// @Title GetSelectData
+// @Description  获取下拉框的数据
+// @Success 200  get success!
 // @router /getSelectData [post]
 func (c *ApplicationController) GetSelectData() {
 	result := &out.OperResult{}

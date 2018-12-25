@@ -29,6 +29,7 @@ type UserInfo struct {
 	Permissions  []string
 }
 
+// 登陆,账户和用户信息管理模块
 type AuthorityManageController struct {
 	beego.Controller
 }

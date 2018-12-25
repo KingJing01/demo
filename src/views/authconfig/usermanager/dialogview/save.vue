@@ -92,7 +92,7 @@
       </template>
     </el-form-item>
     <template>
-      <el-tabs type="card">
+      <el-tabs type="card" @tab-remove="handleTabRemove" >
         <el-tab-pane v-for="(sys, index) in SelectData" :label="sys.SysName" :key="index"><PermissionPage :sys-code="sys.SysCode" @listen="getChildEvent"/></el-tab-pane>
       </el-tabs>
     </template>
@@ -135,7 +135,8 @@ export default {
     // 系统信息选择事件
     handlecheckedAppChange(val) {
       console.log('转换前' + this.childPerSelect)
-      this.SelectData = []
+      debugger
+      var tempSelectData = []
       for (const i of val) {
         // 添加动态tab
         for (const option of this.SysOptions) {
@@ -143,7 +144,7 @@ export default {
             var result = {}
             result.SysName = option.SysName + '权限配置'
             result.SysCode = option.SysCode
-            this.SelectData.push(result)
+            tempSelectData.push(result)
           }
         }
         if (val.length < this.childPerSelect.length) {
@@ -161,6 +162,9 @@ export default {
         }
       }
       console.log('转换后' + this.childPerSelect)
+      this.SelectData = tempSelectData
+      this.data.authData = this.childPerSelect
+      this.data.formData = this.formData
     },
     getChildEvent(val) {
       if (this.childPerSelect.length === 0) {
@@ -182,6 +186,10 @@ export default {
       }
       this.data.authData = this.childPerSelect
       this.data.formData = this.formData
+    },
+    handleTabRemove(val) {
+      debugger
+      console.log(val)
     }
   }
 }

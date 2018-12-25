@@ -182,6 +182,7 @@ export default {
     },
     // 保存/修改用户信息
     saveData() {
+      debugger
       console.log(this.form)
       if (this.type === 'insert') {
         const transData = transPermissionCheckedDataArr(this.form.authData)

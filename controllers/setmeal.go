@@ -90,6 +90,8 @@ func (c *SetMealController) Post() {
 		result.Result = 0
 		result.Message = "seesion失效"
 		c.Data["json"] = result
+		c.ServeJSON()
+		return
 	}
 	var v input.SetMeatInput
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
@@ -112,7 +114,7 @@ func (c *SetMealController) Post() {
 // Delete ...
 // @Title Delete
 // @Description  禁用套餐
-// @Param	id	path 	models.SetMeal	true	"需要禁用的套餐ID 例a,b,c 或 a"
+// @Param	id 	path 	string	true	"需要禁用的套餐ID 例a,b,c 或 a"
 // @Success 200  result:1(success)  0(false)
 // @Failure 403 ids is empty
 // @router /:id [delete]
@@ -123,6 +125,8 @@ func (c *SetMealController) Delete() {
 		result.Result = 0
 		result.Message = "seesion失效"
 		c.Data["json"] = result
+		c.ServeJSON()
+		return
 	}
 	ids := c.Ctx.Input.Param(":id")
 	if err := models.DeleteSetMeal(ids, userID.(int64)); err == nil {
@@ -149,6 +153,8 @@ func (c *SetMealController) UpdateSetMealInfo() {
 		result.Result = 0
 		result.Message = "seesion失效"
 		c.Data["json"] = result
+		c.ServeJSON()
+		return
 	}
 	var v input.SetMeatInput
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {

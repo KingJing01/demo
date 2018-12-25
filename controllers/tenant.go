@@ -157,6 +157,8 @@ func (c *TenantController) Put() {
 		result.Result = 0
 		result.Message = "seesion失效"
 		c.Data["json"] = result
+		c.ServeJSON()
+		return
 	}
 	idStr := c.Ctx.Input.Param(":id")
 	id, _ := strconv.Atoi(idStr)
@@ -198,6 +200,8 @@ func (c *TenantController) Delete() {
 		result.Result = 0
 		result.Message = "seesion失效"
 		c.Data["json"] = result
+		c.ServeJSON()
+		return
 	}
 	idStr := c.Ctx.Input.Param(":id")
 	id, _ := strconv.Atoi(idStr)

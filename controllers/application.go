@@ -40,6 +40,8 @@ func (c *ApplicationController) Post() {
 		result.Result = 2
 		result.Message = "seesion失效"
 		c.Data["json"] = result
+		c.ServeJSON()
+		return
 	}
 	var v models.Application
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
@@ -152,6 +154,8 @@ func (c *ApplicationController) Delete() {
 		result.Result = 0
 		result.Message = "seesion失效"
 		c.Data["json"] = result
+		c.ServeJSON()
+		return
 	}
 	idStr := c.Ctx.Input.Param(":id")
 	id, _ := strconv.Atoi(idStr)
@@ -219,6 +223,8 @@ func (c *ApplicationController) Put() {
 		result.Result = 0
 		result.Message = "seesion失效"
 		c.Data["json"] = result
+		c.ServeJSON()
+		return
 	}
 	idStr := c.Ctx.Input.Param(":id")
 	id, _ := strconv.Atoi(idStr)

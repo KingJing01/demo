@@ -39,6 +39,8 @@ func (c *PermissionController) Post() {
 		result.Result = 0
 		result.Message = "seesion失效"
 		c.Data["json"] = result
+		c.ServeJSON()
+		return
 	}
 	var mystruct map[string]interface{}
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &mystruct); err == nil {
@@ -148,6 +150,8 @@ func (c *PermissionController) Put() {
 		result.Result = 0
 		result.Message = "seesion失效"
 		c.Data["json"] = result
+		c.ServeJSON()
+		return
 	}
 	idStr := c.Ctx.Input.Param(":id")
 	id, _ := strconv.Atoi(idStr)

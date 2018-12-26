@@ -10,7 +10,7 @@ import (
 	"github.com/astaxie/beego"
 )
 
-// SsouserController operations for Ssouser
+// sso登陆管理
 type SsouserController struct {
 	beego.Controller
 }

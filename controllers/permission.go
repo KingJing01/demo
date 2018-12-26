@@ -195,7 +195,12 @@ func (c *PermissionController) Delete() {
 	c.ServeJSON()
 }
 
-// 根据系统编号获取对应的权限
+// GetPerInfoBySysCode ...
+// @Title GetPerInfoBySysCode
+// @Description  根据系统编号获取对应的权限
+// @Param	sysCode	 path 	string 	true		"系统编号"
+// @Success 200  result:1(success)  0(false)
+// @Failure 403 sysCode is empty
 // @router /getPerInfoBySysCode/:sysCode [get]
 func (c *PermissionController) GetPerInfoBySysCode() {
 	result := &out.OperResult{}
@@ -213,7 +218,12 @@ func (c *PermissionController) GetPerInfoBySysCode() {
 	c.ServeJSON()
 }
 
-// 根据套餐编号和系统编号获取对应的权限
+// GetPerInfoBySysCodeUpdate ...
+// @Title GetPerInfoBySysCode
+// @Description  根据套餐编号和系统编号获取对应的权限
+// @Param	sysCode		query 	string 	true		"系统编号"
+// @Param	setMealCode		query 	string 	true	"套餐编号"
+// @Success 200  result:1(success)  0(false)
 // @router /getPerInfoBySysCodeUpdate [get]
 func (c *PermissionController) GetPerInfoBySysCodeUpdate() {
 	result := &out.OperResult{}

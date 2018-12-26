@@ -11,7 +11,7 @@ import (
 	"github.com/astaxie/beego"
 )
 
-// TenantController operations for Tenant
+// 企业信息管理模块
 type TenantController struct {
 	beego.Controller
 }
@@ -30,7 +30,7 @@ func (c *TenantController) URLMapping() {
 // @Title Post
 // @Description create Tenant
 // @Param	body		body 	models.Tenant	true		"body for Tenant content"
-// @Success 201 {int} models.Tenant
+// @Success 200  result:1(success)  0(false)
 // @Failure 403 body is empty
 // @router / [post]
 func (c *TenantController) Post() {
@@ -92,12 +92,10 @@ func (c *TenantController) GetOne() {
 // GetAll ...
 // @Title Get All
 // @Description get Tenant
-// @Param	query	query	string	false	"Filter. e.g. col1:v1,col2:v2 ..."
-// @Param	fields	query	string	false	"Fields returned. e.g. col1,col2 ..."
-// @Param	sortby	query	string	false	"Sorted-by fields. e.g. col1,col2 ..."
-// @Param	order	query	string	false	"Order corresponding to each sortby field, if single value, apply to all sortby fields. e.g. desc,asc ..."
-// @Param	pageSize	query	string	false	"Limit the size of result set. Must be an integer"
-// @Param	offset	query	string	false	"Start position of result set. Must be an integer"
+// @Param	tenantName	query	string	false	"用户名称"
+// @Param	sysName	query	string	false	"系统名称"
+// @Param	pageSize	query	string	false	"一页显示数据量 后台默认为10 "
+// @Param	offset	query	string	false	"数据下标"
 // @Success 200 {object} models.Tenant
 // @Failure 403
 // @router / [get]
@@ -219,10 +217,9 @@ func (c *TenantController) Delete() {
 // GetTenantPermission ...
 // @Title GetTenantPermission
 // @Description 获取企业所有的权限信息
-// @Param	sysCode path 	string	true		"The id you want to update"
-// @Param	tenId  path 	string	true		"The id you want to update"
-// @Success 200 {string} delete success!
-// @Failure 403 id is empty
+// @Param	sysCode query    	string	true		"系统编码"
+// @Param	tenId  query    	string	true		"企业ID"
+// @Success 200  result:1(success)  0(false)
 // @router /getTenantPermission [get]
 func (c *TenantController) GetTenantPermission() {
 	result := &out.OperResult{}

@@ -48,6 +48,10 @@ func (c *AuthorityManageController) Options() {
 	c.ServeJSON()
 }
 
+// AuthorityError...
+// @Title AuthorityError
+// @Description  系统认证错误
+// @Success 200
 // @router /AuthorityError [get]
 func (tc *AuthorityManageController) AuthorityError() {
 	result := out.OperResult{}

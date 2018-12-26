@@ -26,12 +26,13 @@ export function saveSysInfo(info) {
   })
 }
 // 系统名称验证重复
-export function uniqueCheck(sysName) {
+export function uniqueCheck(sysName, sysId) {
   return request({
     url: '/application/checkRepeat',
     method: 'get',
     params: {
-      'SysName': sysName
+      'SysName': sysName,
+      'SysId': sysId
     }
   })
 }

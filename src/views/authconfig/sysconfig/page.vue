@@ -116,7 +116,6 @@
               :disabled="type=='detail'?true:false"
               v-model="form.sysName"
               auto-complete="off"
-              @change="checkRepeat"
             />
             <span v-if= "dialogInfoVisable==true" id="dialogInfo">系统名称已经存在,请重新输入</span>
           </el-form-item>
@@ -155,7 +154,7 @@
   </template></div>
 </template>
 <script>
-import { getListData, saveSysInfo, uniqueCheck, updateSysInfo } from '@/api/sysconfig'
+import { getListData, saveSysInfo, updateSysInfo } from '@/api/sysconfig'
 export default {
   data() {
     return {
@@ -165,8 +164,6 @@ export default {
         offset: 0
       },
       form: {
-        sysUrl: '',
-        sysName: '',
         IsValid: true
       },
       dialogTableVisible: false,
@@ -176,7 +173,8 @@ export default {
       type: 'insert',
       formRules: {
         sysName: [{ required: true, trigger: 'blur', message: '系统名称必输' }],
-        sysUrl: [{ required: true, trigger: 'blur', message: '系统访问地址必输' }]
+        sysUrl: [{ required: true, trigger: 'blur', message: '系统访问地址必输' },
+          { pattern: /^(https?|ftp):\/\/([a-zA-Z0-9.-]+(:[a-zA-Z0-9.&%$-]+)*@)*((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}|([a-zA-Z0-9-]+\.)*[a-zA-Z0-9-]+\.(com|edu|gov|int|mil|net|org|biz|arpa|info|name|pro|aero|coop|museum|[a-zA-Z]{2}))(:[0-9]+)*(\/($|[a-zA-Z0-9.,?'\\+&%$#=~_-]+))*$/, trigger: 'blur', message: '请输入正确格式的访问地址' }]
       }
     }
   },
@@ -258,16 +256,6 @@ export default {
           }
         } else {
           return false
-        }
-      })
-    },
-    // 系统信息验重
-    checkRepeat() {
-      uniqueCheck(this.form.sysName).then(response => {
-        if (response.Result > 0) {
-          this.dialogInfoVisable = true
-        } else {
-          this.dialogInfoVisable = false
         }
       })
     },

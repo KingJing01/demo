@@ -172,8 +172,9 @@ export default {
       dialogInfoVisable: false,
       type: 'insert',
       formRules: {
-        sysName: [{ required: true, trigger: 'blur', message: '系统名称必输' }],
-        sysUrl: [{ required: true, trigger: 'blur', message: '系统访问地址必输' },
+        sysName: [{ required: true, trigger: 'blur', message: '系统名称为必填项' },
+          { min: 3, max: 20, message: '字长在 3 到 20之间', trigger: 'blur' }],
+        sysUrl: [{ required: true, trigger: 'blur', message: '系统访问地址为必填项' },
           { pattern: /^(https?|ftp):\/\/([a-zA-Z0-9.-]+(:[a-zA-Z0-9.&%$-]+)*@)*((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}|([a-zA-Z0-9-]+\.)*[a-zA-Z0-9-]+\.(com|edu|gov|int|mil|net|org|biz|arpa|info|name|pro|aero|coop|museum|[a-zA-Z]{2}))(:[0-9]+)*(\/($|[a-zA-Z0-9.,?'\\+&%$#=~_-]+))*$/, trigger: 'blur', message: '请输入正确格式的访问地址' }]
       }
     }

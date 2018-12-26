@@ -96,10 +96,11 @@
     ><h4 v-if="type==='detail'" slot="title">菜单详情</h4>
       <h4 v-else-if="type==='update'" slot="title">修改菜单</h4>
       <h4 v-else slot="title">新增菜单</h4>
-      <el-form :model="form" :disabled="type=='detail'?true:false" size="small">
+      <el-form ref="perForm" :model="form" :rules="formRules" :disabled="type=='detail'?true:false" size="small">
         <el-form-item
           :label-width="formLabelWidth"
           label="系统名称"
+          prop="SysCode"
         >
           <el-select v-model="form.SysCode" placeholder="请选择" @change="changeSysSelect">
             <el-option
@@ -112,6 +113,7 @@
         <el-form-item
           :label-width="formLabelWidth"
           label="菜单编码"
+          prop="Name"
         >
           <el-input
             v-model="form.Name"
@@ -121,6 +123,7 @@
         <el-form-item
           :label-width="formLabelWidth"
           label="菜单名称"
+          prop="DisplayName"
         >
           <el-input
             v-model="form.DisplayName"
@@ -141,17 +144,17 @@
       <el-button v-show="type=='detail'?false:true" type="primary" size="mini" icon="el-icon-circle-plus" @click="handlePerInsert"/>
       <el-table :data="form.PerData" class="tb-edit" style="width: 100%" highlight-current-row max-height="310" @row-click="handleTableCurrentChange">
         <el-table-column label="权限名称">
-          <template scope="scope">
+          <template slot-scope="scope">
             <el-input v-model="scope.row.DisplayName" :disabled="type=='detail'?true:false" size="mini" placeholder="请输入内容" @change="handleEdit(scope.$index, scope.row)"/>
           </template>
         </el-table-column>
         <el-table-column label="权限缩写">
-          <template scope="scope">
+          <template slot-scope="scope">
             <el-input v-model="scope.row.Name" :disabled="type=='detail'?true:false" size="mini" placeholder="请输入内容" @change="handleEdit(scope.$index, scope.row)"/>
           </template>
         </el-table-column>
         <el-table-column v-if="type!='detail'" label="操作">
-          <template scope="scope">
+          <template slot-scope="scope">
             <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
           </template>
         </el-table-column>
@@ -191,7 +194,12 @@ export default {
       formLabelWidth: '100px',
       dialogInfoVisable: false,
       selection: [], // 列表选择框的信息
-      options: []// 系统下拉数据
+      options: [], // 系统下拉数据
+      formRules: {
+        SysCode: [{ required: true, trigger: 'change', message: '系统为必填项' }],
+        Name: [{ required: true, trigger: 'blur', message: '菜单编码为必填项' }, { min: 3, max: 20, message: '字长在 3 到 20之间', trigger: 'blur' }],
+        DisplayName: [{ required: true, trigger: 'blur', message: '菜单名称为必填项' }, { min: 3, max: 20, message: '字长在 3 到 20之间', trigger: 'blur' }]
+      }
     }
   },
   created() {
@@ -240,25 +248,31 @@ export default {
     },
     // 保存系统信息
     saveData() {
-      if (this.type === 'insert') {
-        addPerInfo(this.form).then(response => {
-          if (response.Result === 0) {
-            this.$message.error(response.Message)
+      this.$refs.perForm.validate(valid => {
+        if (valid) {
+          if (this.type === 'insert') {
+            addPerInfo(this.form).then(response => {
+              if (response.Result === 0) {
+                this.$message.error(response.Message)
+              } else {
+                this.dialogFormVisible = false
+                this.getList()
+              }
+            })
           } else {
-            this.dialogFormVisible = false
-            this.getList()
+            updatePerInfo(this.form).then(response => {
+              if (response.Result === 0) {
+                this.$message.error(response.Message)
+              } else {
+                this.dialogFormVisible = false
+                this.getList()
+              }
+            })
           }
-        })
-      } else {
-        updatePerInfo(this.form).then(response => {
-          if (response.Result === 0) {
-            this.$message.error(response.Message)
-          } else {
-            this.dialogFormVisible = false
-            this.getList()
-          }
-        })
-      }
+        } else {
+          return false
+        }
+      })
     },
     // 系统信息验重
     checkRepeat() {

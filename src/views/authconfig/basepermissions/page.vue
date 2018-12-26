@@ -286,6 +286,7 @@ export default {
       this.form = {}
       this.form.PerData = []
       this.type = 'insert'
+      this.$refs['perForm'].resetFields()
     },
     // 监听dialog的打开事件
     handleOpenDialog() {

@@ -62,9 +62,9 @@ func (c *PermissionController) Post() {
 
 // GetOne ...
 // @Title Get One
-// @Description get Permission by id
-// @Param	id		path 	string	true		"The key for staticblock"
-// @Success 200 {object} models.Permission
+// @Description 获取菜单及对应操作信息
+// @Param	id		path 	string	true		"权限ID"
+// @Success 200  result:1(success)  0(false)
 // @Failure 403 :id is empty
 // @router /:id [get]
 func (c *PermissionController) GetOne() {

@@ -85,7 +85,7 @@ func GetPermissionById(id int) (v *out.PermissonInfo, err error) {
 	o := orm.NewOrm()
 	err = o.Raw("select t1.Id id ,DisplayName display_name,Name name ,MenuText menu_text,MenuCode menu_code,t2.SysName sys_name,t1.SysCode sys_code from permission t1 LEFT JOIN application t2 on t1.SysCode = t2.SysCode where t1.Id = ?", id).QueryRow(&v)
 	var lists []out.PerInfo
-	_, err = o.Raw("select DisplayName display_name,Name name from permission where MenuCode = ? and IsMenu=1", v.MenuCode).QueryRows(&lists)
+	_, err = o.Raw("select DisplayName display_name,Name name from permission where MenuCode = ? and IsMenu=1 and TenantId = 0 ", v.MenuCode).QueryRows(&lists)
 	v.PerData = lists
 	return v, err
 }

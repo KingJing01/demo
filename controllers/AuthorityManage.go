@@ -225,7 +225,7 @@ func (tc *AuthorityManageController) GetUserInfo() {
 // @Param   SysCode     header    string  true        "系统编码"
 // @Success 200  result:1(success)  0(false)
 // @Failure 400
-// @router /registUser [put]
+// @router /registUser [post]
 func (tc *AuthorityManageController) RegistUser() {
 	sysCode := tc.Ctx.Request.Header.Get("SysCode")
 	l := &input.LoginInfo{}

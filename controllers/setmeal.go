@@ -143,7 +143,7 @@ func (c *SetMealController) Delete() {
 // UpdateSetMealInfo ...
 // @Title updateSetMealInfo
 // @Description 修改套餐的信息
-// @param  body    body    inputmodels.SetMeatInput  true      "套餐实体"
+// @Param   body     body    inputmodels.SetMeatInput  true       "套餐实体  "
 // @Success 200  result:1(success)  0(false)
 // @router /updateSetMealInfo [put]
 func (c *SetMealController) UpdateSetMealInfo() {

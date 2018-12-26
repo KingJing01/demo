@@ -112,11 +112,12 @@
     > <h4 v-if="type==='detail'" slot="title">套餐详情</h4>
       <h4 v-else-if="type==='update'" slot="title">修改套餐</h4>
       <h4 v-else slot="title">新增套餐</h4>
-      <el-form :model="form" size="small">
+      <el-form ref="mealForm" :model="form" :rules="formRules" size="small">
         <div v-if="type!='detail'">
           <el-form-item
             :label-width="formLabelWidth"
             label="套餐名"
+            prop="setMealName"
           >
             <el-input
               v-model="form.setMealName"
@@ -127,6 +128,7 @@
           <el-form-item
             :label-width="formLabelWidth"
             label="系统名称"
+            prop="sysCode"
           >
             <el-select v-model="form.sysCode" placeholder="请选择" @change="changeSysSelect">
               <el-option
@@ -197,7 +199,11 @@ export default {
       dialogInfoVisable: false,
       options: [],
       authData: [],
-      multipleSelection: []
+      multipleSelection: [],
+      formRules: {
+        sysCode: [{ required: true, trigger: 'change', message: '系统为必填项' }],
+        setMealName: [{ required: true, trigger: 'blur', message: '套餐名为必填项' }, { max: 20, message: '输入内容最大长度为20', trigger: 'blur' }]
+      }
     }
   },
   created() {
@@ -251,40 +257,44 @@ export default {
     },
     // 保存系统信息
     saveData() {
-      var transData = transPermissionCheckedData(this.authData)
-      if (transData.perName === '') {
-        this.$message({
-          message: '请选择操作权限',
-          type: 'warning'
-        })
-        return false
-      }
-      this.form.perId = transData.perId
-      this.form.perName = transData.perName
-      if (this.dialogInfoVisable === false) {
-        // 新增操作
-        if (this.type === 'insert') {
-          addSetMealInfo(this.form).then(response => {
-            if (response.Result === 0) {
-              this.$message.error(response.Message)
+      this.$refs.mealForm.validate(valid => {
+        if (valid) {
+          var transData = transPermissionCheckedData(this.authData)
+          if (transData.perName === '') {
+            this.$message({
+              message: '请选择操作权限',
+              type: 'warning'
+            })
+            return false
+          }
+          this.form.perId = transData.perId
+          this.form.perName = transData.perName
+          if (this.dialogInfoVisable === false) {
+            // 新增操作
+            if (this.type === 'insert') {
+              addSetMealInfo(this.form).then(response => {
+                if (response.Result === 0) {
+                  this.$message.error(response.Message)
+                } else {
+                  this.dialogFormVisible = false
+                  this.getList()
+                }
+              })
             } else {
-              this.dialogFormVisible = false
-              this.getList()
+              updateSetMealInfo(this.form).then(response => {
+                if (response.Result === 0) {
+                  this.$message.error(response.Message)
+                } else {
+                  this.dialogFormVisible = false
+                  this.getList()
+                }
+              })
             }
-          })
-        } else {
-          updateSetMealInfo(this.form).then(response => {
-            if (response.Result === 0) {
-              this.$message.error(response.Message)
-            } else {
-              this.dialogFormVisible = false
-              this.getList()
-            }
-          })
+          } else {
+            console.log('修改信息')
+          }
         }
-      } else {
-        console.log('修改信息')
-      }
+      })
     },
     // 系统信息验重
     checkRepeat() {

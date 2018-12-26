@@ -1,9 +1,9 @@
 <template>
   <el-tabs v-model="activeName" class="auth_tab" @tab-click="handleClick" >
-    <el-tab-pane label="系统配置" name="first"><SysConfig/></el-tab-pane>
-    <el-tab-pane label="基础权限" name="second"><BasePermission/></el-tab-pane>
-    <el-tab-pane label="用户套餐" name="third"><UserPackage/></el-tab-pane>
-    <el-tab-pane label="平台用户管理" name="fourth"><UserManager/></el-tab-pane>
+    <el-tab-pane label="系统配置" name="first"><SysConfig ref="mychildFirst"/></el-tab-pane>
+    <el-tab-pane label="基础权限" name="second"><BasePermission ref="mychildSecond"/></el-tab-pane>
+    <el-tab-pane label="用户套餐" name="third"><UserPackage ref="mychildThird"/></el-tab-pane>
+    <el-tab-pane label="平台用户管理" name="fourth"><UserManager ref="mychildFourth"/></el-tab-pane>
   </el-tabs>
 </template>
 <script>
@@ -20,7 +20,15 @@ export default {
   },
   methods: {
     handleClick(tab, event) {
-      console.log(tab, event)
+      if (tab.name === 'first') {
+        this.$refs.mychildFirst.getList()
+      } else if (tab.name === 'second') {
+        this.$refs.mychildSecond.getList()
+      } else if (tab.name === 'third') {
+        this.$refs.mychildThird.getList()
+      } else if (tab.name === 'fourth') {
+        this.$refs.mychildFourth.getList()
+      }
     }
   }
 }

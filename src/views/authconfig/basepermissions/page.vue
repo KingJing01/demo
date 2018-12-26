@@ -216,7 +216,6 @@ export default {
     },
     // 获取列表数据
     getList() {
-      console.log('权限 初始化数据')
       getMenuList(this.search).then(response => {
         this.tableData = response.Data.list
         this.search.pageTotal = response.Data.total

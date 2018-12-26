@@ -158,7 +158,6 @@ export default {
     },
     // 获取列表数据
     getList() {
-      console.log(' 用户信息管理 初始化数据')
       getUserList(this.search).then(response => {
         this.tableData = response.Data.list
         this.search.pageTotal = response.Data.total

@@ -195,7 +195,6 @@ export default {
     },
     // 获取列表数据
     getList() {
-      console.log('系统配置 初始化数据')
       getListData(this.search).then(response => {
         this.tableData = response.Data.list
         this.search.pageTotal = response.Data.total

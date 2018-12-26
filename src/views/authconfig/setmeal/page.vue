@@ -222,7 +222,6 @@ export default {
     },
     // 获取列表数据
     getList() {
-      console.log('套餐 初始化数据')
       getSetMealList(this.search).then(response => {
         this.tableData = response.Data.list
         this.search.pageTotal = response.Data.total

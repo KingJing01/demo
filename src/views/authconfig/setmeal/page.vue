@@ -265,13 +265,21 @@ export default {
         // 新增操作
         if (this.type === 'insert') {
           addSetMealInfo(this.form).then(response => {
-            this.dialogFormVisible = false
-            this.getList()
+            if (response.Result === 0) {
+              this.$message.error(response.Message)
+            } else {
+              this.dialogFormVisible = false
+              this.getList()
+            }
           })
         } else {
           updateSetMealInfo(this.form).then(response => {
-            this.dialogFormVisible = false
-            this.getList()
+            if (response.Result === 0) {
+              this.$message.error(response.Message)
+            } else {
+              this.dialogFormVisible = false
+              this.getList()
+            }
           })
         }
       } else {

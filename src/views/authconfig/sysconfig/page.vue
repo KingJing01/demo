@@ -96,7 +96,7 @@
       ><h4 v-if="type==='detail'" slot="title">系统详情</h4>
         <h4 v-else-if="type==='update'" slot="title">修改系统</h4>
         <h4 v-else slot="title">新增系统</h4>
-        <el-form :model="form" size="small">
+        <el-form ref="sysForm" :model="form" :rules="formRules" size="small">
           <el-form-item
             :label-width="formLabelWidth"
             label="系统代码"
@@ -110,6 +110,7 @@
           <el-form-item
             :label-width="formLabelWidth"
             label="系统名称"
+            prop="sysName"
           >
             <el-input
               :disabled="type=='detail'?true:false"
@@ -122,10 +123,12 @@
           <el-form-item
             :label-width="formLabelWidth"
             label="系统地址"
+            prop="sysUrl"
           >
             <el-input
               :disabled="type=='detail'?true:false"
               v-model="form.sysUrl"
+
               auto-complete="off"
             />
           </el-form-item>
@@ -162,13 +165,19 @@ export default {
         offset: 0
       },
       form: {
+        sysUrl: '',
+        sysName: '',
         IsValid: true
       },
       dialogTableVisible: false,
       dialogFormVisible: false,
       formLabelWidth: '100px',
       dialogInfoVisable: false,
-      type: 'insert'
+      type: 'insert',
+      formRules: {
+        sysName: [{ required: true, trigger: 'blur', message: '系统名称必输' }],
+        sysUrl: [{ required: true, trigger: 'blur', message: '系统访问地址必输' }]
+      }
     }
   },
   created() {
@@ -224,21 +233,33 @@ export default {
     },
     // 保存系统信息
     saveData() {
-      if (this.dialogInfoVisable === false) {
-        if (this.type === 'insert') {
-          saveSysInfo(this.form).then(response => {
-            this.dialogFormVisible = false
-            this.dialogInfoVisable = false
-            this.getList()
-          })
+      this.$refs.sysForm.validate(valid => {
+        if (valid) {
+          if (this.type === 'insert') {
+            saveSysInfo(this.form).then(response => {
+              if (response.Result === 0) {
+                this.$message.error(response.Message)
+              } else {
+                this.dialogFormVisible = false
+                this.dialogInfoVisable = false
+                this.getList()
+              }
+            })
+          } else {
+            updateSysInfo(this.form).then(response => {
+              if (response.Result === 0) {
+                this.$message.error(response.Message)
+              } else {
+                this.dialogFormVisible = false
+                this.dialogInfoVisable = false
+                this.getList()
+              }
+            })
+          }
         } else {
-          updateSysInfo(this.form).then(response => {
-            this.dialogFormVisible = false
-            this.dialogInfoVisable = false
-            this.getList()
-          })
+          return false
         }
-      }
+      })
     },
     // 系统信息验重
     checkRepeat() {

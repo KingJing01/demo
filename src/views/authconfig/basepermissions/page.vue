@@ -242,13 +242,21 @@ export default {
     saveData() {
       if (this.type === 'insert') {
         addPerInfo(this.form).then(response => {
-          this.dialogFormVisible = false
-          this.getList()
+          if (response.Result === 0) {
+            this.$message.error(response.Message)
+          } else {
+            this.dialogFormVisible = false
+            this.getList()
+          }
         })
       } else {
         updatePerInfo(this.form).then(response => {
-          this.dialogFormVisible = false
-          this.getList()
+          if (response.Result === 0) {
+            this.$message.error(response.Message)
+          } else {
+            this.dialogFormVisible = false
+            this.getList()
+          }
         })
       }
     },

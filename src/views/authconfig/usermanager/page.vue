@@ -182,8 +182,6 @@ export default {
     },
     // 保存/修改用户信息
     saveData() {
-      debugger
-      console.log(this.form)
       if (this.type === 'insert') {
         const transData = transPermissionCheckedDataArr(this.form.authData)
         var perId = []
@@ -210,9 +208,13 @@ export default {
         this.tenant.perId = perId
         this.tenant.sysCode = sysCode
         saveTenantInfo(this.tenant).then(response => {
-          this.dialogFormVisible = false
-          this.getList()
-          this.tenant = {}
+          if (response.Result === 0) {
+            this.$message.error(response.Message)
+          } else {
+            this.dialogFormVisible = false
+            this.getList()
+            this.tenant = {}
+          }
         })
       } else {
         const transData = transPermissionCheckedData(this.form.authData)
@@ -228,9 +230,13 @@ export default {
         this.tenant.perId = transData.perId
         this.tenant.sysCode = this.form.sysCode
         updateTenantInfo(this.tenant).then(response => {
-          this.dialogFormVisible = false
-          this.getList()
-          this.tenant = {}
+          if (response.Result === 0) {
+            this.$message.error(response.Message)
+          } else {
+            this.dialogFormVisible = false
+            this.getList()
+            this.tenant = {}
+          }
         })
       }
     },

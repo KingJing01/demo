@@ -97,8 +97,8 @@
         <h4 v-else-if="type==='update'" slot="title">修改用户信息</h4>
         <h4 v-else slot="title">新增用户信息</h4>
         <div v-if="type==='detail'"><DetailPage :data="form"/></div>
-        <div v-else-if="type==='update'"><UpdatePage :data="form"/></div>
-        <div v-else><SavePage :data="form"/></div>
+        <div v-else-if="type==='update'"><UpdatePage ref="userData" :data="form"/></div>
+        <div v-else><SavePage ref="userData" :data="form"/></div>
         <div
           slot="footer"
           class="dialog-footer"
@@ -133,7 +133,7 @@ export default {
         pageSize: 5,
         offset: 0
       },
-      form: { },
+      form: {},
       dialogTableVisible: false,
       dialogFormVisible: false,
       dialogInfoVisable: false,
@@ -182,62 +182,65 @@ export default {
     },
     // 保存/修改用户信息
     saveData() {
-      if (this.type === 'insert') {
-        const transData = transPermissionCheckedDataArr(this.form.authData)
-        var perId = []
-        var perName = []
-        var perMenu = []
-        var sysCode = []
-        for (const index in transData) {
-          var arrIndexData = transData[index]
-          if (arrIndexData.perName === '') {
+      const valid = this.$refs.userData.validData()
+      if (valid) {
+        if (this.type === 'insert') {
+          const transData = transPermissionCheckedDataArr(this.form.authData)
+          var perId = []
+          var perName = []
+          var perMenu = []
+          var sysCode = []
+          for (const index in transData) {
+            var arrIndexData = transData[index]
+            if (arrIndexData.perName === '') {
+              this.$message({
+                message: '系统中必须选择操作权限',
+                type: 'warning'
+              })
+              return false
+            } else {
+              perId.push(arrIndexData.perId)
+              perName.push(arrIndexData.perName)
+              perMenu.push(arrIndexData.perMenu)
+              sysCode.push(arrIndexData.sysCode)
+            }
+          }
+          this.tenant = this.form.formData
+          this.tenant.perMenu = perMenu
+          this.tenant.perId = perId
+          this.tenant.sysCode = sysCode
+          saveTenantInfo(this.tenant).then(response => {
+            if (response.Result === 0) {
+              this.$message.error(response.Message)
+            } else {
+              this.dialogFormVisible = false
+              this.getList()
+              this.tenant = {}
+            }
+          })
+        } else {
+          const transData = transPermissionCheckedData(this.form.authData)
+          if (transData.perName === '') {
             this.$message({
-              message: '系统中必须选择操作权限',
+              message: '请选择操作权限',
               type: 'warning'
             })
             return false
-          } else {
-            perId.push(arrIndexData.perId)
-            perName.push(arrIndexData.perName)
-            perMenu.push(arrIndexData.perMenu)
-            sysCode.push(arrIndexData.sysCode)
           }
-        }
-        this.tenant = this.form.formData
-        this.tenant.perMenu = perMenu
-        this.tenant.perId = perId
-        this.tenant.sysCode = sysCode
-        saveTenantInfo(this.tenant).then(response => {
-          if (response.Result === 0) {
-            this.$message.error(response.Message)
-          } else {
-            this.dialogFormVisible = false
-            this.getList()
-            this.tenant = {}
-          }
-        })
-      } else {
-        const transData = transPermissionCheckedData(this.form.authData)
-        if (transData.perName === '') {
-          this.$message({
-            message: '请选择操作权限',
-            type: 'warning'
+          this.tenant = this.form.formData
+          this.tenant.perMenu = transData.perMenu
+          this.tenant.perId = transData.perId
+          this.tenant.sysCode = this.form.sysCode
+          updateTenantInfo(this.tenant).then(response => {
+            if (response.Result === 0) {
+              this.$message.error(response.Message)
+            } else {
+              this.dialogFormVisible = false
+              this.getList()
+              this.tenant = {}
+            }
           })
-          return false
         }
-        this.tenant = this.form.formData
-        this.tenant.perMenu = transData.perMenu
-        this.tenant.perId = transData.perId
-        this.tenant.sysCode = this.form.sysCode
-        updateTenantInfo(this.tenant).then(response => {
-          if (response.Result === 0) {
-            this.$message.error(response.Message)
-          } else {
-            this.dialogFormVisible = false
-            this.getList()
-            this.tenant = {}
-          }
-        })
       }
     },
     // dialog 取消按钮
@@ -254,6 +257,7 @@ export default {
     handleCloseDialog() {
       this.form = {}
       this.type = 'insert'
+      this.$refs.userData.cancleValid()
     }
   }
 }

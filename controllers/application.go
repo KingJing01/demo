@@ -174,14 +174,12 @@ func (c *ApplicationController) Delete() {
 // @Title CheckRepeat
 // @Description  应用名称验重
 // @Param	SysName		path 	string	true		"需要验重的系统名"
-// @Param	SysId		path 	string	true		"系统ID"
 // @Success 200 {string} valid success!
 // @Failure 403 SysName is empty
 // @router /checkRepeat [get]
 func (c *ApplicationController) CheckRepeat() {
 	result := &out.OperResult{}
 	sysName := c.GetString("SysName")
-	SysId := c.GetString("SysId")
 	if total, _ := models.CheckRepeat(sysName); total > 0 {
 		result.Result = 1
 		c.Data["json"] = result

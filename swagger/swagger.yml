@@ -1,0 +1,1445 @@
+swagger: "2.0"
+info:
+  title: beego Test API
+  description: beego has a very cool tools to autogenerate documents for your API
+  version: 1.0.0
+  termsOfService: http://beego.me/
+  contact:
+    email: astaxie@gmail.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+basePath: /v1
+paths:
+  /application/:
+    get:
+      tags:
+      - application
+      description: get Application
+      operationId: ApplicationController.Get All
+      parameters:
+      - in: query
+        name: sysCode
+        description: 系统编码
+        type: string
+      - in: query
+        name: sysName
+        description: 系统名称
+        type: string
+      - in: query
+        name: pageSize
+        description: 一页显示数据量 后台默认为10
+        type: string
+      - in: query
+        name: offset
+        description: 数据下标
+        type: string
+      responses:
+        "200":
+          description: '[object] models.Application'
+        "403":
+          description: ""
+    post:
+      tags:
+      - application
+      description: 新增应用
+      operationId: ApplicationController.Post
+      parameters:
+      - in: body
+        name: body
+        description: 新增的应用信息 SysName   SysUrl  IsValid
+        required: true
+        schema:
+          $ref: '#/definitions/models.Application'
+      responses:
+        "200":
+          description: result:1(success)  0(false)  2 session失效
+        "403":
+          description: body is empty
+  /application/{id}:
+    get:
+      tags:
+      - application
+      description: 根据ID获取应用信息
+      operationId: ApplicationController.Get One
+      parameters:
+      - in: path
+        name: id
+        description: 主键ID
+        required: true
+        type: string
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Application'
+        "403":
+          description: :id is empty
+    put:
+      tags:
+      - application
+      description: update the Application
+      operationId: ApplicationController.Put
+      parameters:
+      - in: path
+        name: id
+        description: The id you want to update
+        required: true
+        type: string
+      - in: body
+        name: body
+        description: body for Application content
+        required: true
+        schema:
+          $ref: '#/definitions/models.Application'
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Application'
+        "403":
+          description: :id is not int
+    delete:
+      tags:
+      - application
+      description: delete the Application 逻辑删除
+      operationId: ApplicationController.Delete
+      parameters:
+      - in: path
+        name: id
+        description: The id you want to delete
+        required: true
+        type: string
+      responses:
+        "200":
+          description: '{string} delete success!'
+        "403":
+          description: id is empty
+  /application/checkRepeat:
+    get:
+      tags:
+      - application
+      description: 应用名称验重
+      operationId: ApplicationController.CheckRepeat
+      parameters:
+      - in: path
+        name: SysName
+        description: 需要验重的系统名
+        required: true
+        type: string
+      responses:
+        "200":
+          description: '{string} valid success!'
+        "403":
+          description: SysName is empty
+  /application/getSelectData:
+    post:
+      tags:
+      - application
+      description: 获取下拉框的数据
+      operationId: ApplicationController.GetSelectData
+      responses:
+        "200":
+          description: get success!
+  /authoritymanage/AuthorityError:
+    get:
+      tags:
+      - authoritymanage
+      description: 系统认证错误
+      operationId: AuthorityManageController.AuthorityError
+      responses:
+        "200":
+          description: ""
+  /authoritymanage/GetUserInfo:
+    get:
+      tags:
+      - authoritymanage
+      description: 根据TOKEN获取用户信息
+      operationId: AuthorityManageController.GetUserInfo
+      parameters:
+      - in: header
+        name: Authorization
+        description: Token信息
+        required: true
+        type: string
+      - in: header
+        name: SysCode
+        description: 系统编码
+        required: true
+        type: string
+      responses:
+        "200":
+          description: result:1(success)  0(false)
+        "404":
+          description: User not found
+  /authoritymanage/Login:
+    post:
+      tags:
+      - authoritymanage
+      description: 系统登陆
+      operationId: AuthorityManageController.Login
+      parameters:
+      - in: body
+        name: body
+        description: 登陆信息  username password
+        required: true
+        schema:
+          $ref: '#/definitions/inputmodels.LoginInfo'
+      - in: header
+        name: Authorization
+        description: Token信息
+        type: string
+      - in: header
+        name: SysCode
+        description: 系统编码
+        required: true
+        type: string
+      responses:
+        "200":
+          description: result:1(success)  0(false)
+        "404":
+          description: User not found
+  /authoritymanage/Logout:
+    post:
+      tags:
+      - authoritymanage
+      description: 退出系统 清除redis保存的token信息
+      operationId: AuthorityManageController.Login
+      parameters:
+      - in: header
+        name: Authorization
+        description: Token信息
+        required: true
+        type: string
+      - in: header
+        name: SysCode
+        description: 系统编码
+        required: true
+        type: string
+      responses:
+        "200":
+          description: result:1(success)  0(false)
+  /authoritymanage/passwdUpdate:
+    put:
+      tags:
+      - authoritymanage
+      description: 修改密码
+      operationId: AuthorityManageController.Login
+      parameters:
+      - in: body
+        name: body
+        description: 新用户信息  用户名和密码
+        required: true
+        schema:
+          $ref: '#/definitions/inputmodels.LoginInfo'
+      - in: header
+        name: Authorization
+        description: Token信息
+        required: true
+        type: string
+      - in: header
+        name: SysCode
+        description: 系统编码
+        required: true
+        type: string
+      responses:
+        "200":
+          description: result:1(success)  0(false)
+  /authoritymanage/registUser:
+    post:
+      tags:
+      - authoritymanage
+      description: APP注册用户
+      operationId: AuthorityManageController.注册新用户 app
+      parameters:
+      - in: body
+        name: body
+        description: 登陆信息  useraname password
+        required: true
+        schema:
+          $ref: '#/definitions/inputmodels.LoginInfo'
+      - in: header
+        name: SysCode
+        description: 系统编码
+        required: true
+        type: string
+      responses:
+        "200":
+          description: result:1(success)  0(false)
+        "400":
+          description: ""
+  /authoritymanage/xsunLogin: {}
+  /permission/:
+    get:
+      tags:
+      - permission
+      description: get Permission
+      operationId: PermissionController.Get All
+      parameters:
+      - in: query
+        name: menuName
+        description: "false"
+        type: string
+      - in: query
+        name: sysName
+        description: "false"
+        type: string
+      - in: query
+        name: pageSize
+        description: Limit the size of result set. Must be an integer
+        type: string
+      - in: query
+        name: offset
+        description: Start position of result set. Must be an integer
+        type: string
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Permission'
+        "403":
+          description: ""
+    post:
+      tags:
+      - permission
+      description: create Permission
+      operationId: PermissionController.Post
+      parameters:
+      - in: body
+        name: body
+        description: body for Permission content
+        required: true
+        schema:
+          $ref: '#/definitions/models.Permission'
+      responses:
+        "201":
+          description: '{int} models.Permission'
+        "403":
+          description: body is empty
+  /permission/{id}:
+    get:
+      tags:
+      - permission
+      description: 获取菜单及对应操作信息
+      operationId: PermissionController.Get One
+      parameters:
+      - in: path
+        name: id
+        description: 权限ID
+        required: true
+        type: string
+      responses:
+        "200":
+          description: result:1(success)  0(false)
+        "403":
+          description: :id is empty
+    put:
+      tags:
+      - permission
+      description: update the Permission
+      operationId: PermissionController.Put
+      parameters:
+      - in: path
+        name: id
+        description: The id you want to update
+        required: true
+        type: string
+      - in: body
+        name: body
+        description: body for Permission content
+        required: true
+        schema:
+          $ref: '#/definitions/models.Permission'
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Permission'
+        "403":
+          description: :id is not int
+    delete:
+      tags:
+      - permission
+      description: delete the Permission
+      operationId: PermissionController.Delete
+      parameters:
+      - in: path
+        name: id
+        description: The id you want to delete
+        required: true
+        type: string
+      responses:
+        "200":
+          description: '{string} delete success!'
+        "403":
+          description: id is empty
+  /permission/getPerInfoBySysCode/{sysCode}:
+    get:
+      tags:
+      - permission
+      description: 根据系统编号获取对应的权限
+      operationId: PermissionController.GetPerInfoBySysCode
+      parameters:
+      - in: path
+        name: sysCode
+        description: 系统编号
+        required: true
+        type: string
+      responses:
+        "200":
+          description: result:1(success)  0(false)
+        "403":
+          description: sysCode is empty
+  /permission/getPerInfoBySysCodeUpdate:
+    get:
+      tags:
+      - permission
+      description: 根据套餐编号和系统编号获取对应的权限
+      operationId: PermissionController.GetPerInfoBySysCode
+      parameters:
+      - in: query
+        name: sysCode
+        description: 系统编号
+        required: true
+        type: string
+      - in: query
+        name: setMealCode
+        description: 套餐编号
+        required: true
+        type: string
+      responses:
+        "200":
+          description: result:1(success)  0(false)
+  /role/:
+    get:
+      tags:
+      - role
+      description: get Role
+      operationId: RoleController.Get All
+      parameters:
+      - in: query
+        name: query
+        description: Filter. e.g. col1:v1,col2:v2 ...
+        type: string
+      - in: query
+        name: fields
+        description: Fields returned. e.g. col1,col2 ...
+        type: string
+      - in: query
+        name: sortby
+        description: Sorted-by fields. e.g. col1,col2 ...
+        type: string
+      - in: query
+        name: order
+        description: Order corresponding to each sortby field, if single value, apply
+          to all sortby fields. e.g. desc,asc ...
+        type: string
+      - in: query
+        name: limit
+        description: Limit the size of result set. Must be an integer
+        type: string
+      - in: query
+        name: offset
+        description: Start position of result set. Must be an integer
+        type: string
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Role'
+        "403":
+          description: ""
+    post:
+      tags:
+      - role
+      description: create Role
+      operationId: RoleController.Post
+      parameters:
+      - in: body
+        name: body
+        description: body for Role content
+        required: true
+        schema:
+          $ref: '#/definitions/models.Role'
+      responses:
+        "201":
+          description: '{int} models.Role'
+        "403":
+          description: body is empty
+  /role/{id}:
+    get:
+      tags:
+      - role
+      description: get Role by id
+      operationId: RoleController.Get One
+      parameters:
+      - in: path
+        name: id
+        description: The key for staticblock
+        required: true
+        type: string
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Role'
+        "403":
+          description: :id is empty
+    put:
+      tags:
+      - role
+      description: update the Role
+      operationId: RoleController.Put
+      parameters:
+      - in: path
+        name: id
+        description: The id you want to update
+        required: true
+        type: string
+      - in: body
+        name: body
+        description: body for Role content
+        required: true
+        schema:
+          $ref: '#/definitions/models.Role'
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Role'
+        "403":
+          description: :id is not int
+    delete:
+      tags:
+      - role
+      description: delete the Role
+      operationId: RoleController.Delete
+      parameters:
+      - in: path
+        name: id
+        description: The id you want to delete
+        required: true
+        type: string
+      responses:
+        "200":
+          description: '{string} delete success!'
+        "403":
+          description: id is empty
+  /setmeal/:
+    get:
+      tags:
+      - setmeal
+      description: 获取套餐信息
+      operationId: SetMealController.Get All
+      parameters:
+      - in: query
+        name: setMealName
+        description: 套餐名称
+        type: string
+      - in: query
+        name: sysName
+        description: 系统名称
+        type: string
+      - in: query
+        name: pageSize
+        description: 一页显示数据量 后台默认为10
+        type: string
+      - in: query
+        name: offset
+        description: 数据下标
+        type: string
+      responses:
+        "200":
+          description: '[object] models.SetMeal'
+        "403":
+          description: ""
+    post:
+      tags:
+      - setmeal
+      description: create SetMeat
+      operationId: SetMealController.Post
+      parameters:
+      - in: body
+        name: body
+        description: body for SetMeal content
+        required: true
+        schema:
+          $ref: '#/definitions/models.SetMeal'
+      responses:
+        "201":
+          description: '{int} models.SetMeal'
+        "403":
+          description: body is empty
+  /setmeal/{id}:
+    delete:
+      tags:
+      - setmeal
+      description: 禁用套餐
+      operationId: SetMealController.Delete
+      parameters:
+      - in: path
+        name: id
+        description: 需要禁用的套餐ID 例a,b,c 或 a
+        required: true
+        type: string
+      responses:
+        "200":
+          description: result:1(success)  0(false)
+        "403":
+          description: ids is empty
+  /setmeal/getSetMealRadio/{sysCode}:
+    get:
+      tags:
+      - setmeal
+      description: 获取套餐单选数据
+      operationId: SetMealController.GetSetMealRadio
+      parameters:
+      - in: path
+        name: sysCode
+        description: 根据系统编号获取单选按钮数据
+        required: true
+        type: string
+      responses:
+        "200":
+          description: result:1(success)  0(false)
+  /setmeal/updateSetMealInfo:
+    put:
+      tags:
+      - setmeal
+      description: 修改套餐的信息
+      operationId: SetMealController.updateSetMealInfo
+      parameters:
+      - in: body
+        name: body
+        description: 套餐实体
+        required: true
+        schema:
+          $ref: '#/definitions/inputmodels.SetMeatInput'
+      responses:
+        "200":
+          description: result:1(success)  0(false)
+  /ssouser/:
+    get:
+      tags:
+      - ssouser
+      description: get Ssouser
+      operationId: SsouserController.Get All
+      parameters:
+      - in: query
+        name: query
+        description: Filter. e.g. col1:v1,col2:v2 ...
+        type: string
+      - in: query
+        name: fields
+        description: Fields returned. e.g. col1,col2 ...
+        type: string
+      - in: query
+        name: sortby
+        description: Sorted-by fields. e.g. col1,col2 ...
+        type: string
+      - in: query
+        name: order
+        description: Order corresponding to each sortby field, if single value, apply
+          to all sortby fields. e.g. desc,asc ...
+        type: string
+      - in: query
+        name: limit
+        description: Limit the size of result set. Must be an integer
+        type: string
+      - in: query
+        name: offset
+        description: Start position of result set. Must be an integer
+        type: string
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/.Ssouser'
+        "403":
+          description: ""
+    post:
+      tags:
+      - ssouser
+      description: create Ssouser
+      operationId: SsouserController.Post
+      parameters:
+      - in: body
+        name: body
+        description: body for Ssouser content
+        required: true
+        schema:
+          $ref: '#/definitions/.Ssouser'
+      responses:
+        "201":
+          description: '{int} models.Ssouser'
+        "403":
+          description: body is empty
+  /ssouser/{id}:
+    get:
+      tags:
+      - ssouser
+      description: get Ssouser by id
+      operationId: SsouserController.Get One
+      parameters:
+      - in: path
+        name: id
+        description: The key for staticblock
+        required: true
+        type: string
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/.Ssouser'
+        "403":
+          description: :id is empty
+    put:
+      tags:
+      - ssouser
+      description: update the Ssouser
+      operationId: SsouserController.Put
+      parameters:
+      - in: path
+        name: id
+        description: The id you want to update
+        required: true
+        type: string
+      - in: body
+        name: body
+        description: body for Ssouser content
+        required: true
+        schema:
+          $ref: '#/definitions/.Ssouser'
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/.Ssouser'
+        "403":
+          description: :id is not int
+    delete:
+      tags:
+      - ssouser
+      description: delete the Ssouser
+      operationId: SsouserController.Delete
+      parameters:
+      - in: path
+        name: id
+        description: The id you want to delete
+        required: true
+        type: string
+      responses:
+        "200":
+          description: '{string} delete success!'
+        "403":
+          description: id is empty
+  /tenant/:
+    get:
+      tags:
+      - tenant
+      description: get Tenant
+      operationId: TenantController.Get All
+      parameters:
+      - in: query
+        name: tenantName
+        description: 用户名称
+        type: string
+      - in: query
+        name: sysName
+        description: 系统名称
+        type: string
+      - in: query
+        name: pageSize
+        description: 一页显示数据量 后台默认为10
+        type: string
+      - in: query
+        name: offset
+        description: 数据下标
+        type: string
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Tenant'
+        "403":
+          description: ""
+    post:
+      tags:
+      - tenant
+      description: create Tenant
+      operationId: TenantController.Post
+      parameters:
+      - in: body
+        name: body
+        description: body for Tenant content
+        required: true
+        schema:
+          $ref: '#/definitions/models.Tenant'
+      responses:
+        "200":
+          description: result:1(success)  0(false)
+        "403":
+          description: body is empty
+  /tenant/{id}:
+    get:
+      tags:
+      - tenant
+      description: get Tenant by id
+      operationId: TenantController.Get One
+      parameters:
+      - in: path
+        name: id
+        description: The key for staticblock
+        required: true
+        type: string
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Tenant'
+        "403":
+          description: :id is empty
+    put:
+      tags:
+      - tenant
+      description: update the Tenant
+      operationId: TenantController.Put
+      parameters:
+      - in: path
+        name: id
+        description: The id you want to update
+        required: true
+        type: string
+      - in: body
+        name: body
+        description: body for Tenant content
+        required: true
+        schema:
+          $ref: '#/definitions/models.Tenant'
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Tenant'
+        "403":
+          description: :id is not int
+    delete:
+      tags:
+      - tenant
+      description: 逻辑删除
+      operationId: TenantController.Delete
+      parameters:
+      - in: path
+        name: id
+        description: The id you want to delete
+        required: true
+        type: string
+      responses:
+        "200":
+          description: '{string} delete success!'
+        "403":
+          description: id is empty
+  /tenant/getTenantPermission:
+    get:
+      tags:
+      - tenant
+      description: 获取企业所有的权限信息
+      operationId: TenantController.GetTenantPermission
+      parameters:
+      - in: query
+        name: sysCode
+        description: 系统编码
+        required: true
+        type: string
+      - in: query
+        name: tenId
+        description: 企业ID
+        required: true
+        type: string
+      responses:
+        "200":
+          description: result:1(success)  0(false)
+  /user/:
+    get:
+      tags:
+      - user
+      description: get User
+      operationId: UserController.Get All
+      parameters:
+      - in: query
+        name: query
+        description: Filter. e.g. col1:v1,col2:v2 ...
+        type: string
+      - in: query
+        name: fields
+        description: Fields returned. e.g. col1,col2 ...
+        type: string
+      - in: query
+        name: sortby
+        description: Sorted-by fields. e.g. col1,col2 ...
+        type: string
+      - in: query
+        name: order
+        description: Order corresponding to each sortby field, if single value, apply
+          to all sortby fields. e.g. desc,asc ...
+        type: string
+      - in: query
+        name: limit
+        description: Limit the size of result set. Must be an integer
+        type: string
+      - in: query
+        name: offset
+        description: Start position of result set. Must be an integer
+        type: string
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.User'
+        "403":
+          description: ""
+    post:
+      tags:
+      - user
+      description: create User
+      operationId: UserController.Post
+      parameters:
+      - in: body
+        name: body
+        description: body for User content
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      responses:
+        "201":
+          description: '{int} models.User'
+        "403":
+          description: body is empty
+  /user/{id}:
+    get:
+      tags:
+      - user
+      description: get User by id
+      operationId: UserController.Get One
+      parameters:
+      - in: path
+        name: id
+        description: The key for staticblock
+        required: true
+        type: string
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.User'
+        "403":
+          description: :id is empty
+    put:
+      tags:
+      - user
+      description: update the User
+      operationId: UserController.Put
+      parameters:
+      - in: path
+        name: id
+        description: The id you want to update
+        required: true
+        type: string
+      - in: body
+        name: body
+        description: body for User content
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.User'
+        "403":
+          description: :id is not int
+    delete:
+      tags:
+      - user
+      description: delete the User
+      operationId: UserController.Delete
+      parameters:
+      - in: path
+        name: id
+        description: The id you want to delete
+        required: true
+        type: string
+      responses:
+        "200":
+          description: '{string} delete success!'
+        "403":
+          description: id is empty
+  /userrole/:
+    get:
+      tags:
+      - userrole
+      description: get Userrole
+      operationId: UserroleController.Get All
+      parameters:
+      - in: query
+        name: query
+        description: Filter. e.g. col1:v1,col2:v2 ...
+        type: string
+      - in: query
+        name: fields
+        description: Fields returned. e.g. col1,col2 ...
+        type: string
+      - in: query
+        name: sortby
+        description: Sorted-by fields. e.g. col1,col2 ...
+        type: string
+      - in: query
+        name: order
+        description: Order corresponding to each sortby field, if single value, apply
+          to all sortby fields. e.g. desc,asc ...
+        type: string
+      - in: query
+        name: limit
+        description: Limit the size of result set. Must be an integer
+        type: string
+      - in: query
+        name: offset
+        description: Start position of result set. Must be an integer
+        type: string
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Userrole'
+        "403":
+          description: ""
+    post:
+      tags:
+      - userrole
+      description: create Userrole
+      operationId: UserroleController.Post
+      parameters:
+      - in: body
+        name: body
+        description: body for Userrole content
+        required: true
+        schema:
+          $ref: '#/definitions/models.Userrole'
+      responses:
+        "201":
+          description: '{int} models.Userrole'
+        "403":
+          description: body is empty
+  /userrole/{id}:
+    get:
+      tags:
+      - userrole
+      description: get Userrole by id
+      operationId: UserroleController.Get One
+      parameters:
+      - in: path
+        name: id
+        description: The key for staticblock
+        required: true
+        type: string
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Userrole'
+        "403":
+          description: :id is empty
+    put:
+      tags:
+      - userrole
+      description: update the Userrole
+      operationId: UserroleController.Put
+      parameters:
+      - in: path
+        name: id
+        description: The id you want to update
+        required: true
+        type: string
+      - in: body
+        name: body
+        description: body for Userrole content
+        required: true
+        schema:
+          $ref: '#/definitions/models.Userrole'
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Userrole'
+        "403":
+          description: :id is not int
+    delete:
+      tags:
+      - userrole
+      description: delete the Userrole
+      operationId: UserroleController.Delete
+      parameters:
+      - in: path
+        name: id
+        description: The id you want to delete
+        required: true
+        type: string
+      responses:
+        "200":
+          description: '{string} delete success!'
+        "403":
+          description: id is empty
+definitions:
+  .Ssouser:
+    type: object
+  inputmodels.LoginInfo:
+    title: LoginInfo
+    type: object
+    properties:
+      Password:
+        type: string
+      UserName:
+        type: string
+  inputmodels.SetMeatInput:
+    title: SetMeatInput
+    type: object
+    properties:
+      Id:
+        type: integer
+        format: int64
+      PerId:
+        type: string
+      PerName:
+        type: string
+      SetMealCode:
+        type: string
+      SetMealName:
+        type: string
+      SysCode:
+        type: string
+  models.Application:
+    title: Application
+    type: object
+    properties:
+      CreationTime:
+        type: string
+        format: datetime
+      CreatorUserId:
+        type: integer
+        format: int64
+      DeletionTime:
+        type: string
+        format: datetime
+      DeletionUserId:
+        type: integer
+        format: int64
+      Id:
+        type: integer
+        format: int64
+      IsDeleted:
+        type: integer
+        format: int64
+      IsValid:
+        type: integer
+        format: int64
+      LastModificationTime:
+        type: string
+        format: datetime
+      LastModificationUserId:
+        type: integer
+        format: int64
+      SysCode:
+        type: string
+      SysName:
+        type: string
+      SysUrl:
+        type: string
+  models.Permission:
+    title: Permission
+    type: object
+    properties:
+      CreationTime:
+        type: string
+        format: datetime
+      CreatorUserId:
+        type: integer
+        format: int64
+      DeleterUserId:
+        type: integer
+        format: int64
+      DeletionTime:
+        type: string
+        format: datetime
+      Discriminator:
+        type: string
+      DisplayName:
+        type: string
+      Id:
+        type: integer
+        format: int64
+      IsDeleted:
+        type: integer
+        format: int64
+      IsMenu:
+        type: integer
+        format: int64
+      LastModificationTime:
+        type: string
+        format: datetime
+      LastModificationUserId:
+        type: integer
+        format: int64
+      MenuCode:
+        type: integer
+        format: int64
+      MenuText:
+        type: string
+      Name:
+        type: string
+      RoleId:
+        type: integer
+        format: int64
+      SysCode:
+        type: integer
+        format: int64
+      TenantId:
+        type: integer
+        format: int64
+      UserId:
+        type: integer
+        format: int64
+  models.Role:
+    title: Role
+    type: object
+    properties:
+      ConcurrencyStamp:
+        type: string
+      CreationTime:
+        type: string
+        format: datetime
+      CreatorUserId:
+        type: integer
+        format: int64
+      DeleterUserId:
+        type: integer
+        format: int64
+      DeletionTime:
+        type: string
+        format: datetime
+      Description:
+        type: string
+      DisplayName:
+        type: string
+      Id:
+        type: integer
+        format: int64
+      IsDefault:
+        type: integer
+        format: int32
+      IsDeleted:
+        type: integer
+        format: int32
+      IsStatic:
+        type: integer
+        format: int32
+      LastModificationTime:
+        type: string
+        format: datetime
+      LastModifierUserId:
+        type: integer
+        format: int64
+      Name:
+        type: string
+      NormalizedName:
+        type: string
+      TenantId:
+        type: integer
+        format: int64
+  models.SetMeal:
+    title: SetMeal
+    type: object
+    properties:
+      CreationTime:
+        type: string
+        format: datetime
+      CreatorUserId:
+        type: integer
+        format: int64
+      DeletionTime:
+        type: string
+        format: datetime
+      DeletionUserId:
+        type: integer
+        format: int64
+      Id:
+        type: integer
+        format: int64
+      IsDeleted:
+        type: integer
+        format: int64
+      LastModificationTime:
+        type: string
+        format: datetime
+      LastModificationUserId:
+        type: integer
+        format: int64
+      PermissionText:
+        type: string
+      SetMealCode:
+        type: string
+      SetMealName:
+        type: string
+      SysCode:
+        type: string
+  models.Tenant:
+    title: Tenant
+    type: object
+    properties:
+      BusinessLisenceUrl:
+        type: string
+      CreationTime:
+        type: string
+        format: datetime
+      CreatorUserId:
+        type: integer
+        format: int64
+      DeleterUserId:
+        type: integer
+        format: int64
+      DeletionTime:
+        type: string
+        format: datetime
+      Email:
+        type: string
+      Id:
+        type: integer
+        format: int64
+      IsDeleted:
+        type: integer
+        format: int32
+      LastModificationTime:
+        type: string
+        format: datetime
+      LastModifierUserId:
+        type: integer
+        format: int64
+      LinkMan:
+        type: string
+      LinkPhone:
+        type: string
+      OrganizationCode:
+        type: string
+      TaxFileNumber:
+        type: string
+      TenantAddress:
+        type: string
+      TenantName:
+        type: string
+  models.User:
+    title: User
+    type: object
+    properties:
+      CreationTime:
+        type: string
+        format: datetime
+      CreatorUserId:
+        type: integer
+        format: int64
+      DeleterUserId:
+        type: integer
+        format: int64
+      DeletionTime:
+        type: string
+        format: datetime
+      EmailAddress:
+        type: string
+      EmailConfirmationCode:
+        type: string
+      Id:
+        type: integer
+        format: int64
+      IsDeleted:
+        type: integer
+        format: int32
+      IsEmailConfirmed:
+        type: integer
+        format: int32
+      IsPhoneNumberConfirmed:
+        type: integer
+        format: int32
+      LastModificationTime:
+        type: string
+        format: datetime
+      LastModifierUserId:
+        type: integer
+        format: int64
+      Name:
+        type: string
+      PasswordResetCode:
+        type: string
+      PhoneNumber:
+        type: string
+      SsoID:
+        type: integer
+        format: int64
+      SysCode:
+        type: string
+      TenantId:
+        type: integer
+        format: int64
+      UserName:
+        type: string
+      UserUrl:
+        type: string
+  models.Userrole:
+    title: Userrole
+    type: object
+    properties:
+      CreationTime:
+        type: string
+        format: datetime
+      CreatorUserId:
+        type: integer
+        format: int64
+      Id:
+        type: integer
+        format: int64
+      RoleId:
+        type: integer
+        format: int64
+      SysCode:
+        type: string
+      TenantId:
+        type: integer
+        format: int64
+      UserId:
+        type: integer
+        format: int64
+tags:
+- name: application
+  description: |
+    应用系统管理模块
+- name: permission
+  description: |
+    PermissionController operations for Permission
+- name: role
+  description: |
+    RoleController operations for Role
+- name: ssouser
+  description: |
+    sso登陆管理
+- name: user
+  description: |
+    用户基本信息管理
+- name: userrole
+  description: |
+    用户角色关联关系管理
+- name: authoritymanage
+  description: |
+    登陆,账户和用户信息管理模块
+- name: tenant
+  description: |
+    企业信息管理模块
+- name: setmeal
+  description: |
+    套餐信息管理

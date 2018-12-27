@@ -1,8 +1,9 @@
 <template>
-  <el-form :model="formData" size="small">
+  <el-form ref="userForm" :model="formData" :rules="formRules" size="small" >
     <el-form-item
       :label-width="formLabelWidth"
       label="公司名称"
+      prop="TenantName"
     >
       <el-input
         v-model="formData.TenantName"
@@ -12,6 +13,7 @@
     <el-form-item
       :label-width="formLabelWidth"
       label="公司地址"
+      prop="TenantAddress"
     >
       <el-input
         v-model="formData.TenantAddress"
@@ -64,6 +66,7 @@
       <el-col :span="12"> <el-form-item
         :label-width="formLabelWidth"
         label="联系电话"
+        prop="LinkPhone"
       >
         <el-input
           v-model="formData.LinkPhone"
@@ -74,6 +77,7 @@
       <el-col :span="12"><el-form-item
         :label-width="formLabelWidth"
         label="联系邮箱"
+        prop="Email"
       >
         <el-input
           v-model="formData.Email"
@@ -119,7 +123,16 @@ export default {
         sysCode: this.data.sysCode
       },
       formData: {},
-      authData: []
+      authData: [],
+      formRules: {
+        TenantName: [{ required: true, trigger: 'blur', message: '公司名称为必填项' },
+          { min: 3, max: 40, message: '输入内容最大长度为40', trigger: 'blur' }],
+        TenantAddress: [{ max: 40, message: '输入内容最大长度为40', trigger: 'blur' }],
+        Email: [{ required: true, trigger: 'blur', message: '邮件为必输项' },
+          { pattern: /^[A-Za-z\d]+([-_.][A-Za-z\d]+)*@([A-Za-z\d]+[-.])+[A-Za-z\d]{2,4}$/, trigger: 'blur', message: '请输入正确格式的邮箱' }],
+        LinkPhone: [{ required: true, trigger: 'blur', message: '联系人电话为必输项' },
+          { pattern: /^1[345678]\d{9}$/, trigger: 'blur', message: '请输入正确格式的手机号' }]
+      }
     }
   },
   created() {
@@ -164,6 +177,14 @@ export default {
         this.authData[topIndex].mychecked = true
         this.authData[topIndex].indeterminate = true // 添加不确定状态
       }
+    },
+    validData() {
+      this.$refs.userForm.validate(valid => {
+        return valid
+      })
+    },
+    cancleValid() {
+      this.$refs['userForm'].resetFields()
     }
   }
 }

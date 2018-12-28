@@ -88,7 +88,6 @@
     <el-form-item
       :label-width="formLabelWidth"
       label="系统名称"
-      prop="SysCode"
     >
       <template>
         <el-checkbox-group v-model="checkedApplications" @change="handlecheckedAppChange">
@@ -132,7 +131,8 @@ export default {
         Email: [{ required: true, trigger: 'blur', message: '邮件为必输项' },
           { pattern: /^[A-Za-z\d]+([-_.][A-Za-z\d]+)*@([A-Za-z\d]+[-.])+[A-Za-z\d]{2,4}$/, trigger: 'blur', message: '请输入正确格式的邮箱' }],
         LinkPhone: [{ required: true, trigger: 'blur', message: '联系人电话为必输项' },
-          { pattern: /^1[345678]\d{9}$/, trigger: 'blur', message: '请输入正确格式的手机号' }]
+          { pattern: /^1[345678]\d{9}$/, trigger: 'blur', message: '请输入正确格式的手机号' }],
+        SysCode: [{ required: true, trigger: 'blur', message: '系统为必选项' }]
       }
     }
   },

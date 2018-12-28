@@ -192,7 +192,7 @@ func LoginCheck(username string, password string, SysCode string) (result bool, 
 	return true, user, nil
 }
 
-func RegistUser(loginInfo *input.LoginInfo, SysCode string) (err error) {
+func RegistUser(loginInfo *input.LoginInfo, SysCode string) (ssoId int, err error) {
 	o := orm.NewOrm()
 	o.Begin()
 	ssoUser := new(SsoUser)
@@ -202,6 +202,7 @@ func RegistUser(loginInfo *input.LoginInfo, SysCode string) (err error) {
 	if err != nil {
 		o.Rollback()
 	}
+	ssoId = ssoUser.Id
 	user := new(User)
 	user.Name = loginInfo.UserName
 	user.PhoneNumber = loginInfo.UserName

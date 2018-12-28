@@ -235,9 +235,10 @@ func (tc *AuthorityManageController) RegistUser() {
 	l := &input.LoginInfo{}
 	json.Unmarshal(tc.Ctx.Input.RequestBody, l)
 	lresult := &out.OperResult{}
-	if err := models.RegistUser(l, sysCode); err == nil {
+	if ssoID, err := models.RegistUser(l, sysCode); err == nil {
 		lresult.Result = 1
 		lresult.Message = "创建用户成功"
+		lresult.Data = ssoID
 		tc.Data["json"] = lresult
 	} else {
 		lresult.Result = 1

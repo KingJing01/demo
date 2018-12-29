@@ -398,6 +398,29 @@
                 }
             }
         },
+        "/authoritymanage/validUserActPermission": {
+            "post": {
+                "tags": [
+                    "authoritymanage"
+                ],
+                "description": "验证用户的操作权限是否有效",
+                "operationId": "AuthorityManageController.Login",
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "Authorization",
+                        "description": "Token信息",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "result:1(success)  0(false)"
+                    }
+                }
+            }
+        },
         "/authoritymanage/xsunLogin": {},
         "/permission/": {
             "get": {
@@ -556,7 +579,7 @@
                 "tags": [
                     "permission"
                 ],
-                "description": "update the Permission",
+                "description": "更新权限信息",
                 "operationId": "PermissionController.Put",
                 "parameters": [
                     {
@@ -592,7 +615,7 @@
                 "tags": [
                     "permission"
                 ],
-                "description": "delete the Permission",
+                "description": "逻辑删除权限",
                 "operationId": "PermissionController.Delete",
                 "parameters": [
                     {
@@ -2098,7 +2121,7 @@
     "tags": [
         {
             "name": "application",
-            "description": "应用系统管理模块\n"
+            "description": "ApplicationController  应用系统管理模块\n"
         },
         {
             "name": "permission",
@@ -2110,27 +2133,27 @@
         },
         {
             "name": "ssouser",
-            "description": "sso登陆管理\n"
+            "description": "SsouserController  sso登陆管理\n"
         },
         {
             "name": "user",
-            "description": "用户基本信息管理\n"
+            "description": "UserController  用户基本信息管理\n"
         },
         {
             "name": "userrole",
-            "description": "用户角色关联关系管理\n"
+            "description": "UserroleController  用户角色关联关系管理\n"
         },
         {
             "name": "authoritymanage",
-            "description": "登陆,账户和用户信息管理模块\n"
+            "description": "AuthorityManageController  登陆,账户和用户信息管理模块\n"
         },
         {
             "name": "tenant",
-            "description": "企业信息管理模块\n"
+            "description": "TenantController  企业信息管理模块\n"
         },
         {
             "name": "setmeal",
-            "description": "套餐信息管理\n"
+            "description": "SetMealController  套餐信息管理\n"
         }
     ]
 }

@@ -1,8 +1,8 @@
+package routers
+
 // @APIVersion 1.0.0
 // @Title 权限系统Swagger
 // @Description 欣阳权限系统对接接口api
-package routers
-
 import (
 	"demo/controllers"
 

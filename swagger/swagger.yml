@@ -262,6 +262,21 @@ paths:
           description: result:1(success)  0(false)
         "400":
           description: ""
+  /authoritymanage/validUserActPermission:
+    post:
+      tags:
+      - authoritymanage
+      description: 验证用户的操作权限是否有效
+      operationId: AuthorityManageController.Login
+      parameters:
+      - in: header
+        name: Authorization
+        description: Token信息
+        required: true
+        type: string
+      responses:
+        "200":
+          description: result:1(success)  0(false)
   /authoritymanage/xsunLogin: {}
   /permission/:
     get:
@@ -330,7 +345,7 @@ paths:
     put:
       tags:
       - permission
-      description: update the Permission
+      description: 更新权限信息
       operationId: PermissionController.Put
       parameters:
       - in: path
@@ -354,7 +369,7 @@ paths:
     delete:
       tags:
       - permission
-      description: delete the Permission
+      description: 逻辑删除权限
       operationId: PermissionController.Delete
       parameters:
       - in: path
@@ -1412,7 +1427,7 @@ definitions:
 tags:
 - name: application
   description: |
-    应用系统管理模块
+    ApplicationController  应用系统管理模块
 - name: permission
   description: |
     PermissionController operations for Permission
@@ -1421,19 +1436,19 @@ tags:
     RoleController operations for Role
 - name: ssouser
   description: |
-    sso登陆管理
+    SsouserController  sso登陆管理
 - name: user
   description: |
-    用户基本信息管理
+    UserController  用户基本信息管理
 - name: userrole
   description: |
-    用户角色关联关系管理
+    UserroleController  用户角色关联关系管理
 - name: authoritymanage
   description: |
-    登陆,账户和用户信息管理模块
+    AuthorityManageController  登陆,账户和用户信息管理模块
 - name: tenant
   description: |
-    企业信息管理模块
+    TenantController  企业信息管理模块
 - name: setmeal
   description: |
-    套餐信息管理
+    SetMealController  套餐信息管理

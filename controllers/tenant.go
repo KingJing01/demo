@@ -11,7 +11,7 @@ import (
 	"github.com/astaxie/beego"
 )
 
-// 企业信息管理模块
+//TenantController ... 企业信息管理模块
 type TenantController struct {
 	beego.Controller
 }
@@ -45,11 +45,11 @@ func (c *TenantController) Post() {
 	var mystruct map[string]interface{}
 	json.Unmarshal(c.Ctx.Input.RequestBody, &mystruct)
 	sysCode := tool.ParseInterfaceArr(mystruct["sysCode"].([]interface{}))
-	perId := tool.ParseInterfaceArr(mystruct["perId"].([]interface{}))
+	perID := tool.ParseInterfaceArr(mystruct["perId"].([]interface{}))
 	perMenu := tool.ParseInterfaceArr(mystruct["perMenu"].([]interface{}))
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 		v.LastModificationTime = time.Now()
-		if err := models.AddTenant(&v, sysCode, perId, perMenu, userID.(int64)); err == nil {
+		if err := models.AddTenant(&v, sysCode, perID, perMenu, userID.(int64)); err == nil {
 			result.Result = 1
 			c.Data["json"] = result
 		} else {
@@ -164,11 +164,11 @@ func (c *TenantController) Put() {
 	var mystruct map[string]interface{}
 	json.Unmarshal(c.Ctx.Input.RequestBody, &mystruct)
 	sysCode := mystruct["sysCode"].(string)
-	perIdStr := mystruct["perId"].(string)
+	perIDStr := mystruct["perId"].(string)
 	perMenu := mystruct["perMenu"].(string)
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 		v.LastModificationTime = time.Now()
-		if err := models.UpdateTenantById(&v, sysCode, perIdStr, perMenu, v.Id, userID.(int64)); err == nil {
+		if err := models.UpdateTenantById(&v, sysCode, perIDStr, perMenu, v.Id, userID.(int64)); err == nil {
 			result.Result = 1
 			c.Data["json"] = result
 		} else {

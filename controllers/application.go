@@ -10,7 +10,7 @@ import (
 	"github.com/astaxie/beego"
 )
 
-// 应用系统管理模块
+//ApplicationController ... 应用系统管理模块
 type ApplicationController struct {
 	beego.Controller
 }

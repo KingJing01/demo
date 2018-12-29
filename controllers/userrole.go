@@ -10,7 +10,7 @@ import (
 	"github.com/astaxie/beego"
 )
 
-// 用户角色关联关系管理
+//UserroleController ... 用户角色关联关系管理
 type UserroleController struct {
 	beego.Controller
 }

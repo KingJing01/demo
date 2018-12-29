@@ -9,7 +9,7 @@ import (
 	"github.com/astaxie/beego"
 )
 
-// 套餐信息管理
+//SetMealController ... 套餐信息管理
 type SetMealController struct {
 	beego.Controller
 }

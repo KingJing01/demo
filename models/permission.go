@@ -322,3 +322,9 @@ func UpdatePermission(m map[string]interface{}, id int, userID int64) (err error
 	_, err = o.InsertMulti(len(arr), permissionList)
 	return err
 }
+
+// ValidUserActPermission ...
+func ValidUserActPermission(token string, sysCode string, menuCode string) (flag int) {
+
+	return
+}

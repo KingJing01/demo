@@ -145,7 +145,11 @@ func (tc *AuthorityManageController) Login() {
 		tokenString, err := token.SignedString([]byte(SecretKey))
 		//获取用户对应的系统权限
 		permissions, _ := models.GetPermissionByUser(user.Id, sysCode)
-		permissionData, err := json.Marshal(permissions)
+		var arrPermission []string
+		for _, v := range permissions {
+			arrPermission = append(arrPermission, v.Name)
+		}
+		authData, _ := json.Marshal(arrPermission)
 		// 设置 user 信息
 		var userOut out.UserInfoToken
 		userOut.UserName = user.UserName
@@ -156,7 +160,10 @@ func (tc *AuthorityManageController) Login() {
 		tokenMap["userInfo"] = string(jsonUser)
 		tools.InitRedis()
 		skey := fmt.Sprintf("%s%s", tokenString, sysCode)
-		tools.Globalcluster.Do("set", skey, permissionData)
+		_, err = tools.Globalcluster.Do("set", skey, authData)
+		if err == nil {
+			fmt.Println("1111")
+		}
 		tools.Globalcluster.Do("set", tokenString, user.SsoID)
 		tools.Globalcluster.Do("EXPIRE", tokenString, 3600)
 		tools.Globalcluster.Close()
@@ -291,6 +298,28 @@ func (tc *AuthorityManageController) PasswdUpdate() {
 	} else {
 		lresult.Result = 0
 		lresult.Message = "修改用户密码"
+		tc.Data["json"] = lresult
+	}
+	tc.ServeJSON()
+}
+
+// ValidUserActPermission ...
+// @Title Login
+// @Description 验证用户的操作权限是否有效
+// @Param   Authorization     header    string  true        "Token信息"
+// @Success 200  result:1(success)  0(false)
+// @router /validUserActPermission [post]
+func (tc *AuthorityManageController) ValidUserActPermission() {
+	token := tc.Ctx.Request.Header.Get("Authorization")
+	var mystruct map[string]interface{}
+	json.Unmarshal(tc.Ctx.Input.RequestBody, &mystruct)
+	menuCode := mystruct["menuCode"].(string)
+	lresult := &out.OperResult{}
+	if flag, _, _ := tools.CheckAuthority(token, menuCode); flag == true {
+		lresult.Result = 1
+		tc.Data["json"] = lresult
+	} else {
+		lresult.Result = 0
 		tc.Data["json"] = lresult
 	}
 	tc.ServeJSON()

@@ -159,7 +159,7 @@ func (tc *AuthorityManageController) Login() {
 		jsonUser, _ := json.Marshal(userOut)
 		tokenMap["userInfo"] = string(jsonUser)
 		tools.InitRedis()
-		skey := fmt.Sprintf("%s%s", tokenString, sysCode)
+		skey := fmt.Sprintf("%s%s", strconv.FormatInt(user.Id, 10), sysCode)
 		_, err = tools.Globalcluster.Do("set", skey, authData)
 		if err == nil {
 			fmt.Println("1111")
@@ -264,12 +264,9 @@ func (tc *AuthorityManageController) RegistUser() {
 // @router /Logout [post]
 func (tc *AuthorityManageController) Logout() {
 	lresult := &out.LoginResult{}
-	sysCode := tc.Ctx.Request.Header.Get("SysCode")
 	authorization := tc.Ctx.Request.Header.Get("Authorization")
-	skey := fmt.Sprintf("%s%s", authorization, sysCode)
 	tools.InitRedis()
 	tools.Globalcluster.Do("DEL", authorization)
-	tools.Globalcluster.Do("DEL", skey)
 	tools.Globalcluster.Close()
 	lresult.Result = 1
 	lresult.Token = ""

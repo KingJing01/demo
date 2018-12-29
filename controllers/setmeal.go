@@ -9,12 +9,12 @@ import (
 	"github.com/astaxie/beego"
 )
 
-//SetMealController ... 套餐信息管理
+//SetMealController  套餐信息管理
 type SetMealController struct {
 	beego.Controller
 }
 
-// URLMapping ...
+// URLMapping 路径映射
 func (c *SetMealController) URLMapping() {
 	c.Mapping("Post", c.Post)
 	//c.Mapping("GetOne", c.GetOne)

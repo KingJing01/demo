@@ -12,6 +12,7 @@ import (
 	"github.com/astaxie/beego/orm"
 )
 
+//Application ... 系统应用
 type Application struct {
 	Id                     int       `orm:"column(Id);auto;pk"`
 	SysCode                string    `orm:"column(SysCode);size(20)"`
@@ -55,7 +56,7 @@ func GetApplicationById(id int) (v *Application, err error) {
 	return nil, err
 }
 
-//获取筛选条件下的数据总量
+//GetTotalApplication  获取筛选条件下的数据总量
 func GetTotalApplication(query map[string]string) (total int64, err error) {
 	o := orm.NewOrm()
 	qs := o.QueryTable(new(Application))

@@ -11,7 +11,7 @@ import (
 	"github.com/astaxie/beego"
 )
 
-//TenantController ... 企业信息管理模块
+//TenantController  企业信息管理模块
 type TenantController struct {
 	beego.Controller
 }

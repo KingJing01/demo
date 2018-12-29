@@ -137,7 +137,7 @@ func (c *PermissionController) GetAll() {
 
 // Put ...
 // @Title Put
-// @Description update the Permission
+// @Description 更新权限信息
 // @Param	id		path 	string	true		"The id you want to update"
 // @Param	body		body 	models.Permission	true		"body for Permission content"
 // @Success 200 {object} models.Permission
@@ -173,9 +173,9 @@ func (c *PermissionController) Put() {
 	c.ServeJSON()
 }
 
-// Delete ...
+// Delete 逻辑删除权限
 // @Title Delete
-// @Description delete the Permission
+// @Description 逻辑删除权限
 // @Param	id		path 	string	true		"The id you want to delete"
 // @Success 200 {string} delete success!
 // @Failure 403 id is empty
@@ -195,7 +195,7 @@ func (c *PermissionController) Delete() {
 	c.ServeJSON()
 }
 
-// GetPerInfoBySysCode ...
+// GetPerInfoBySysCode 根据系统编号获取对应的权限
 // @Title GetPerInfoBySysCode
 // @Description  根据系统编号获取对应的权限
 // @Param	sysCode	 path 	string 	true		"系统编号"
@@ -218,7 +218,7 @@ func (c *PermissionController) GetPerInfoBySysCode() {
 	c.ServeJSON()
 }
 
-// GetPerInfoBySysCodeUpdate ...
+// GetPerInfoBySysCodeUpdate 根据套餐编号和系统编号获取对应的权限
 // @Title GetPerInfoBySysCode
 // @Description  根据套餐编号和系统编号获取对应的权限
 // @Param	sysCode		query 	string 	true		"系统编号"

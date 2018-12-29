@@ -10,12 +10,12 @@ import (
 	"github.com/astaxie/beego"
 )
 
-//UserController ... 用户基本信息管理
+//UserController  用户基本信息管理
 type UserController struct {
 	beego.Controller
 }
 
-// URLMapping ...
+// URLMapping 路径映射
 func (c *UserController) URLMapping() {
 	c.Mapping("Post", c.Post)
 	c.Mapping("GetOne", c.GetOne)

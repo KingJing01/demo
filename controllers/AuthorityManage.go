@@ -16,7 +16,7 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 )
 
-//UserInfo ... 用户信息实体
+//UserInfo  用户信息实体
 type UserInfo struct {
 	out.OperResult
 	UserId       int64
@@ -30,7 +30,7 @@ type UserInfo struct {
 	Permissions  []string
 }
 
-//AuthorityManageController ... 登陆,账户和用户信息管理模块
+//AuthorityManageController  登陆,账户和用户信息管理模块
 type AuthorityManageController struct {
 	beego.Controller
 }
@@ -40,19 +40,19 @@ const (
 	SecretKey = "sfljdsfjsljdslfdsfsdfjdsf"
 )
 
-//URLMapping ... 路径映射
+//URLMapping  路径映射
 func (c *AuthorityManageController) URLMapping() {
 	c.Mapping("AuthorityError", c.AuthorityError)
 	c.Mapping("xsunLogin", c.SysLogin)
 }
 
-//Options ...
+//Options options请求的返回
 func (c *AuthorityManageController) Options() {
 	c.Data["json"] = map[string]interface{}{"status": 200, "message": "ok", "moreinfo": ""}
 	c.ServeJSON()
 }
 
-// AuthorityError ...
+// AuthorityError 认证错误
 // @Title AuthorityError
 // @Description  系统认证错误
 // @Success 200
@@ -65,7 +65,7 @@ func (c *AuthorityManageController) AuthorityError() {
 	c.ServeJSON()
 }
 
-// SysLogin ...
+// SysLogin 系统登陆跳转
 // @Title SysLogin
 // @Description  系统登陆跳转
 // @Success 200  login.html
@@ -79,7 +79,7 @@ func (c *AuthorityManageController) SysLogin() {
 	c.TplName = "login.html"
 }
 
-// Login ...
+// Login 系统登陆
 // @Title Login
 // @Description  系统登陆
 // @Param   body     body    inputmodels.LoginInfo  true        "登陆信息  username password"
@@ -193,7 +193,7 @@ func (c *AuthorityManageController) Login() {
 
 }
 
-// GetUserInfo ...
+// GetUserInfo 根据TOKEN获取用户信息
 // @Title GetUserInfo
 // @Description 根据TOKEN获取用户信息
 // @Param   Authorization     header    string  true        "Token信息"
@@ -230,7 +230,7 @@ func (c *AuthorityManageController) GetUserInfo() {
 	c.ServeJSON()
 }
 
-// RegistUser ...
+// RegistUser APP注册用户
 // @Title 注册新用户 app
 // @Description  APP注册用户
 // @Param   body     body    inputmodels.LoginInfo  true        "登陆信息  useraname password"
@@ -256,7 +256,7 @@ func (c *AuthorityManageController) RegistUser() {
 	c.ServeJSON()
 }
 
-// Logout ...
+// Logout 退出系统
 // @Title Login
 // @Description  退出系统 清除redis保存的token信息
 // @Param   Authorization     header    string  true        "Token信息"
@@ -276,7 +276,7 @@ func (c *AuthorityManageController) Logout() {
 	c.ServeJSON()
 }
 
-// PasswdUpdate ...
+// PasswdUpdate 修改密码
 // @Title Login
 // @Description 修改密码
 // @Param   body     body    inputmodels.LoginInfo  true        "新用户信息  用户名和密码"
@@ -301,7 +301,7 @@ func (c *AuthorityManageController) PasswdUpdate() {
 	c.ServeJSON()
 }
 
-// ValidUserActPermission ...
+// ValidUserActPermission 验证用户的操作权限是否有效
 // @Title Login
 // @Description 验证用户的操作权限是否有效
 // @Param   Authorization     header    string  true        "Token信息"

@@ -1,5 +1,5 @@
 <template>
-  <el-form ref="userForm" :model="formData" :rules="formRules" size="small" >
+  <el-form ref="userFormUpdate" :model="formData" :rules="formRules" size="small" >
     <el-form-item
       :label-width="formLabelWidth"
       label="公司名称"
@@ -179,12 +179,12 @@ export default {
       }
     },
     validData() {
-      this.$refs.userForm.validate(valid => {
-        return valid
+      this.$refs.userFormUpdate.validate(valid => {
+        this.data.valid = valid
       })
     },
     cancleValid() {
-      this.$refs['userForm'].resetFields()
+      this.$refs['userFormUpdate'].resetFields()
     }
   }
 }

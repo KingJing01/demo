@@ -182,7 +182,9 @@ export default {
     },
     // 保存/修改用户信息
     saveData() {
-      const valid = this.$refs.userData.validData()
+      debugger
+      this.$refs.userData.validData()
+      const valid = this.form.valid
       if (valid) {
         if (this.type === 'insert') {
           const transData = transPermissionCheckedDataArr(this.form.authData)

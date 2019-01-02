@@ -206,7 +206,7 @@ export default {
     },
     validData() {
       this.$refs.userForm.validate(valid => {
-        return valid
+        this.data.valid = valid
       })
     },
     cancleValid() {

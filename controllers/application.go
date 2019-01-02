@@ -3,6 +3,7 @@ package controllers
 import (
 	"demo/models"
 	out "demo/outmodels"
+	tool "demo/tools"
 	"encoding/json"
 	"strconv"
 	"time"
@@ -35,18 +36,12 @@ func (c *ApplicationController) URLMapping() {
 // @router / [post]
 func (c *ApplicationController) Post() {
 	result := &out.OperResult{}
-	userID := c.GetSession("userId")
-	if userID == nil {
-		result.Result = 2
-		result.Message = "seesion失效"
-		c.Data["json"] = result
-		c.ServeJSON()
-		return
-	}
+	originToken := c.Ctx.Request.Header.Get("Authorization")
+	_, _, userID, _ := tool.GetInfoFromToken(originToken)
 	var v models.Application
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 		v.CreationTime = time.Now()
-		v.CreatorUserId = userID.(int64)
+		v.CreatorUserId = userID
 		//生成系统编号
 		v.SysCode = models.GenerateSysCode()
 		if _, err := models.AddApplication(&v); err == nil {

@@ -140,11 +140,17 @@ func (c *AuthorityManageController) Login() {
 			return
 		}
 		c.SetSession("userId", user.Id)
+		c.SetSession("tenantId", user.TenantId)
 		token := jwt.New(jwt.SigningMethodHS256)
 		claims := make(jwt.MapClaims)
+		// jwt 唯一标识存放userId
 		claims["jti"] = user.Id
+		// jwt 有效时间
 		claims["exp"] = time.Now().Add(time.Minute * time.Duration(10)).Unix()
+		// jwt 发布时间
 		claims["iat"] = time.Now().Unix()
+		// jwt 发布者 存放用户
+		claims["iss"] = user.TenantId
 		token.Claims = claims
 		tokenString, err := token.SignedString([]byte(SecretKey))
 		//获取用户对应的系统权限

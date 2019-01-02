@@ -1,9 +1,11 @@
 package models
 
 import (
+	out "demo/outmodels"
 	"errors"
 	"fmt"
 	"reflect"
+	"strconv"
 	"strings"
 	"time"
 
@@ -11,22 +13,20 @@ import (
 )
 
 type Role struct {
-	Id                   int       `orm:"column(Id);auto"`
-	ConcurrencyStamp     string    `orm:"column(ConcurrencyStamp);size(128);null"`
+	ID                   int       `orm:"column(Id);auto"`
+	RoleCode             string    `orm:"column(RoleCode);size(20)"`
+	RoleName             string    `orm:"column(RoleName);size(45)"`
+	TenantID             int       `orm:"column(TenantId);null"`
+	SysCode              string    `orm:"column(SysCode);size(20)"`
+	IsValid              int       `orm:"column(IsDefault);0"`
+	IsDeleted            int8      `orm:"column(IsDeleted);0"`
+	AuthText             string    `orm:"column(AuthText);size(1024)"`
 	CreationTime         time.Time `orm:"column(CreationTime);type(datetime)"`
-	CreatorUserId        int64     `orm:"column(CreatorUserId);null"`
-	DeleterUserId        int64     `orm:"column(DeleterUserId);null"`
+	CreatorUserID        int64     `orm:"column(CreatorUserId);null"`
+	DeleterUserID        int64     `orm:"column(DeleterUserId);null"`
 	DeletionTime         time.Time `orm:"column(DeletionTime);type(datetime);null"`
-	DisplayName          string    `orm:"column(DisplayName);size(45)"`
-	IsDefault            int8      `orm:"column(IsDefault);null"`
-	IsDeleted            int8      `orm:"column(IsDeleted)"`
-	IsStatic             int8      `orm:"column(IsStatic);null"`
 	LastModificationTime time.Time `orm:"column(LastModificationTime);type(datetime);null"`
-	LastModifierUserId   int64     `orm:"column(LastModifierUserId);null"`
-	Name                 string    `orm:"column(Name);size(32)"`
-	NormalizedName       string    `orm:"column(NormalizedName);size(32)"`
-	TenantId             int       `orm:"column(TenantId);null"`
-	Description          string    `orm:"column(Description);size(1024);null"`
+	LastModifierUserID   int64     `orm:"column(LastModifierUserId);null"`
 }
 
 func (t *Role) TableName() string {
@@ -49,7 +49,7 @@ func AddRole(m *Role) (id int64, err error) {
 // Id doesn't exist
 func GetRoleById(id int) (v *Role, err error) {
 	o := orm.NewOrm()
-	v = &Role{Id: id}
+	v = &Role{ID: id}
 	if err = o.Read(v); err == nil {
 		return v, nil
 	}
@@ -156,7 +156,7 @@ func GetAllRole(query map[string]string, fields []string, sortby []string, order
 // the record to be updated doesn't exist
 func UpdateRoleById(m *Role) (err error) {
 	o := orm.NewOrm()
-	v := Role{Id: m.Id}
+	v := Role{ID: m.ID}
 	// ascertain id exists in the database
 	if err = o.Read(&v); err == nil {
 		var num int64
@@ -171,10 +171,50 @@ func UpdateRoleById(m *Role) (err error) {
 // the record to be deleted doesn't exist
 func DeleteRole(id int) (err error) {
 	o := orm.NewOrm()
-	v := Role{Id: id}
+	v := Role{ID: id}
 	// ascertain id exists in the database
 	if err = o.Read(&v); err == nil {
 		_, err = o.Raw("update role set IsDeleted=1 , DeletionTime = ?  where Id= ?  ", time.Now(), id).Exec()
 	}
 	return
+}
+
+// 获取角色列表的信息
+func GetRoleList(roleName string, sysName string, offset int64, limit int64, tenantID int64) (result []out.RoleInfo, err error) {
+	o := orm.NewOrm()
+	var sql = `SELECT  t1.RoleName role_name,  t1.RoleCode role_code, t2.SysName sys_name, t1.isValid is_valid, t1.AuthText auth_text,  t1.ID Id
+	FROM  role t1 LEFT JOIN   application t2 ON t1.SysCode = t2.SysCode WHERE  t1.TenantId = ? AND t1.isDeleted = 0 and t2.isDeleted=0 and t2.isValid = 0 `
+	conditions := []string{}
+	if roleName != "" {
+		conditions = append(conditions, " t1.roleName like '%"+roleName+"%'")
+	}
+	if sysName != "" {
+		conditions = append(conditions, " t2.SysName  like '%"+sysName+"%'")
+	}
+	if len(conditions) > 0 {
+		sql = sql + " and " + strings.Join(conditions, " and ")
+	}
+	sql = sql + " limit " + strconv.FormatInt(limit, 10) + "  offset " + strconv.FormatInt(offset, 10)
+	_, err = o.Raw(sql, tenantID).QueryRows(&result)
+	return result, err
+}
+
+// 统计查询条件的数量
+func CountRoleInfo(roleName string, sysName string, tenantID int64) (total int64) {
+	o := orm.NewOrm()
+	conditions := []string{}
+	var sql = "SELECT count(0) total FROM  role t1 LEFT JOIN   application t2 ON t1.SysCode = t2.SysCode WHERE  t1.TenantId = ? AND t1.isDeleted = 0 and t2.isDeleted=0 and t2.isValid = 0  "
+	if roleName != "" {
+		conditions = append(conditions, " t1.RoleName like '%"+roleName+"%'")
+	}
+	if sysName != "" {
+		conditions = append(conditions, " t2.SysName  like '%"+sysName+"%'")
+	}
+	if len(conditions) > 0 {
+		sql = sql + " and " + strings.Join(conditions, " and ")
+	}
+	var maps []orm.Params
+	o.Raw(sql, tenantID).Values(&maps)
+	total, _ = strconv.ParseInt(maps[0]["total"].(string), 10, 64)
+	return total
 }

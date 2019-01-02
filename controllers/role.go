@@ -3,10 +3,9 @@ package controllers
 import (
 	"demo/models"
 	out "demo/outmodels"
+	"demo/tools"
 	"encoding/json"
-	"errors"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/astaxie/beego"
@@ -80,69 +79,46 @@ func (c *RoleController) GetOne() {
 
 // GetAll ...
 // @Title Get All
-// @Description get Role
-// @Param	query	query	string	false	"Filter. e.g. col1:v1,col2:v2 ..."
-// @Param	fields	query	string	false	"Fields returned. e.g. col1,col2 ..."
-// @Param	sortby	query	string	false	"Sorted-by fields. e.g. col1,col2 ..."
-// @Param	order	query	string	false	"Order corresponding to each sortby field, if single value, apply to all sortby fields. e.g. desc,asc ..."
-// @Param	limit	query	string	false	"Limit the size of result set. Must be an integer"
-// @Param	offset	query	string	false	"Start position of result set. Must be an integer"
-// @Success 200 {object} models.Role
+// @Description 获取角色信息
+// @Param	roleName 	query	string	false	"角色名称名称"
+// @Param	sysName	query	string	false	"系统名称"
+// @Param	pageSize	query	string	false	 "一页显示数据量 后台默认为10 "
+// @Param	offset	query	string	false	"数据下标"
+// @Success 200 [object] models.SetMeal
 // @Failure 403
 // @router / [get]
 func (c *RoleController) GetAll() {
-	var fields []string
-	var sortby []string
-	var order []string
-	var query = make(map[string]string)
+	result := &out.OperResult{}
+	originToken := c.Ctx.Request.Header.Get("Authorization")
+	_, tenantID, _, _ := tools.GetInfoFromToken(originToken)
+	var roleName string
+	var sysName string
 	var limit int64 = 10
 	var offset int64
-
-	// fields: col1,col2,entity.col3
-	if v := c.GetString("fields"); v != "" {
-		fields = strings.Split(v, ",")
-	}
-	// limit: 10 (default is 10)
-	if v, err := c.GetInt64("limit"); err == nil {
+	// pageSize: 10 (default is 10)
+	if v, err := c.GetInt64("pageSize"); err == nil {
 		limit = v
 	}
 	// offset: 0 (default is 0)
 	if v, err := c.GetInt64("offset"); err == nil {
 		offset = v
 	}
-	// sortby: col1,col2
-	if v := c.GetString("sortby"); v != "" {
-		sortby = strings.Split(v, ",")
+	// roleName
+	if v := c.GetString("roleName"); v != "" {
+		roleName = v
 	}
-	// order: desc,asc
-	if v := c.GetString("order"); v != "" {
-		order = strings.Split(v, ",")
+	// sysName
+	if v := c.GetString("sysName"); v != "" {
+		sysName = v
 	}
-	// query: k:v,k:v
-	if v := c.GetString("query"); v != "" {
-		for _, cond := range strings.Split(v, ",") {
-			kv := strings.SplitN(cond, ":", 2)
-			if len(kv) != 2 {
-				c.Data["json"] = errors.New("Error: invalid query key/value pair")
-				c.ServeJSON()
-				return
-			}
-			k, v := kv[0], kv[1]
-			query[k] = v
-		}
-	}
-	query["IsDeleted"] = "0"
-
-	total, _ := models.GetTotalRole(query)
-
-	l, err := models.GetAllRole(query, fields, sortby, order, offset, limit)
-	result := &out.OperResult{}
+	data, err := models.GetRoleList(roleName, sysName, offset, limit, tenantID)
+	total := models.CountRoleInfo(roleName, sysName, tenantID)
 	if err != nil {
 		c.Data["json"] = err.Error()
 	} else {
 		result.Result = 1
 		var page = make(map[string]interface{})
-		page["list"] = l
+		page["list"] = data
 		var ListQuery = make(map[string]int64)
 		ListQuery["limit"] = limit
 		ListQuery["page"] = offset
@@ -166,7 +142,7 @@ func (c *RoleController) Put() {
 	result := &out.OperResult{}
 	idStr := c.Ctx.Input.Param(":id")
 	id, _ := strconv.Atoi(idStr)
-	v := models.Role{Id: id}
+	v := models.Role{ID: id}
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 		v.LastModificationTime = time.Now()
 		if err := models.UpdateRoleById(&v); err == nil {

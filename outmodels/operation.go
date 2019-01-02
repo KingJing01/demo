@@ -80,3 +80,12 @@ type PerInfo struct {
 	DisplayName string
 	Name        string
 }
+
+type RoleInfo struct {
+	Id       int
+	RoleName string
+	RoleCode string
+	SysName  string
+	IsValid  int
+	AuthText string
+}

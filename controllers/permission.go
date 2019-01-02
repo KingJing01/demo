@@ -145,19 +145,13 @@ func (c *PermissionController) GetAll() {
 // @router /:id [put]
 func (c *PermissionController) Put() {
 	result := &out.OperResult{}
-	userID := c.GetSession("userId")
-	if userID == nil {
-		result.Result = 0
-		result.Message = "seesion失效"
-		c.Data["json"] = result
-		c.ServeJSON()
-		return
-	}
+	originToken := c.Ctx.Request.Header.Get("Authorization")
+	_, _, userID, _ := tool.GetInfoFromToken(originToken)
 	idStr := c.Ctx.Input.Param(":id")
 	id, _ := strconv.Atoi(idStr)
 	var mystruct map[string]interface{}
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &mystruct); err == nil {
-		if err := models.UpdatePermission(mystruct, id, userID.(int64)); err == nil {
+		if err := models.UpdatePermission(mystruct, id, userID); err == nil {
 			result.Result = 1
 			c.Data["json"] = result
 		} else {
@@ -195,7 +189,7 @@ func (c *PermissionController) Delete() {
 	c.ServeJSON()
 }
 
-// GetPerInfoBySysCode 根据系统编号获取对应的权限
+// GetPerInfoBySysCode 根据系统编号获取企业下对应的权限
 // @Title GetPerInfoBySysCode
 // @Description  根据系统编号获取对应的权限
 // @Param	sysCode	 path 	string 	true		"系统编号"
@@ -203,9 +197,11 @@ func (c *PermissionController) Delete() {
 // @Failure 403 sysCode is empty
 // @router /getPerInfoBySysCode/:sysCode [get]
 func (c *PermissionController) GetPerInfoBySysCode() {
+	originToken := c.Ctx.Request.Header.Get("Authorization")
+	_, tenantID, _, _ := tool.GetInfoFromToken(originToken)
 	result := &out.OperResult{}
 	sysCode := c.Ctx.Input.Param(":sysCode")
-	if data, err := models.GetPerInfoBySysCode(sysCode); len(data) > 0 {
+	if data, err := models.GetPerInfoBySysCode(sysCode, tenantID); len(data) > 0 {
 		permissionList := tool.ParsePermissionDataForCheckbox(data)
 		result.Result = 1
 		result.Data = permissionList

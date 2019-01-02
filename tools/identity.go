@@ -67,5 +67,22 @@ func CheckAuthority(stoken string, permissionName string) (result bool, claims j
 		err = nil
 	}
 	return result, claims, err
+}
 
+//GetInfoFromToken  从token中获取信息
+func GetInfoFromToken(stoken string) (result bool, tenantID int64, userID int64, err error) {
+	var token *jwt.Token
+	token, err = jwt.Parse(stoken, func(*jwt.Token) (interface{}, error) {
+		return []byte(SecretKey), nil
+	})
+	if err != nil {
+		fmt.Println("parase with claims failed.", err)
+		return false, 0, 0, err
+	}
+	claims, _ := token.Claims.(jwt.MapClaims)
+	tmpTenantID := strconv.FormatFloat(claims["iss"].(float64), 'f', -1, 64)
+	tenantID, _ = strconv.ParseInt(tmpTenantID, 10, 64)
+	tmpUserID := strconv.FormatFloat(claims["jti"].(float64), 'f', -1, 64)
+	userID, _ = strconv.ParseInt(tmpUserID, 10, 64)
+	return true, tenantID, tenantID, err
 }

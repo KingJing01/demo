@@ -198,10 +198,10 @@ func (c *PermissionController) Delete() {
 // @router /getPerInfoBySysCode/:sysCode [get]
 func (c *PermissionController) GetPerInfoBySysCode() {
 	originToken := c.Ctx.Request.Header.Get("Authorization")
-	_, tenantID, _, _ := tool.GetInfoFromToken(originToken)
+	_, tenantID, userID, _ := tool.GetInfoFromToken(originToken)
 	result := &out.OperResult{}
 	sysCode := c.Ctx.Input.Param(":sysCode")
-	if data, err := models.GetPerInfoBySysCode(sysCode, tenantID); len(data) > 0 {
+	if data, err := models.GetPerInfoBySysCode(sysCode, tenantID, userID); len(data) > 0 {
 		permissionList := tool.ParsePermissionDataForCheckbox(data)
 		result.Result = 1
 		result.Data = permissionList

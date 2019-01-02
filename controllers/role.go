@@ -1,9 +1,10 @@
 package controllers
 
 import (
+	input "demo/inputmodels"
 	"demo/models"
 	out "demo/outmodels"
-	"demo/tools"
+	tools "demo/tools"
 	"encoding/json"
 	"strconv"
 	"time"
@@ -33,11 +34,12 @@ func (c *RoleController) URLMapping() {
 // @Failure 403 body is empty
 // @router / [post]
 func (c *RoleController) Post() {
+	originToken := c.Ctx.Request.Header.Get("Authorization")
+	_, tenantID, userID, _ := tools.GetInfoFromToken(originToken)
 	result := &out.OperResult{}
-	var v models.Role
+	var v input.RoleInput
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
-		v.CreationTime = time.Now()
-		if _, err := models.AddRole(&v); err == nil {
+		if _, err := models.AddRole(&v, userID, tenantID); err == nil {
 			result.Result = 1
 			c.Data["json"] = result
 		} else {

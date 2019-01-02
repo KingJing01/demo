@@ -84,5 +84,5 @@ func GetInfoFromToken(stoken string) (result bool, tenantID int64, userID int64,
 	tenantID, _ = strconv.ParseInt(tmpTenantID, 10, 64)
 	tmpUserID := strconv.FormatFloat(claims["jti"].(float64), 'f', -1, 64)
 	userID, _ = strconv.ParseInt(tmpUserID, 10, 64)
-	return true, tenantID, tenantID, err
+	return true, tenantID, userID, err
 }

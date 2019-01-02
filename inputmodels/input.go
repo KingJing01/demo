@@ -14,3 +14,13 @@ type SetMeatInput struct {
 	PerId       string `from:"perId"`
 	PerName     string `from:"perName"`
 }
+
+//RoleInput 角色信息入参接受
+type RoleInput struct {
+	Id       int    `from:"id"`
+	RoleName string `from:"roleName"`
+	AuthText string `from:"authText"`
+	SysCode  string `from:"sysCode"`
+	PerId    string `from:"perId"`
+	PerName  string `from:"perName"`
+}

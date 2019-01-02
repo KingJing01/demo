@@ -15,7 +15,7 @@ type UserroleController struct {
 	beego.Controller
 }
 
-// URLMapping 路径映射
+// URLMapping clear
 func (c *UserroleController) URLMapping() {
 	c.Mapping("Post", c.Post)
 	c.Mapping("GetOne", c.GetOne)

@@ -276,9 +276,9 @@ func CountPermissionInfo(menuName string, sysName string) (total int64) {
 }
 
 //GetPerInfoBySysCode 根据系统编号和租户Id(token获取)得到权限
-func GetPerInfoBySysCode(SysCode string, TenantID int64) (result []out.PermissionCheckInfo, err error) {
+func GetPerInfoBySysCode(SysCode string, TenantID int64, userID int64) (result []out.PermissionCheckInfo, err error) {
 	o := orm.NewOrm()
-	_, err = o.Raw("SELECT t1. NAME name ,t1.DisplayName display_name,GROUP_CONCAT(t2.NAME) code ,GROUP_CONCAT(t2.DisplayName) code_name FROM permission t1 LEFT JOIN permission t2 ON t1.MenuCode = t2.MenuCode WHERE t1.SysCode = t2.SysCode AND t1.IsMenu = 0 AND t1.SysCode = ? AND t2.IsMenu = 1 and t2.TenantId=? group by t1.Name order by t1.MenuCode,t1.Id asc", SysCode, TenantID).QueryRows(&result)
+	_, err = o.Raw("SELECT t1. NAME name ,t1.DisplayName display_name,GROUP_CONCAT(t2.NAME) code ,GROUP_CONCAT(t2.DisplayName) code_name FROM permission t1 LEFT JOIN permission t2 ON t1.MenuCode = t2.MenuCode WHERE t1.SysCode = t2.SysCode AND t1.IsMenu = 0 AND  t1.SysCode = ? AND t2.IsMenu = 1 and t2.TenantId=? and  t2.UserId=? group by t1.Name order by t1.MenuCode,t1.Id asc", SysCode, TenantID, userID).QueryRows(&result)
 	return result, err
 }
 

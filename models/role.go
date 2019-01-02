@@ -1,6 +1,7 @@
 package models
 
 import (
+	input "demo/inputmodels"
 	out "demo/outmodels"
 	"errors"
 	"fmt"
@@ -18,7 +19,7 @@ type Role struct {
 	RoleName             string    `orm:"column(RoleName);size(45)"`
 	TenantID             int       `orm:"column(TenantId);null"`
 	SysCode              string    `orm:"column(SysCode);size(20)"`
-	IsValid              int       `orm:"column(IsDefault);0"`
+	IsValid              int       `orm:"column(IsValid);0"`
 	IsDeleted            int8      `orm:"column(IsDeleted);0"`
 	AuthText             string    `orm:"column(AuthText);size(1024)"`
 	CreationTime         time.Time `orm:"column(CreationTime);type(datetime)"`
@@ -39,9 +40,39 @@ func init() {
 
 // AddRole insert a new Role into database and returns
 // last inserted Id on success.
-func AddRole(m *Role) (id int64, err error) {
+func AddRole(m *input.RoleInput, userID int64, tenantID int64) (id int64, err error) {
 	o := orm.NewOrm()
-	id, err = o.Insert(m)
+	var maps []orm.Params
+	o.Raw("select IFNULL(MAX(RoleCode),'300000')+1  sysCode from role").Values(&maps)
+	sysCode := m.SysCode
+	nowTime := time.Now()
+	o.Begin()
+	role := new(Role)
+	role.CreationTime = nowTime
+	role.AuthText = m.PerName
+	role.RoleName = m.RoleName
+	role.SysCode = sysCode
+	role.CreatorUserID = userID
+	role.RoleCode = maps[0]["sysCode"].(string)
+	id, err = o.Insert(role)
+	if err != nil {
+		o.Rollback()
+	}
+	arr := strings.Split(m.PerId, ",")
+	var param string
+	for _, x := range arr {
+		param += "'" + x + "',"
+	}
+	length := len(param) - 1
+	params := param[0:length]
+	var sql = `INSERT INTO permission (NAME,tenantId,DisplayName,SysCode,MenuCode,CreationTime,IsMenu,UserId
+		) SELECT NAME,?,DisplayName,?,MenuCode,?,IsMenu,? FROM permission t1
+		WHERE t1.TenantId = 0 AND IsMenu = 1 AND t1.Name IN (` + params + `)`
+	_, err = o.Raw(sql, tenantID, sysCode, nowTime, userID).Exec()
+	if err != nil {
+		o.Rollback()
+	}
+	o.Commit()
 	return
 }
 

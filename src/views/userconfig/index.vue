@@ -15,11 +15,11 @@ export default {
   },
   methods: {
     handleClick(tab, event) {
-    /*   if (tab.name === 'first') {
+      if (tab.name === 'first') {
         this.$refs.mychildFirst.getList()
       } else {
         this.$refs.mychildSecond.getList()
-      } */
+      }
     }
   }
 }

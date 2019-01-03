@@ -157,21 +157,6 @@ func UpdateUserById(m *User) (err error) {
 	return
 }
 
-// DeleteUser deletes User by Id and returns error if
-// the record to be deleted doesn't exist
-func DeleteUser(id int64) (err error) {
-	o := orm.NewOrm()
-	v := User{Id: id}
-	// ascertain id exists in the database
-	if err = o.Read(&v); err == nil {
-		var num int64
-		if num, err = o.Delete(&User{Id: id}); err == nil {
-			fmt.Println("Number of records deleted in database:", num)
-		}
-	}
-	return
-}
-
 //根据用户名、密码查询
 func LoginCheck(username string, password string, SysCode string) (result bool, user User, err error) {
 	valid := validation.Validation{}
@@ -271,4 +256,26 @@ func CountUserInfo(roleName string, sysName string, userName string, tenantID in
 	o.Raw(sql, tenantID).Values(&maps)
 	total, _ = strconv.ParseInt(maps[0]["total"].(string), 10, 64)
 	return total
+}
+
+//UpdateUserValidStatus 更新isValid数据状态
+func UpdateUserValidStatus(id int, isValid int64, userID int64) (err error) {
+	o := orm.NewOrm()
+	_, err = o.Raw("UPDATE user SET IsValid = ?, LastModificationTime =? , LastModifierUserId =? WHERE Id =?", isValid, time.Now(), userID, id).Exec()
+	return err
+}
+
+//DeleteUser 删除角色信息
+func DeleteUser(ids string, userID int64) (err error) {
+	arr := strings.Split(ids, ",")
+	var param string
+	for _, x := range arr {
+		param += x + ","
+	}
+	length := len(param) - 1
+	params := param[0:length]
+	var sql = "update user set IsDeleted=1 , DeletionTime = ? ,DeleterUserId = ? where Id in ( " + params + ")"
+	o := orm.NewOrm()
+	_, err = o.Raw(sql, time.Now(), userID).Exec()
+	return
 }

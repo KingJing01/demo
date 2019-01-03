@@ -457,6 +457,15 @@ func init() {
             Filters: nil,
             Params: nil})
 
+    beego.GlobalControllerRouter["demo/controllers:UserController"] = append(beego.GlobalControllerRouter["demo/controllers:UserController"],
+        beego.ControllerComments{
+            Method: "UpdateUserValidStatus",
+            Router: `/updateUserValidStatus/:id`,
+            AllowHTTPMethods: []string{"put"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
     beego.GlobalControllerRouter["demo/controllers:UserroleController"] = append(beego.GlobalControllerRouter["demo/controllers:UserroleController"],
         beego.ControllerComments{
             Method: "Post",

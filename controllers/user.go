@@ -22,6 +22,7 @@ func (c *UserController) URLMapping() {
 	c.Mapping("GetAll", c.GetAll)
 	c.Mapping("Put", c.Put)
 	c.Mapping("Delete", c.Delete)
+	c.Mapping("updateUserValidStatus", c.UpdateUserValidStatus)
 }
 
 // Post ...
@@ -151,18 +152,48 @@ func (c *UserController) Put() {
 
 // Delete ...
 // @Title Delete
-// @Description delete the User
+// @Description delete the USer
 // @Param	id		path 	string	true		"The id you want to delete"
 // @Success 200 {string} delete success!
 // @Failure 403 id is empty
 // @router /:id [delete]
 func (c *UserController) Delete() {
-	idStr := c.Ctx.Input.Param(":id")
-	id, _ := strconv.ParseInt(idStr, 10, 64)
-	if err := models.DeleteUser(id); err == nil {
-		c.Data["json"] = "OK"
+	result := &out.OperResult{}
+	originToken := c.Ctx.Request.Header.Get("Authorization")
+	_, _, userID, _ := tools.GetInfoFromToken(originToken)
+	ids := c.Ctx.Input.Param(":id")
+	if err := models.DeleteUser(ids, userID); err == nil {
+		result.Result = 1
+		c.Data["json"] = result
 	} else {
-		c.Data["json"] = err.Error()
+		result.Result = 0
+		result.Message = err.Error()
+		c.Data["json"] = result
+	}
+	c.ServeJSON()
+}
+
+// UpdateUserValidStatus 列表修改用户有效状态
+// @Title Delete
+// @Description 列表修改角色有效状态
+// @Param	id		path 	string	true		"The id you want to delete"
+// @Success 200 {string} delete success!
+// @Failure 403 id is empty
+// @router /updateUserValidStatus/:id [put]
+func (c *UserController) UpdateUserValidStatus() {
+	originToken := c.Ctx.Request.Header.Get("Authorization")
+	_, _, userID, _ := tools.GetInfoFromToken(originToken)
+	result := &out.OperResult{}
+	idStr := c.Ctx.Input.Param(":id")
+	id, _ := strconv.Atoi(idStr)
+	isValid, _ := c.GetInt64("IsValid")
+	if err := models.UpdateUserValidStatus(id, isValid, userID); err == nil {
+		result.Result = 1
+		c.Data["json"] = result
+	} else {
+		result.Result = 0
+		result.Message = err.Error()
+		c.Data["json"] = result
 	}
 	c.ServeJSON()
 }

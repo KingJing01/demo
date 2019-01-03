@@ -14,7 +14,7 @@ import (
      ],
      'permissionName': '财务系统', 'mychecked': false, 'indeterminate': false, 'permissionId': 'tms.bill'
    }]*/
-// 将后台查询的数据进行格式转化方便前台使用
+// 将后台查询的数据进行格式转化方便前台使用 新增使用
 func ParsePermissionDataForCheckbox(data []out.PermissionCheckInfo) (result []map[string]interface{}) {
 	for _, x := range data {
 		mapResult := make(map[string]interface{})
@@ -49,7 +49,7 @@ func ParsePermissionDataForCheckbox(data []out.PermissionCheckInfo) (result []ma
 }
 
 /*  修改模块时将套餐中已选择的数据设置为已勾选
- *	将后台查询的数据进行格式转化方便前台使用
+ *	将后台查询的数据进行格式转化方便前台使用  修改使用
  */
 func ParsePermissionDataForCheckboxUpdate(data []out.PermissionCheckInfo) (result []map[string]interface{}) {
 	for _, x := range data {

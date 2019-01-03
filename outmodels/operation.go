@@ -86,6 +86,7 @@ type RoleInfo struct {
 	RoleName string
 	RoleCode string
 	SysName  string
+	SysCode  string
 	IsValid  int
 	AuthText string
 }

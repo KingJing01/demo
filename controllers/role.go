@@ -7,7 +7,6 @@ import (
 	tools "demo/tools"
 	"encoding/json"
 	"strconv"
-	"time"
 
 	"github.com/astaxie/beego"
 )
@@ -139,18 +138,14 @@ func (c *RoleController) GetAll() {
 // @Param	body		body 	models.Role	true		"body for Role content"
 // @Success 200 {object} models.Role
 // @Failure 403 :id is not int
-// @router /:id [put]
+// @router / [put]
 func (c *RoleController) Put() {
 	originToken := c.Ctx.Request.Header.Get("Authorization")
 	_, _, userID, _ := tools.GetInfoFromToken(originToken)
 	result := &out.OperResult{}
-	idStr := c.Ctx.Input.Param(":id")
-	id, _ := strconv.Atoi(idStr)
-	v := models.Role{ID: id}
+	var v input.RoleInput
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
-		v.LastModificationTime = time.Now()
-		v.LastModifierUserID = userID
-		if err := models.UpdateRoleById(&v); err == nil {
+		if err := models.UpdateRoleById(&v, userID); err == nil {
 			result.Result = 1
 			c.Data["json"] = result
 		} else {

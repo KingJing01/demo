@@ -189,6 +189,15 @@ func init() {
 
     beego.GlobalControllerRouter["demo/controllers:PermissionController"] = append(beego.GlobalControllerRouter["demo/controllers:PermissionController"],
         beego.ControllerComments{
+            Method: "GetPerInfoByRoleID",
+            Router: `/getPerInfoByRoleId/:roleId`,
+            AllowHTTPMethods: []string{"get"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
+    beego.GlobalControllerRouter["demo/controllers:PermissionController"] = append(beego.GlobalControllerRouter["demo/controllers:PermissionController"],
+        beego.ControllerComments{
             Method: "GetPerInfoBySysCode",
             Router: `/getPerInfoBySysCode/:sysCode`,
             AllowHTTPMethods: []string{"get"},
@@ -225,18 +234,18 @@ func init() {
 
     beego.GlobalControllerRouter["demo/controllers:RoleController"] = append(beego.GlobalControllerRouter["demo/controllers:RoleController"],
         beego.ControllerComments{
-            Method: "GetOne",
-            Router: `/:id`,
-            AllowHTTPMethods: []string{"get"},
+            Method: "Put",
+            Router: `/`,
+            AllowHTTPMethods: []string{"put"},
             MethodParams: param.Make(),
             Filters: nil,
             Params: nil})
 
     beego.GlobalControllerRouter["demo/controllers:RoleController"] = append(beego.GlobalControllerRouter["demo/controllers:RoleController"],
         beego.ControllerComments{
-            Method: "Put",
+            Method: "GetOne",
             Router: `/:id`,
-            AllowHTTPMethods: []string{"put"},
+            AllowHTTPMethods: []string{"get"},
             MethodParams: param.Make(),
             Filters: nil,
             Params: nil})

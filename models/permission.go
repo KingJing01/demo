@@ -326,8 +326,13 @@ func UpdatePermission(m map[string]interface{}, id int, userID int64) (err error
 	return err
 }
 
-// ValidUserActPermission ...
-func ValidUserActPermission(token string, sysCode string, menuCode string) (flag int) {
-
-	return
+func GetPerInfoByRoleCode(roleID string, sysCode string, TenantID int64, userID int64) (result []out.PermissionCheckInfo, err error) {
+	o := orm.NewOrm()
+	_, err = o.Raw(`SELECT t3.Name name ,t3.DisplayName display_name,GROUP_CONCAT(t1.NAME) code,GROUP_CONCAT(t1.DisplayName) code_name,
+	GROUP_CONCAT(CASE	WHEN t2.NAME IS NULL THEN	0 ELSE 1 END ) flag
+FROM ( SELECT MenuCode,NAME,DisplayName FROM permission WHERE TenantId = ?	AND UserId = ? AND RoleId = 0 AND SysCode = ?) t1
+LEFT JOIN (SELECT	NAME,	DisplayName FROM permission WHERE TenantId = ? AND UserId = ? AND RoleId = ? AND SysCode = ?
+) t2 ON t2.NAME = t1.NAME  LEFT JOIN (
+SELECT MenuCode,NAME,DisplayName FROM permission WHERE IsMenu=0) t3 on t3.MenuCode = t1.MenuCode group by t1.MenuCode`, TenantID, userID, sysCode, TenantID, userID, roleID, sysCode).QueryRows(&result)
+	return result, err
 }

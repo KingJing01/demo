@@ -237,3 +237,29 @@ func (c *PermissionController) GetPerInfoBySysCodeUpdate() {
 	}
 	c.ServeJSON()
 }
+
+// GetPerInfoByRoleID 根据角色id获取权限
+// @Title GetPerInfoByRoleID
+// @Description  根据角色编号获取权限
+// @Param	roleCode	 path 	string 	true		"系统编号"
+// @Success 200  result:1(success)  0(false)
+// @Failure 403 sysCode is empty
+// @router /getPerInfoByRoleId/:roleId [get]
+func (c *PermissionController) GetPerInfoByRoleID() {
+	originToken := c.Ctx.Request.Header.Get("Authorization")
+	_, tenantID, userID, _ := tool.GetInfoFromToken(originToken)
+	result := &out.OperResult{}
+	roleID := c.Ctx.Input.Param(":roleId")
+	sysCode := c.GetString("sysCode")
+	if data, err := models.GetPerInfoByRoleCode(roleID, sysCode, tenantID, userID); len(data) > 0 {
+		permissionList := tool.ParsePermissionDataForCheckboxUpdate(data)
+		result.Result = 1
+		result.Data = permissionList
+		c.Data["json"] = result
+	} else {
+		result.Result = 0
+		result.Message = err.Error()
+		c.Data["json"] = result
+	}
+	c.ServeJSON()
+}

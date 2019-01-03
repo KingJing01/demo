@@ -184,29 +184,51 @@ func GetAllRole(query map[string]string, fields []string, sortby []string, order
 	return nil, err
 }
 
-// UpdateRole updates Role by Id and returns error if
+// UpdateRoleById 更新角色信息
 // the record to be updated doesn't exist
-func UpdateRoleById(m *Role) (err error) {
+func UpdateRoleById(m *input.RoleInput, userID int64) (err error) {
 	o := orm.NewOrm()
-	v := Role{ID: m.ID}
+	o.Begin()
+	v := Role{ID: m.Id}
 	// ascertain id exists in the database
 	if err = o.Read(&v); err == nil {
 		var num int64
-		m.SysCode = v.SysCode
-		m.TenantID = v.TenantID
-		m.CreationTime = v.CreationTime
-		m.CreatorUserID = v.CreatorUserID
-		if num, err = o.Update(m); err == nil {
+		v.LastModificationTime = time.Now()
+		v.LastModifierUserID = userID
+		v.SysCode = m.SysCode
+		v.AuthText = m.PerName
+		if num, err = o.Update(&v); err == nil {
 			fmt.Println("Number of records updated in database:", num)
 		}
 	}
+	_, err = o.Raw("delete from permission where RoleId = ?", m.Id).Exec()
+	if err != nil {
+		o.Rollback()
+		return
+	}
+	arr := strings.Split(m.PerId, ",")
+	var param string
+	for _, x := range arr {
+		param += "'" + x + "',"
+	}
+	length := len(param) - 1
+	params := param[0:length]
+	var sql = `INSERT INTO permission (NAME,tenantId,DisplayName,SysCode,MenuCode,CreationTime,IsMenu,UserId,RoleId
+		) SELECT NAME,?,DisplayName,?,MenuCode,?,IsMenu,?,? FROM permission t1
+		WHERE t1.TenantId = 0 AND IsMenu = 1 AND t1.Name IN (` + params + `)`
+	_, err = o.Raw(sql, v.TenantID, m.SysCode, time.Now(), userID, m.Id).Exec()
+	if err != nil {
+		o.Rollback()
+	}
+
+	o.Commit()
 	return
 }
 
 // 获取角色列表的信息
 func GetRoleList(roleName string, sysName string, offset int64, limit int64, tenantID int64) (result []out.RoleInfo, err error) {
 	o := orm.NewOrm()
-	var sql = `SELECT  t1.RoleName role_name,  t1.RoleCode role_code, t2.SysName sys_name, t1.isValid is_valid, t1.AuthText auth_text,  t1.ID id
+	var sql = `SELECT  t1.RoleName role_name,t1.SysCode sys_code,t1.RoleCode role_code, t2.SysName sys_name, t1.isValid is_valid, t1.AuthText auth_text, t1.ID id
 	FROM  role t1 LEFT JOIN   application t2 ON t1.SysCode = t2.SysCode WHERE  t1.TenantId = ? AND t1.isDeleted = 0 and t2.isDeleted=0 and t2.isValid = 0 `
 	conditions := []string{}
 	if roleName != "" {

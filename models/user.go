@@ -226,18 +226,21 @@ func PasswdUpdate(info *input.LoginInfo, SysCode string) (err error) {
 }
 
 // 获取角色列表的信息
-func GetUserList(roleName string, sysName string, offset int64, limit int64, tenantID int64) (result []out.RoleInfo, err error) {
+func GetUserList(roleName string, sysName string, userName string, offset int64, limit int64, tenantID int64) (result []out.UserInfo, err error) {
 	o := orm.NewOrm()
-	var sql = `SELECT 	t2.EmailAddress,t2.PhoneNumber,t2.UserName,t2.Id,t3.SysName,t4.RoleName,
-	t4.AuthText,t4.IsValid FROM	USER t2 LEFT JOIN  userrole t1  ON t1.UserId = t2.Id
+	var sql = `SELECT t2.EmailAddress emial_address ,t2.PhoneNumber phone_number,t2.UserName user_name,t2.Id id,t3.SysName sys_name,t4.RoleName role_name,
+	t4.AuthText auth_text,t4.IsValid is_valid FROM	USER t2 LEFT JOIN  userrole t1  ON t1.UserId = t2.Id
 	LEFT JOIN application t3 ON t2.SysCode = t3.SysCode LEFT JOIN role t4 ON t1.RoleId = t4.Id
-	where t2.TenantId=? `
+	where t2.TenantId=?  and t2.IsDeleted=0`
 	conditions := []string{}
 	if roleName != "" {
 		conditions = append(conditions, " t1.roleName like '%"+roleName+"%'")
 	}
 	if sysName != "" {
-		conditions = append(conditions, " t2.SysName  like '%"+sysName+"%'")
+		conditions = append(conditions, " t3.SysName  like '%"+sysName+"%'")
+	}
+	if userName != "" {
+		conditions = append(conditions, " t2.PhoneNumber  like '%"+userName+"%' or t2.EmailAddress like '%"+userName+"%' or t2.UserName like '%"+userName+"%'")
 	}
 	if len(conditions) > 0 {
 		sql = sql + " and " + strings.Join(conditions, " and ")
@@ -248,15 +251,18 @@ func GetUserList(roleName string, sysName string, offset int64, limit int64, ten
 }
 
 // 统计查询条件的数量
-func CountUserInfo(roleName string, sysName string, tenantID int64) (total int64) {
+func CountUserInfo(roleName string, sysName string, userName string, tenantID int64) (total int64) {
 	o := orm.NewOrm()
 	conditions := []string{}
-	var sql = "SELECT count(0) total FROM  role t1 LEFT JOIN   application t2 ON t1.SysCode = t2.SysCode WHERE  t1.TenantId = ? AND t1.isDeleted = 0 and t2.isDeleted=0 and t2.isValid = 0  "
+	var sql = "SELECT count(0) total FROM	USER t2 LEFT JOIN  userrole t1  ON t1.UserId = t2.Id LEFT JOIN application t3 ON t2.SysCode = t3.SysCode LEFT JOIN role t4 ON t1.RoleId = t4.Id where t2.TenantId=? and t2.IsDeleted=0"
 	if roleName != "" {
 		conditions = append(conditions, " t1.RoleName like '%"+roleName+"%'")
 	}
 	if sysName != "" {
-		conditions = append(conditions, " t2.SysName  like '%"+sysName+"%'")
+		conditions = append(conditions, " t3.SysName  like '%"+sysName+"%'")
+	}
+	if userName != "" {
+		conditions = append(conditions, " t2.PhoneNumber  like '%"+userName+"%' or t2.EmailAddress like '%"+userName+"%' or t2.UserName like '%"+userName+"%'")
 	}
 	if len(conditions) > 0 {
 		sql = sql + " and " + strings.Join(conditions, " and ")

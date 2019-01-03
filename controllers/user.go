@@ -106,8 +106,8 @@ func (c *UserController) GetAll() {
 		userName = v
 	}
 
-	data, err := models.GetUserList(roleName, sysName, offset, limit, tenantID)
-	total := models.CountUserInfo(roleName, sysName, tenantID)
+	data, err := models.GetUserList(roleName, sysName, userName, offset, limit, tenantID)
+	total := models.CountUserInfo(roleName, sysName, userName, tenantID)
 	if err != nil {
 		c.Data["json"] = err.Error()
 	} else {

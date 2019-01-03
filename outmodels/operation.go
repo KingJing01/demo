@@ -90,3 +90,16 @@ type RoleInfo struct {
 	IsValid  int
 	AuthText string
 }
+
+type UserInfo struct {
+	Id           int
+	RoleName     string
+	RoleCode     string
+	SysName      string
+	SysCode      string
+	IsValid      int
+	AuthText     string
+	EmailAddress string
+	PhoneNumber  string
+	UserName     string
+}

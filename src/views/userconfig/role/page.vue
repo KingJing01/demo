@@ -220,11 +220,11 @@ export default {
     handleClick(row) {
       this.type = 'update'
       this.dialogFormVisible = true
-      this.form.setMealName = row.SetMealName
-      this.form.setMealCode = row.SetMealCode
+      this.form.roleName = row.roleName
+      this.form.roleCode = row.roleCode
       this.form.sysCode = row.SysCode
       this.form.id = row.Id
-      getPerInfoBySysCodeUpdate(row.SysCode, row.SetMealCode).then(response => {
+      getPerInfoBySysCodeUpdate(row.SysCode, row.roleCode).then(response => {
         this.authData = response.Data
       })
     },
@@ -260,7 +260,6 @@ export default {
     // 保存系统信息
     saveData() {
       this.$refs.roleForm.validate(valid => {
-        debugger
         if (valid) {
           var transData = transPermissionCheckedData(this.authData)
           if (transData.perName === '') {

@@ -182,7 +182,6 @@ export default {
     },
     // 保存/修改用户信息
     saveData() {
-      debugger
       this.$refs.userData.validData()
       const valid = this.form.valid
       if (valid) {

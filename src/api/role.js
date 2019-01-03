@@ -1,0 +1,51 @@
+/*  基本权限  角色模块
+ *  引用配置的api
+ */
+import request from '@/utils/request'
+
+// 获取套餐列表信息
+export function getRoleList(info) {
+  return request({
+    url: '/role',
+    method: 'get',
+    params: info
+  })
+}
+// 新增角色信息
+export function addRoleInfo(info) {
+  return request({
+    url: '/role',
+    method: 'post',
+    data: {
+      'roleName': info.roleName,
+      'perId': info.perId,
+      'perName': info.perName,
+      'sysCode': info.sysCode
+    }
+  })
+}
+// 删除角色信息
+export function deleteRole(ids) {
+  return request({
+    url: '/role/' + ids,
+    method: 'delete'
+  })
+}
+// 更新角色信息
+export function updateRoleInfo(info) {
+  return request({
+    url: '/role/' + info.Id,
+    method: 'put',
+    data: info
+  })
+}
+
+// 更新角色有效状态 updateValidStatus
+export function updateValidStatus(info) {
+  return request({
+    url: '/role/updateValidStatus/' + info.Id,
+    method: 'put',
+    data: info.IsValid
+  })
+}
+

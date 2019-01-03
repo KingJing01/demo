@@ -311,6 +311,7 @@ func (c *AuthorityManageController) PasswdUpdate() {
 // @Title Login
 // @Description 验证用户的操作权限是否有效
 // @Param   Authorization     header    string  true        "Token信息"
+// @Param   menuCode     query    string  true        "权限编码"
 // @Success 200  result:1(success)  0(false)
 // @router /validUserActPermission [post]
 func (c *AuthorityManageController) ValidUserActPermission() {

@@ -56,6 +56,7 @@
         label="系统名称"
         align="center"
       /><el-table-column
+        v-if="false"
         prop="SysCode"
         label="系统编码"
         align="center"

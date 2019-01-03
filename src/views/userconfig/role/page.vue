@@ -61,6 +61,12 @@
         align="center"
       />
       <el-table-column
+        v-if="false"
+        prop="SysCode"
+        label="系统编码"
+        align="center"
+      />
+      <el-table-column
         :show-overflow-tooltip="true"
         prop="AuthText"
         label="权限"
@@ -118,36 +124,31 @@
     > <h4 v-if="type==='detail'" slot="title">角色详情</h4>
       <h4 v-else-if="type==='update'" slot="title">修改角色</h4>
       <h4 v-else slot="title">新增角色</h4>
-      <el-form ref="roleForm" :model="form" :rules="formRules" size="small">
-        <div v-if="type!='detail'">
-          <el-form-item
-            :label-width="formLabelWidth"
-            label="角色名称"
-            prop="roleName"
-          >
-            <el-input
-              v-model="form.roleName"
-              auto-complete="off"
-            />
-          </el-form-item>
+      <el-form ref="roleForm" :model="form" :rules="formRules" :disabled="type=='detail'?true:false" size="small">
+        <el-form-item
+          :label-width="formLabelWidth"
+          label="角色名称"
+          prop="roleName"
+        >
+          <el-input
+            v-model="form.roleName"
+            auto-complete="off"
+          />
+        </el-form-item>
 
-          <el-form-item
-            :label-width="formLabelWidth"
-            label="系统名称"
-            prop="sysCode"
-          >
-            <el-select v-model="form.sysCode" placeholder="请选择" @change="changeSysSelect">
-              <el-option
-                v-for="item in options"
-                :key="item.SysCode"
-                :label="item.SysName"
-                :value="item.SysCode"/>
-            </el-select>
-          </el-form-item>
-        </div>
-        <div v-else>
-          <span> {{ form.sysName }}  {{ form.setMealName }} </span>
-        </div>
+        <el-form-item
+          :label-width="formLabelWidth"
+          label="系统名称"
+          prop="sysCode"
+        >
+          <el-select v-model="form.sysCode" placeholder="请选择" @change="changeSysSelect">
+            <el-option
+              v-for="item in options"
+              :key="item.SysCode"
+              :label="item.SysName"
+              :value="item.SysCode"/>
+          </el-select>
+        </el-form-item>
       </el-form>
       <template>
         <div class="content">
@@ -187,7 +188,7 @@
 <script>
 import { getRoleList, addRoleInfo, updateRoleInfo, updateValidStatus, deleteRole } from '@/api/role'
 import { sysDataSelect } from '@/api/sysconfig'
-import { getPerInfoBySysCode, getPerInfoBySysCodeUpdate } from '@/api/permission'
+import { getPerInfoBySysCode, getPerInfoByRoleId } from '@/api/permission'
 import { transPermissionCheckedData } from '@/api/utils'
 export default {
   data() {
@@ -224,11 +225,11 @@ export default {
     handleClick(row) {
       this.type = 'update'
       this.dialogFormVisible = true
-      this.form.roleName = row.roleName
-      this.form.roleCode = row.roleCode
+      this.form.roleName = row.RoleName
+      this.form.roleCode = row.RoleCode
       this.form.sysCode = row.SysCode
       this.form.id = row.Id
-      getPerInfoBySysCodeUpdate(row.SysCode, row.roleCode).then(response => {
+      getPerInfoByRoleId(row.Id, row.SysCode).then(response => {
         this.authData = response.Data
       })
     },
@@ -387,8 +388,9 @@ export default {
       this.type = 'detail'
       this.dialogFormVisible = true
       this.form.roleName = row.RoleName
-      this.form.sysName = row.SysName
-      getPerInfoBySysCodeUpdate(row.SysCode, row.SetMealCode).then(response => {
+      this.form.sysCode = row.SysCode
+      this.form.id = row.Id
+      getPerInfoByRoleId(row.Id, row.SysCode).then(response => {
         this.authData = response.Data
       })
     },

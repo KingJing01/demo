@@ -30,6 +30,16 @@ export function getPerInfoBySysCodeUpdate(sysCode, setMealCode) {
   })
 }
 
+// 获取角色下的权限
+export function getPerInfoByRoleId(roleId, sysCode) {
+  return request({
+    url: '/permission/getPerInfoByRoleId/' + roleId,
+    method: 'get',
+    params: {
+      sysCode
+    }
+  })
+}
 // 保存菜单信息
 export function addPerInfo(info) {
   return request({

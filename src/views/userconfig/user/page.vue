@@ -34,7 +34,7 @@
     <!-- 查询 form end -->
     <el-row id="action_line" style="margin-bottom:10px">
       <el-button @click="dialogFormVisible = true">新增用户</el-button>
-      <el-button type="primary" @click="handleDeleteSetMeal">删除用户</el-button>
+      <el-button type="primary" @click="handleDeleteUser">删除用户</el-button>
     </el-row>
     <!-- 基础权限列表  start -->
     <el-table
@@ -109,6 +109,7 @@
           <el-button
             type="text"
             size="small"
+            @click="handleDeleteClick(scope.row.Id)"
           >删除</el-button>
         </template>
       </el-table-column>
@@ -132,39 +133,35 @@
       width="40%"
       @close="handleCloseDialog"
       @open="handleOpenDialog"
-    > <h4 v-if="type==='detail'" slot="title">套餐详情</h4>
-      <h4 v-else-if="type==='update'" slot="title">修改套餐</h4>
-      <h4 v-else slot="title">新增套餐</h4>
-      <el-form ref="mealForm" :model="form" :rules="formRules" size="small">
-        <div v-if="type!='detail'">
-          <el-form-item
-            :label-width="formLabelWidth"
-            label="套餐名"
-            prop="setMealName"
-          >
-            <el-input
-              v-model="form.setMealName"
-              auto-complete="off"
-            />
-          </el-form-item>
+    > <h4 v-if="type==='detail'" slot="title">用户详情</h4>
+      <h4 v-else-if="type==='update'" slot="title">修改用户</h4>
+      <h4 v-else slot="title">新增用户</h4>
+      <el-form ref="mealForm" :model="form" :disabled="type=='detail'?true:false" :rules="formRules" size="small">
+        <el-form-item
+          :label-width="formLabelWidth"
+          label="套餐名"
+          prop="setMealName"
+        >
+          <el-input
+            v-model="form.setMealName"
+            auto-complete="off"
+          />
+        </el-form-item>
 
-          <el-form-item
-            :label-width="formLabelWidth"
-            label="系统名称"
-            prop="sysCode"
-          >
-            <el-select v-model="form.sysCode" placeholder="请选择" @change="changeSysSelect">
-              <el-option
-                v-for="item in options"
-                :key="item.SysCode"
-                :label="item.SysName"
-                :value="item.SysCode"/>
-            </el-select>
-          </el-form-item>
-        </div>
-        <div v-else>
-          <span> {{ form.sysName }}  {{ form.setMealName }} </span>
-        </div>
+        <el-form-item
+          :label-width="formLabelWidth"
+          label="系统名称"
+          prop="sysCode"
+        >
+          <el-select v-model="form.sysCode" placeholder="请选择" @change="changeSysSelect">
+            <el-option
+              v-for="item in options"
+              :key="item.SysCode"
+              :label="item.SysName"
+              :value="item.SysCode"/>
+          </el-select>
+        </el-form-item>
+
       </el-form>
       <template>
         <div class="content">
@@ -202,8 +199,8 @@
   </div>
 </template>
 <script>
-import { getUserList } from '@/api/user'
-import { addSetMealInfo, deleteSetMeal, updateSetMealInfo } from '@/api/setmeal'
+import { getUserList, updateUserValidStatus, deleteUser } from '@/api/user'
+import { addSetMealInfo, updateSetMealInfo } from '@/api/setmeal'
 import { sysDataSelect } from '@/api/sysconfig'
 import { getPerInfoBySysCode, getPerInfoBySysCodeUpdate } from '@/api/permission'
 import { transPermissionCheckedData } from '@/api/utils'
@@ -374,7 +371,7 @@ export default {
     },
     // 批量禁用套餐
     handleDeleteSetMeal() {
-      deleteSetMeal(this.multipleSelection.toString()).then(response => {
+      deleteUser(this.multipleSelection.toString()).then(response => {
         this.getList()
       })
     },
@@ -400,6 +397,48 @@ export default {
       this.form.sysName = row.SysName
       getPerInfoBySysCodeUpdate(row.SysCode, row.SetMealCode).then(response => {
         this.authData = response.Data
+      })
+    },
+    // 表格按钮切换事件
+    handleSwitchChange(row, index) {
+      debugger
+      updateUserValidStatus(row).then(response => {
+        if (response.Result !== 1) {
+          this.$message({
+            showClose: true,
+            message: '操作失败',
+            type: 'warning'
+          })
+          this.tableData[index].IsValid = (row.IsValid === 1 ? 0 : 1)
+        }
+      })
+    },
+    // 删除操作
+    handleDeleteClick(id) {
+      deleteUser(id).then(response => {
+        if (response.Result === 1) {
+          this.getList()
+        } else {
+          this.$message({
+            showClose: true,
+            message: '操作失败',
+            type: 'warning'
+          })
+        }
+      })
+    },
+    // 批量禁用套餐
+    handleDeleteUser() {
+      deleteUser(this.multipleSelection.toString()).then(response => {
+        if (response.Result === 1) {
+          this.getList()
+        } else {
+          this.$message({
+            showClose: true,
+            message: '操作失败',
+            type: 'warning'
+          })
+        }
       })
     }
   }

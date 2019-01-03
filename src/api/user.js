@@ -12,9 +12,9 @@ export function getUserList(info) {
   })
 }
 // 新增角色信息
-export function addRoleInfo(info) {
+export function addUserInfo(info) {
   return request({
-    url: '/role',
+    url: '/user',
     method: 'post',
     data: {
       'roleName': info.roleName,
@@ -25,25 +25,26 @@ export function addRoleInfo(info) {
   })
 }
 // 删除角色信息
-export function deleteRole(ids) {
+export function deleteUser(ids) {
   return request({
-    url: '/role/' + ids,
+    url: '/user/' + ids,
     method: 'delete'
   })
 }
 // 更新角色信息
-export function updateRoleInfo(info) {
+export function updateUserInfo(info) {
   return request({
-    url: '/role',
+    url: '/user',
     method: 'put',
     data: info
   })
 }
 
-// 更新角色有效状态 updateValidStatus
-export function updateValidStatus(info) {
+// 更新用户有效状态 updateUserValidStatus
+export function updateUserValidStatus(info) {
+  debugger
   return request({
-    url: '/role/updateValidStatus/' + info.Id,
+    url: '/user/updateUserValidStatus/' + info.Id,
     method: 'put',
     data: info.IsValid
   })

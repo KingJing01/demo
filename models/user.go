@@ -2,9 +2,11 @@ package models
 
 import (
 	input "demo/inputmodels"
+	out "demo/outmodels"
 	"errors"
 	"fmt"
 	"reflect"
+	"strconv"
 	"strings"
 	"time"
 
@@ -221,4 +223,46 @@ func PasswdUpdate(info *input.LoginInfo, SysCode string) (err error) {
 	o := orm.NewOrm()
 	_, err = o.Raw("update ssouser set Passwd=? where Phone=? or Email=?", info.Password, info.UserName, info.UserName).Exec()
 	return err
+}
+
+// 获取角色列表的信息
+func GetUserList(roleName string, sysName string, offset int64, limit int64, tenantID int64) (result []out.RoleInfo, err error) {
+	o := orm.NewOrm()
+	var sql = `SELECT 	t2.EmailAddress,t2.PhoneNumber,t2.UserName,t2.Id,t3.SysName,t4.RoleName,
+	t4.AuthText,t4.IsValid FROM	USER t2 LEFT JOIN  userrole t1  ON t1.UserId = t2.Id
+	LEFT JOIN application t3 ON t2.SysCode = t3.SysCode LEFT JOIN role t4 ON t1.RoleId = t4.Id
+	where t2.TenantId=? `
+	conditions := []string{}
+	if roleName != "" {
+		conditions = append(conditions, " t1.roleName like '%"+roleName+"%'")
+	}
+	if sysName != "" {
+		conditions = append(conditions, " t2.SysName  like '%"+sysName+"%'")
+	}
+	if len(conditions) > 0 {
+		sql = sql + " and " + strings.Join(conditions, " and ")
+	}
+	sql = sql + " limit " + strconv.FormatInt(limit, 10) + "  offset " + strconv.FormatInt(offset, 10)
+	_, err = o.Raw(sql, tenantID).QueryRows(&result)
+	return result, err
+}
+
+// 统计查询条件的数量
+func CountUserInfo(roleName string, sysName string, tenantID int64) (total int64) {
+	o := orm.NewOrm()
+	conditions := []string{}
+	var sql = "SELECT count(0) total FROM  role t1 LEFT JOIN   application t2 ON t1.SysCode = t2.SysCode WHERE  t1.TenantId = ? AND t1.isDeleted = 0 and t2.isDeleted=0 and t2.isValid = 0  "
+	if roleName != "" {
+		conditions = append(conditions, " t1.RoleName like '%"+roleName+"%'")
+	}
+	if sysName != "" {
+		conditions = append(conditions, " t2.SysName  like '%"+sysName+"%'")
+	}
+	if len(conditions) > 0 {
+		sql = sql + " and " + strings.Join(conditions, " and ")
+	}
+	var maps []orm.Params
+	o.Raw(sql, tenantID).Values(&maps)
+	total, _ = strconv.ParseInt(maps[0]["total"].(string), 10, 64)
+	return total
 }

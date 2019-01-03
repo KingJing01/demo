@@ -5,18 +5,22 @@
       :inline="true"
       :model="search"
       class="demo-form-inline"
-    >
-
-      <el-form-item label="套餐名称">
+    ><el-form-item label="系统名称">
+      <el-input
+        v-model="search.sysName"
+        placeholder="系统名称"
+      />
+    </el-form-item>
+      <el-form-item label="角色名称">
         <el-input
-          v-model="search.setMealName"
+          v-model="search.roleName"
           placeholder="套餐名称"
         />
       </el-form-item>
-      <el-form-item label="系统名称">
+      <el-form-item label="登录名">
         <el-input
-          v-model="search.sysName"
-          placeholder="系统名称"
+          v-model="search.roleName"
+          placeholder="用户名/邮箱/手机号"
         />
       </el-form-item>
       <el-form-item>
@@ -28,6 +32,10 @@
       </el-form-item>
     </el-form>
     <!-- 查询 form end -->
+    <el-row id="action_line" style="margin-bottom:10px">
+      <el-button @click="dialogFormVisible = true">新增用户</el-button>
+      <el-button type="primary" @click="handleDeleteSetMeal">删除用户</el-button>
+    </el-row>
     <!-- 基础权限列表  start -->
     <el-table
       :data="tableData"
@@ -42,13 +50,23 @@
         align="center"
       />
       <el-table-column
-        prop="SetMealCode"
-        label="套餐编码"
+        prop="UserCode"
+        label="用户编号"
         align="center"
       />
       <el-table-column
-        prop="SetMealName"
-        label="套餐名称"
+        prop="UserName"
+        label="登录名"
+        align="center"
+      />
+      <el-table-column
+        prop="PhoneNumber"
+        label="手机号"
+        align="center"
+      />
+      <el-table-column
+        prop="EmailAddress"
+        label="邮箱"
         align="center"
       />
       <el-table-column
@@ -56,22 +74,27 @@
         label="系统名称"
         align="center"
       /><el-table-column
-        prop="SysCode"
-        label="系统编码"
+        prop="RoleName"
+        label="角色名称"
         align="center"
       />
       <el-table-column
         :show-overflow-tooltip="true"
-        prop="PermissionText"
-        label="操作名称"
+        prop="AuthText"
+        label="权限"
         align="center"
       />
-      <el-table-column
-        :formatter="formatText"
-        prop="IsDeleted"
-        label="是否有效"
-        align="center"
-      />
+      <el-table-column prop="IsValid" align="center" label="是否禁用">
+        <template slot-scope="scope">
+          <el-switch
+            v-model="scope.row.IsValid"
+            :active-value="0"
+            :inactive-value="1"
+            active-color="#13ce66"
+            inactive-color="#ff4949"
+            @change="handleSwitchChange(scope.row,scope.$index)"/>
+        </template>
+      </el-table-column>
       <el-table-column
         prop="Id"
         label="操作"
@@ -83,6 +106,10 @@
             size="small"
             @click="handleClick(scope.row)"
           >编辑</el-button>
+          <el-button
+            type="text"
+            size="small"
+          >删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -96,10 +123,6 @@
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"/>
     </div>
-    <el-row id="action_line">
-      <el-button @click="dialogFormVisible = true">新增套餐</el-button>
-      <el-button type="primary" @click="handleDeleteSetMeal">禁用套餐</el-button>
-    </el-row>
 
     <!-- 分页控件  end -->
     <!-- 弹出层 信息录入和修改  start -->

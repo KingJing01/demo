@@ -34,7 +34,7 @@ export function deleteRole(ids) {
 // 更新角色信息
 export function updateRoleInfo(info) {
   return request({
-    url: '/role/' + info.Id,
+    url: '/role',
     method: 'put',
     data: info
   })

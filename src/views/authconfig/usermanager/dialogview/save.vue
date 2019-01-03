@@ -149,7 +149,6 @@ export default {
     // 系统信息选择事件
     handlecheckedAppChange(val) {
       console.log('转换前' + this.childPerSelect)
-      debugger
       var tempSelectData = []
       for (const i of val) {
         // 添加动态tab
@@ -164,7 +163,6 @@ export default {
         if (val.length < this.childPerSelect.length) {
           var tempChildSelect = []
           for (const child of this.childPerSelect) {
-            debugger
             if (child.sysCode === i) {
               var temp = {}
               temp.data = child.data

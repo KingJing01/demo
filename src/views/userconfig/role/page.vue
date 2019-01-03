@@ -265,7 +265,6 @@ export default {
     // 保存系统信息
     saveData() {
       this.$refs.roleForm.validate(valid => {
-        debugger
         if (valid) {
           var transData = transPermissionCheckedData(this.authData)
           if (transData.perName === '') {

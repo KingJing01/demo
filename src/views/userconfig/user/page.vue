@@ -202,7 +202,8 @@
   </div>
 </template>
 <script>
-import { getSetMealList, addSetMealInfo, deleteSetMeal, updateSetMealInfo } from '@/api/setmeal'
+import { getUserList } from '@/api/user'
+import { addSetMealInfo, deleteSetMeal, updateSetMealInfo } from '@/api/setmeal'
 import { sysDataSelect } from '@/api/sysconfig'
 import { getPerInfoBySysCode, getPerInfoBySysCodeUpdate } from '@/api/permission'
 import { transPermissionCheckedData } from '@/api/utils'
@@ -251,7 +252,7 @@ export default {
     },
     // 获取列表数据
     getList() {
-      getSetMealList(this.search).then(response => {
+      getUserList(this.search).then(response => {
         this.tableData = response.Data.list
         this.search.pageTotal = response.Data.total
       })
@@ -273,7 +274,7 @@ export default {
     handleCurrentChange(val) {
       var pageSize = this.search.pageSize
       this.search.offset = (val > 1 ? (val - 1) * pageSize : 0)
-      getSetMealList(this.search).then(response => {
+      getUserList(this.search).then(response => {
         this.tableData = response.Data.list
         this.search.pageTotal = response.Data.total
       })
@@ -377,11 +378,7 @@ export default {
         this.getList()
       })
     },
-    // 文本格式转换
-    formatText(row, column) {
-      const data = row[column.property]
-      return data === 0 ? '是' : '否'
-    },
+
     // 监听dialog的关闭事件
     handleCloseDialog() {
       this.form = {}

@@ -30,7 +30,7 @@
     <!-- 查询 form end -->
     <el-row id="action_line" style="margin-bottom:15px">
       <el-button type="primary" @click="dialogFormVisible=true">新增</el-button>
-      <el-button type="default" >删除</el-button>
+      <el-button type="default" @click="handleDeleteRole" >删除</el-button>
     </el-row>
     <!-- 基础权限列表  start -->
     <el-table
@@ -66,12 +66,17 @@
         label="权限"
         align="center"
       />
-      <el-table-column
-        :formatter="formatText"
-        prop="IsValid"
-        label="是否禁用"
-        align="center"
-      />
+      <el-table-column prop="IsValid" align="center" label="是否禁用">
+        <template slot-scope="scope">
+          <el-switch
+            v-model="scope.row.IsValid"
+            :active-value="0"
+            :inactive-value="1"
+            active-color="#13ce66"
+            inactive-color="#ff4949"
+            @change="handleSwitchChange(scope.row,scope.$index)"/>
+        </template>
+      </el-table-column>
       <el-table-column
         prop="Id"
         label="操作"
@@ -86,7 +91,7 @@
           <el-button
             type="text"
             size="small"
-            @click="handleClick(scope.row)"
+            @click="handleDeleteClick(scope.row.Id)"
           >删除</el-button>
         </template>
       </el-table-column>
@@ -180,8 +185,7 @@
   </div>
 </template>
 <script>
-import { deleteSetMeal } from '@/api/setmeal'
-import { getRoleList, addRoleInfo, updateRoleInfo } from '@/api/role'
+import { getRoleList, addRoleInfo, updateRoleInfo, updateValidStatus, deleteRole } from '@/api/role'
 import { sysDataSelect } from '@/api/sysconfig'
 import { getPerInfoBySysCode, getPerInfoBySysCodeUpdate } from '@/api/permission'
 import { transPermissionCheckedData } from '@/api/utils'
@@ -260,6 +264,7 @@ export default {
     // 保存系统信息
     saveData() {
       this.$refs.roleForm.validate(valid => {
+        debugger
         if (valid) {
           var transData = transPermissionCheckedData(this.authData)
           if (transData.perName === '') {
@@ -351,15 +356,18 @@ export default {
       this.multipleSelection = data
     },
     // 批量禁用套餐
-    handleDeleteSetMeal() {
-      deleteSetMeal(this.multipleSelection.toString()).then(response => {
-        this.getList()
+    handleDeleteRole() {
+      deleteRole(this.multipleSelection.toString()).then(response => {
+        if (response.Result === 1) {
+          this.getList()
+        } else {
+          this.$message({
+            showClose: true,
+            message: '操作失败',
+            type: 'warning'
+          })
+        }
       })
-    },
-    // 文本格式转换
-    formatText(row, column) {
-      const data = row[column.property]
-      return data === 0 ? '是' : '否'
     },
     // 监听dialog的关闭事件
     handleCloseDialog() {
@@ -378,10 +386,37 @@ export default {
     handleRowClick(row, event) {
       this.type = 'detail'
       this.dialogFormVisible = true
-      this.form.setMealName = row.SetMealName
+      this.form.roleName = row.RoleName
       this.form.sysName = row.SysName
       getPerInfoBySysCodeUpdate(row.SysCode, row.SetMealCode).then(response => {
         this.authData = response.Data
+      })
+    },
+    // 表格按钮切换事件
+    handleSwitchChange(row, index) {
+      updateValidStatus(row).then(response => {
+        if (response.Result !== 1) {
+          this.$message({
+            showClose: true,
+            message: '操作失败',
+            type: 'warning'
+          })
+          this.tableData[index].IsValid = (row.IsValid === 1 ? 0 : 1)
+        }
+      })
+    },
+    // 删除操作
+    handleDeleteClick(id) {
+      deleteRole(id).then(response => {
+        if (response.Result === 1) {
+          this.getList()
+        } else {
+          this.$message({
+            showClose: true,
+            message: '操作失败',
+            type: 'warning'
+          })
+        }
       })
     }
   }

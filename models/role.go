@@ -17,7 +17,7 @@ type Role struct {
 	ID                   int       `orm:"column(Id);auto"`
 	RoleCode             string    `orm:"column(RoleCode);size(20)"`
 	RoleName             string    `orm:"column(RoleName);size(45)"`
-	TenantID             int       `orm:"column(TenantId);null"`
+	TenantID             int64     `orm:"column(TenantId);null"`
 	SysCode              string    `orm:"column(SysCode);size(20)"`
 	IsValid              int       `orm:"column(IsValid);0"`
 	IsDeleted            int8      `orm:"column(IsDeleted);0"`
@@ -48,6 +48,7 @@ func AddRole(m *input.RoleInput, userID int64, tenantID int64) (id int64, err er
 	nowTime := time.Now()
 	o.Begin()
 	role := new(Role)
+	role.TenantID = tenantID
 	role.CreationTime = nowTime
 	role.AuthText = m.PerName
 	role.RoleName = m.RoleName
@@ -65,10 +66,10 @@ func AddRole(m *input.RoleInput, userID int64, tenantID int64) (id int64, err er
 	}
 	length := len(param) - 1
 	params := param[0:length]
-	var sql = `INSERT INTO permission (NAME,tenantId,DisplayName,SysCode,MenuCode,CreationTime,IsMenu,UserId
-		) SELECT NAME,?,DisplayName,?,MenuCode,?,IsMenu,? FROM permission t1
+	var sql = `INSERT INTO permission (NAME,tenantId,DisplayName,SysCode,MenuCode,CreationTime,IsMenu,UserId,RoleId
+		) SELECT NAME,?,DisplayName,?,MenuCode,?,IsMenu,?,? FROM permission t1
 		WHERE t1.TenantId = 0 AND IsMenu = 1 AND t1.Name IN (` + params + `)`
-	_, err = o.Raw(sql, tenantID, sysCode, nowTime, userID).Exec()
+	_, err = o.Raw(sql, tenantID, sysCode, nowTime, userID, role.ID).Exec()
 	if err != nil {
 		o.Rollback()
 	}
@@ -191,6 +192,10 @@ func UpdateRoleById(m *Role) (err error) {
 	// ascertain id exists in the database
 	if err = o.Read(&v); err == nil {
 		var num int64
+		m.SysCode = v.SysCode
+		m.TenantID = v.TenantID
+		m.CreationTime = v.CreationTime
+		m.CreatorUserID = v.CreatorUserID
 		if num, err = o.Update(m); err == nil {
 			fmt.Println("Number of records updated in database:", num)
 		}
@@ -198,22 +203,10 @@ func UpdateRoleById(m *Role) (err error) {
 	return
 }
 
-// DeleteRole deletes Role by Id and returns error if
-// the record to be deleted doesn't exist
-func DeleteRole(id int) (err error) {
-	o := orm.NewOrm()
-	v := Role{ID: id}
-	// ascertain id exists in the database
-	if err = o.Read(&v); err == nil {
-		_, err = o.Raw("update role set IsDeleted=1 , DeletionTime = ?  where Id= ?  ", time.Now(), id).Exec()
-	}
-	return
-}
-
 // 获取角色列表的信息
 func GetRoleList(roleName string, sysName string, offset int64, limit int64, tenantID int64) (result []out.RoleInfo, err error) {
 	o := orm.NewOrm()
-	var sql = `SELECT  t1.RoleName role_name,  t1.RoleCode role_code, t2.SysName sys_name, t1.isValid is_valid, t1.AuthText auth_text,  t1.ID Id
+	var sql = `SELECT  t1.RoleName role_name,  t1.RoleCode role_code, t2.SysName sys_name, t1.isValid is_valid, t1.AuthText auth_text,  t1.ID id
 	FROM  role t1 LEFT JOIN   application t2 ON t1.SysCode = t2.SysCode WHERE  t1.TenantId = ? AND t1.isDeleted = 0 and t2.isDeleted=0 and t2.isValid = 0 `
 	conditions := []string{}
 	if roleName != "" {
@@ -248,4 +241,26 @@ func CountRoleInfo(roleName string, sysName string, tenantID int64) (total int64
 	o.Raw(sql, tenantID).Values(&maps)
 	total, _ = strconv.ParseInt(maps[0]["total"].(string), 10, 64)
 	return total
+}
+
+//UpdateValidStatus 更新isValid数据状态
+func UpdateValidStatus(id int, isValid int64, userID int64) (err error) {
+	o := orm.NewOrm()
+	_, err = o.Raw("UPDATE role SET IsValid = ?, LastModificationTime =? , LastModifierUserId =? WHERE Id =?", isValid, time.Now(), userID, id).Exec()
+	return err
+}
+
+//DeleteRole 删除角色信息
+func DeleteRole(ids string, userID int64) (err error) {
+	arr := strings.Split(ids, ",")
+	var param string
+	for _, x := range arr {
+		param += x + ","
+	}
+	length := len(param) - 1
+	params := param[0:length]
+	var sql = "update role set IsDeleted=1 , DeletionTime = ? ,DeleterUserId = ? where Id in ( " + params + ")"
+	o := orm.NewOrm()
+	_, err = o.Raw(sql, time.Now(), userID).Exec()
+	return
 }

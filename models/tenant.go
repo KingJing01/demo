@@ -146,7 +146,7 @@ func GetTenantById(id int) (v *Tenant, err error) {
 func UpdateTenantById(m *Tenant, sysCode string, perIdStr string, perMenu string, tenId int, userID int64) (err error) {
 	o := orm.NewOrm()
 	o.Begin()
-	v := Tenant{Id: m.Id}
+	v := Tenant{Id: tenId}
 	// ascertain id exists in the database
 	if err = o.Read(&v); err == nil {
 		m.CreationTime = v.CreationTime
@@ -154,8 +154,12 @@ func UpdateTenantById(m *Tenant, sysCode string, perIdStr string, perMenu string
 		m.LastModifierUserId = userID
 		_, err = o.Update(m)
 	}
+	var maps []orm.Params
+	o.Raw("select UserId from userrole where TenantId = ? and SysCode=? and RoleId=1", tenId, sysCode).Values(&maps)
+	tempOwnerID := maps[0]["UserId"].(string)
+	ownerID, _ := strconv.ParseInt(tempOwnerID, 10, 64)
 	//权限信息修改
-	err = UpdateTenantPermission(sysCode, perIdStr, perMenu, v.Id)
+	err = UpdateTenantPermission(sysCode, perIdStr, perMenu, tenId, ownerID)
 	if err != nil {
 		o.Rollback()
 	}
@@ -229,16 +233,16 @@ func GetPerInfoForTenant(sysCode string, tenantId int) (result []out.PermissionC
 }
 
 // 更新权限信息
-func UpdateTenantPermission(sysCode string, perIdStr string, perMenu string, tenId int) (err error) {
-	err = DeleteTenatPermssion(sysCode, tenId)
+func UpdateTenantPermission(sysCode string, perIdStr string, perMenu string, tenID int, ownerID int64) (err error) {
+	err = DeleteTenatPermssion(sysCode, tenID)
 	if err != nil {
 		return err
 	}
-	err = InsertTenantPermission(sysCode, perIdStr, tenId, '0')
+	err = InsertTenantPermission(sysCode, perIdStr, tenID, ownerID)
 	if err != nil {
 		return err
 	}
-	err = UpdateTenatMenuText(sysCode, perMenu, tenId)
+	err = UpdateTenatMenuText(sysCode, perMenu, tenID)
 	if err != nil {
 		return err
 	}

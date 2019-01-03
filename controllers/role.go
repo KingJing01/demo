@@ -141,12 +141,15 @@ func (c *RoleController) GetAll() {
 // @Failure 403 :id is not int
 // @router /:id [put]
 func (c *RoleController) Put() {
+	originToken := c.Ctx.Request.Header.Get("Authorization")
+	_, _, userID, _ := tools.GetInfoFromToken(originToken)
 	result := &out.OperResult{}
 	idStr := c.Ctx.Input.Param(":id")
 	id, _ := strconv.Atoi(idStr)
 	v := models.Role{ID: id}
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 		v.LastModificationTime = time.Now()
+		v.LastModifierUserID = userID
 		if err := models.UpdateRoleById(&v); err == nil {
 			result.Result = 1
 			c.Data["json"] = result
@@ -172,9 +175,35 @@ func (c *RoleController) Put() {
 // @router /:id [delete]
 func (c *RoleController) Delete() {
 	result := &out.OperResult{}
+	originToken := c.Ctx.Request.Header.Get("Authorization")
+	_, _, userID, _ := tools.GetInfoFromToken(originToken)
+	ids := c.Ctx.Input.Param(":id")
+	if err := models.DeleteRole(ids, userID); err == nil {
+		result.Result = 1
+		c.Data["json"] = result
+	} else {
+		result.Result = 0
+		result.Message = err.Error()
+		c.Data["json"] = result
+	}
+	c.ServeJSON()
+}
+
+// UpdateValidStatus 列表修改角色有效状态
+// @Title Delete
+// @Description 列表修改角色有效状态
+// @Param	id		path 	string	true		"The id you want to delete"
+// @Success 200 {string} delete success!
+// @Failure 403 id is empty
+// @router /updateValidStatus/:id [put]
+func (c *RoleController) UpdateValidStatus() {
+	originToken := c.Ctx.Request.Header.Get("Authorization")
+	_, _, userID, _ := tools.GetInfoFromToken(originToken)
+	result := &out.OperResult{}
 	idStr := c.Ctx.Input.Param(":id")
 	id, _ := strconv.Atoi(idStr)
-	if err := models.DeleteRole(id); err == nil {
+	isValid, _ := c.GetInt64("IsValid")
+	if err := models.UpdateValidStatus(id, isValid, userID); err == nil {
 		result.Result = 1
 		c.Data["json"] = result
 	} else {

@@ -130,59 +130,15 @@
     <el-dialog
       :close-on-click-modal="false"
       :visible.sync="dialogFormVisible"
-      width="40%"
+      width="25%"
       @close="handleCloseDialog"
       @open="handleOpenDialog"
     > <h4 v-if="type==='detail'" slot="title">用户详情</h4>
       <h4 v-else-if="type==='update'" slot="title">修改用户</h4>
       <h4 v-else slot="title">新增用户</h4>
-      <el-form ref="mealForm" :model="form" :disabled="type=='detail'?true:false" :rules="formRules" size="small">
-        <el-form-item
-          :label-width="formLabelWidth"
-          label="套餐名"
-          prop="setMealName"
-        >
-          <el-input
-            v-model="form.setMealName"
-            auto-complete="off"
-          />
-        </el-form-item>
-
-        <el-form-item
-          :label-width="formLabelWidth"
-          label="系统名称"
-          prop="sysCode"
-        >
-          <el-select v-model="form.sysCode" placeholder="请选择" @change="changeSysSelect">
-            <el-option
-              v-for="item in options"
-              :key="item.SysCode"
-              :label="item.SysName"
-              :value="item.SysCode"/>
-          </el-select>
-        </el-form-item>
-
-      </el-form>
-      <template>
-        <div class="content">
-          <div class="power">
-            <h4>模块配置</h4>
-            <el-row>
-              <el-col :span="7">菜单功能</el-col>
-              <el-col :span="17">权限名称</el-col>
-            </el-row>
-            <div v-for="(permissionTop, topIndex) in authData" :key="topIndex">
-              <el-row>
-                <el-col :span="6">
-                  <p class="checkGroup" style="width:99%;">
-                    <el-checkbox :indeterminate="permissionTop.indeterminate" :key="topIndex" v-model="permissionTop.mychecked" :label="permissionTop.permissionId" :disabled="type=='detail'?true:false" class="auth_check" @change="onChangeTop(topIndex, permissionTop.permissionId, $event)">{{ permissionTop.permissionName }}</el-checkbox>
-                </p></el-col>
-                <el-col :span="18">
-                  <el-checkbox v-for="permissionSon in permissionTop.childrenList" v-model="permissionSon.mychecked" :label="permissionSon.permissionId" :key="permissionSon.permissionId" :disabled="type=='detail'?true:false" @change="onChangeSon(topIndex, permissionSon.permissionId, permissionTop.permissionId, $event)">{{ permissionSon.permissionName }}</el-checkbox>
-                </el-col>
-            </el-row></div>
-          </div>
-      </div></template>
+      <div v-if="type==='detail'"><DetailPage :data="form"/></div>
+      <div v-else-if="type==='update'"><UpdatePage ref="userData" :data="form"/></div>
+      <div v-else><SavePage ref="userData" :data="form"/></div>
       <div
         slot="footer"
         class="dialog-footer"
@@ -204,7 +160,12 @@ import { addSetMealInfo, updateSetMealInfo } from '@/api/setmeal'
 import { sysDataSelect } from '@/api/sysconfig'
 import { getPerInfoBySysCode, getPerInfoBySysCodeUpdate } from '@/api/permission'
 import { transPermissionCheckedData } from '@/api/utils'
+
+import DetailPage from './dialogview/detail'
+import SavePage from './dialogview/save'
+import UpdatePage from './dialogview/update'
 export default {
+  components: { DetailPage, SavePage, UpdatePage },
   data() {
     return {
       type: 'insert',

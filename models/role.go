@@ -286,3 +286,19 @@ func DeleteRole(ids string, userID int64) (err error) {
 	_, err = o.Raw(sql, time.Now(), userID).Exec()
 	return
 }
+
+// GetRoleBySysCode 通过系统编号获取对应租户下的角色
+func GetRoleBySysCode(sysCode string, tenantID int64) (data []out.ComponentData, err error) {
+	arr := strings.Split(sysCode, ",")
+	var param string
+	for _, x := range arr {
+		param += x + ","
+	}
+	length := len(param) - 1
+	params := param[0:length]
+	var sql = `select t.SysCode parent_key,t1.SysName parent_name, group_concat(t.RoleCode) child_key,group_concat(t.RoleName) child_name from role t left join application t1 on t.SysCode = t1.SysCode
+		where  t.tenantId = ? and t.isValid = 0 and t.isDeleted = 0 and t.SysCode in ( ` + params + ") group by t.SysCode"
+	o := orm.NewOrm()
+	_, err = o.Raw(sql, tenantID).QueryRows(&data)
+	return data, err
+}

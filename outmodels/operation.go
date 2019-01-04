@@ -103,3 +103,15 @@ type UserInfo struct {
 	PhoneNumber  string
 	UserName     string
 }
+
+// ComponentData 组件数据
+type ComponentData struct {
+	// 循环条件的的判断依据
+	ParentKey string
+	// 显示的父节点名称
+	ParentName string
+	// 子组件的键值
+	ChildKey string
+	// 子组件的显示名
+	ChildName string
+}

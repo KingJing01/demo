@@ -261,6 +261,15 @@ func init() {
 
     beego.GlobalControllerRouter["demo/controllers:RoleController"] = append(beego.GlobalControllerRouter["demo/controllers:RoleController"],
         beego.ControllerComments{
+            Method: "GetRoleBySysCode",
+            Router: `/getRoleBySysCode`,
+            AllowHTTPMethods: []string{"get"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
+    beego.GlobalControllerRouter["demo/controllers:RoleController"] = append(beego.GlobalControllerRouter["demo/controllers:RoleController"],
+        beego.ControllerComments{
             Method: "UpdateValidStatus",
             Router: `/updateValidStatus/:id`,
             AllowHTTPMethods: []string{"put"},

@@ -98,3 +98,30 @@ func ParseInterfaceArr(params []interface{}) (param []string) {
 	}
 	return strArray
 }
+
+//ParseCheckRadioData  解析数据给前台组件使用
+func ParseCheckRadioData(data []out.ComponentData) (result []map[string]interface{}) {
+	for _, x := range data {
+		mapResult := make(map[string]interface{})
+		mapResult["name"] = x.ParentName
+		// 中文权限拆为数组
+		displayArr := strings.Split(x.ChildName, ",")
+		// 缩写权限 拆为数组
+		arr := strings.Split(x.ChildKey, ",")
+		var children []map[string]interface{}
+		//子列数据拼凑
+		for j, t := range displayArr {
+			for k, z := range arr {
+				perArr := make(map[string]interface{})
+				if j == k {
+					perArr["childName"] = t
+					perArr["childCode"] = z
+					children = append(children, perArr)
+				}
+			}
+		}
+		mapResult["childrenList"] = children
+		result = append(result, mapResult)
+	}
+	return result
+}

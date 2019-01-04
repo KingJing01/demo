@@ -209,3 +209,28 @@ func (c *RoleController) UpdateValidStatus() {
 	}
 	c.ServeJSON()
 }
+
+// GetRoleBySysCode 根据系统获取系统下的角色
+// @Title UpdateValidStatus
+// @Description 根据系统获取系统下的角色
+// @Param	sysCodes		query 	string	true		"需要查询的系统编号"
+// @Success 200 {string} get success!
+// @Failure 403 sysCodes is empty
+// @router /getRoleBySysCode [get]
+func (c *RoleController) GetRoleBySysCode() {
+	originToken := c.Ctx.Request.Header.Get("Authorization")
+	_, tenantID, _, _ := tools.GetInfoFromToken(originToken)
+	result := &out.OperResult{}
+	sysCode := c.GetString("sysCode")
+	if data, err := models.GetRoleBySysCode(sysCode, tenantID); err == nil {
+		radioData := tools.ParseCheckRadioData(data)
+		result.Result = 1
+		result.Data = radioData
+		c.Data["json"] = result
+	} else {
+		result.Result = 0
+		result.Message = err.Error()
+		c.Data["json"] = result
+	}
+	c.ServeJSON()
+}

@@ -49,3 +49,14 @@ export function updateValidStatus(info) {
   })
 }
 
+// 获取系统下的角色数据
+export function getRoleDataBySysCodes(info) {
+  return request({
+    url: '/role/getRoleBySysCode',
+    method: 'get',
+    params: {
+      sysCode: info.join(',')
+    }
+  })
+}
+

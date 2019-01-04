@@ -1,7 +1,6 @@
 <template>
   <el-form ref="mealForm" :model="form" :rules="formRules" size="small" label-width="100px">
     <el-form-item
-      :label-width="formLabelWidth"
       label="登录名"
       prop="UserName"
     >
@@ -11,7 +10,6 @@
       />
     </el-form-item>
     <el-form-item
-      :label-width="formLabelWidth"
       label="手机号"
       prop="PhoneNumber"
     >
@@ -21,7 +19,6 @@
       />
     </el-form-item>
     <el-form-item
-      :label-width="formLabelWidth"
       label="邮箱"
       prop="EmailAddress"
     >
@@ -31,29 +28,44 @@
       />
     </el-form-item>
     <el-form-item
-      :label-width="formLabelWidth"
-      label="系统名称"
       prop="SysCode"
+      label="系统名称"
     >
-      <el-select v-model="form.SysCode" placeholder="请选择">
-        <el-option
-          v-for="item in options"
-          :key="item.SysCode"
-          :label="item.SysName"
-          :value="item.SysCode"/>
-      </el-select>
+      <template>
+        <el-checkbox-group v-model="checkedApplications" @change="handlecheckedAppChange">
+          <el-checkbox v-for="(sys, index) in options" :label="sys.SysCode" :key="index">{{ sys.SysName }}</el-checkbox>
+        </el-checkbox-group>
+      </template>
     </el-form-item>
+    <template>
+      <div v-for="(radio, topIndex) in radioData" :key="topIndex">
+        <el-row>
+          <el-col :span="6">
+            <el-form-item
+              :label="radio.name"
+          /></el-col>
+          <el-col :span="18">
+            <el-radio-group v-model="radio.name">
+              <el-radio v-for="child in radio.childrenList" :label="child.childCode" :key="child.childCode" @change="handleRadioChange(radio.name,child.childCode)">{{ child.childName }}</el-radio>
+            </el-radio-group>
+          </el-col>
+        </el-row>
+      </div>
+    </template>
   </el-form>
 </template>
 <script>
 import { sysDataSelect } from '@/api/sysconfig'
+import { getRoleDataBySysCodes } from '@/api/role'
 export default {
   data: function() {
     return {
+      radio: '',
+      checkedApplications: [],
+      radioData: [],
       options: {},
       form: {},
       formRules: {
-        SysCode: [{ required: true, trigger: 'change', message: '系统为必填项' }],
         EmailAddress: [{ required: true, trigger: 'change', message: '邮箱为必填项' }],
         PhoneNumber: [{ required: true, trigger: 'change', message: '手机号为必填项' }],
         UserName: [{ required: true, trigger: 'blur', message: '用户名为必填项' }, { max: 20, message: '输入内容最大长度为20', trigger: 'blur' }]
@@ -68,6 +80,16 @@ export default {
       sysDataSelect().then(response => {
         this.options = response.Data
       })
+    },
+    // 系统修改刷新数据
+    handlecheckedAppChange(val) {
+      getRoleDataBySysCodes(val).then(response => {
+        this.radioData = response.Data
+      })
+    },
+    // 单选按钮的修改事件
+    handleRadioChange(name, code) {
+      console.log(name, code)
     }
   }
 }

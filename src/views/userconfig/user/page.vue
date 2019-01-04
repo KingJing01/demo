@@ -19,7 +19,7 @@
       </el-form-item>
       <el-form-item label="登录名">
         <el-input
-          v-model="search.roleName"
+          v-model="search.userName"
           placeholder="用户名/邮箱/手机号"
         />
       </el-form-item>

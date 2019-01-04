@@ -203,7 +203,7 @@ export default {
       multipleSelection: [],
       formRules: {
         sysCode: [{ required: true, trigger: 'change', message: '系统为必填项' }],
-        setMealName: [{ required: true, trigger: 'blur', message: '套餐名为必填项' }, { max: 20, message: '输入内容最大长度为20', trigger: 'blur' }]
+        setMealName: [{ required: true, trigger: 'blur', message: '套餐名为必填项' }]
       }
     }
   },

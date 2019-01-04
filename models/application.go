@@ -236,8 +236,12 @@ func CountApplicationInfo(sysCode string, sysName string) (total int64) {
 }
 
 // 获取下拉框数据
-func GetSelectData() (sysInfo []out.SysInfo) {
+func GetSelectData(tenantID int64) (sysInfo []out.SysInfo) {
 	o := orm.NewOrm()
-	o.Raw("select SysCode sys_code,SysName sys_name from application where IsValid = 0 ").QueryRows(&sysInfo)
+	if tenantID == 0 {
+		o.Raw("select SysCode sys_code,SysName sys_name from application where IsValid = 0 ").QueryRows(&sysInfo)
+	} else {
+		o.Raw("select t1.SysCode sys_code ,t2.SysName sys_name from tenantapplication t1 LEFT JOIN application t2 on t1.SysCode = t2.SysCode where t1.TenantId = ? and t2.IsValid=0 ", tenantID).QueryRows(&sysInfo)
+	}
 	return sysInfo
 }

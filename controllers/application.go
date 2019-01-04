@@ -191,8 +191,10 @@ func (c *ApplicationController) CheckRepeat() {
 // @Success 200  get success!
 // @router /getSelectData [post]
 func (c *ApplicationController) GetSelectData() {
+	originToken := c.Ctx.Request.Header.Get("Authorization")
+	_, tenantID, _, _ := tool.GetInfoFromToken(originToken)
 	result := &out.OperResult{}
-	if sysInfo := models.GetSelectData(); len(sysInfo) > 0 {
+	if sysInfo := models.GetSelectData(tenantID); len(sysInfo) > 0 {
 		result.Result = 1
 		result.Data = sysInfo
 		c.Data["json"] = result

@@ -235,7 +235,7 @@ func CountApplicationInfo(sysCode string, sysName string) (total int64) {
 	return total
 }
 
-// 获取下拉框数据
+//GetSelectData 获取下拉框数据
 func GetSelectData(tenantID int64) (sysInfo []out.SysInfo) {
 	o := orm.NewOrm()
 	if tenantID == 0 {

@@ -61,6 +61,18 @@ func AddUser(m *User, selectData []map[string]interface{}, tenantID int64) (id i
 		o.Rollback()
 		return 0, err
 	}
+	userrole := Userrole{}
+	userrole.CreationTime = time.Now()
+	userrole.TenantId = tenantID
+	m.SsoID = ssoID
+	for code, value := range selectData {
+		sysCode := strconv.Itoa(code)
+		m.SysCode = sysCode
+		userrole.SysCode = sysCode
+		userrole.RoleId = value[sysCode].(int)
+		o.Insert(userrole)
+		id, err = o.Insert(m)
+	}
 	m.SsoID = ssoID
 	id, err = o.Insert(m)
 	if err != nil {

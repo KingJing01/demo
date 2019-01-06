@@ -104,6 +104,7 @@ func ParseCheckRadioData(data []out.ComponentData) (result []map[string]interfac
 	for _, x := range data {
 		mapResult := make(map[string]interface{})
 		mapResult["name"] = x.ParentName
+		mapResult["key"] = x.ParentKey
 		// 中文权限拆为数组
 		displayArr := strings.Split(x.ChildName, ",")
 		// 缩写权限 拆为数组

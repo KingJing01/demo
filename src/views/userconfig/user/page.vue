@@ -155,11 +155,9 @@
   </div>
 </template>
 <script>
-import { getUserList, updateUserValidStatus, deleteUser } from '@/api/user'
-import { addSetMealInfo, updateSetMealInfo } from '@/api/setmeal'
+import { getUserList, updateUserInfo, addUserInfo, updateUserValidStatus, deleteUser } from '@/api/user'
 import { sysDataSelect } from '@/api/sysconfig'
-import { getPerInfoBySysCode, getPerInfoBySysCodeUpdate } from '@/api/permission'
-import { transPermissionCheckedData } from '@/api/utils'
+import { getPerInfoBySysCodeUpdate } from '@/api/permission'
 
 import DetailPage from './dialogview/detail'
 import SavePage from './dialogview/save'
@@ -239,88 +237,40 @@ export default {
     },
     // 保存系统信息
     saveData() {
-      this.$refs.mealForm.validate(valid => {
-        if (valid) {
-          var transData = transPermissionCheckedData(this.authData)
-          if (transData.perName === '') {
-            this.$message({
-              message: '请选择操作权限',
-              type: 'warning'
+      this.$refs.userData.validData()
+      const valid = this.form.valid
+      debugger
+      if (valid) {
+        if (this.dialogInfoVisable === false) {
+          // 新增操作
+          if (this.type === 'insert') {
+            addUserInfo(this.form.formData).then(response => {
+              if (response.Result === 0) {
+                this.$message.error(response.Message)
+              } else {
+                this.dialogFormVisible = false
+                this.getList()
+              }
             })
-            return false
-          }
-          this.form.perId = transData.perId
-          this.form.perName = transData.perName
-          if (this.dialogInfoVisable === false) {
-            // 新增操作
-            if (this.type === 'insert') {
-              addSetMealInfo(this.form).then(response => {
-                if (response.Result === 0) {
-                  this.$message.error(response.Message)
-                } else {
-                  this.dialogFormVisible = false
-                  this.getList()
-                }
-              })
-            } else {
-              updateSetMealInfo(this.form).then(response => {
-                if (response.Result === 0) {
-                  this.$message.error(response.Message)
-                } else {
-                  this.dialogFormVisible = false
-                  this.getList()
-                }
-              })
-            }
           } else {
-            console.log('修改信息')
+            updateUserInfo(this.form).then(response => {
+              if (response.Result === 0) {
+                this.$message.error(response.Message)
+              } else {
+                this.dialogFormVisible = false
+                this.getList()
+              }
+            })
           }
+        } else {
+          console.log('修改信息')
         }
-      })
-    },
-    // 系统信息验重
-    checkRepeat() {
-      console.log('修改信息')
+      }
     },
     // dialog 取消按钮
     handleCancle() {
       this.dialogFormVisible = false
       this.dialogInfoVisable = false
-    },
-    // 绑定 系统下拉的值修改事件
-    changeSysSelect(val) {
-      getPerInfoBySysCode(val).then(response => {
-        this.authData = response.Data
-      })
-    },
-    onChangeTop(index, topId, e) { // 父级change事件
-      this.authData[index].mychecked = e// 父级勾选后，子级全部勾选或者取消
-      if (e === false) this.authData[index].indeterminate = false // 去掉不确定状态
-      var childrenArray = this.authData[index].childrenList
-      if (childrenArray) {
-        for (var i = 0, len = childrenArray.length; i < len; i++) { childrenArray[i].mychecked = e }
-      }
-    },
-    onChangeSon(topIndex, sonId, topId, e) { // 子级change事件
-      var childrenArray = this.authData[topIndex].childrenList
-      var tickCount = 0
-      var unTickCount = 0
-      var len = childrenArray.length
-      for (var i = 0; i < len; i++) {
-        if (sonId === childrenArray[i].permissionId) childrenArray[i].mychecked = e
-        if (childrenArray[i].mychecked === true) tickCount++
-        if (childrenArray[i].mychecked === false) unTickCount++
-      }
-      if (tickCount === len) { // 子级全勾选
-        this.authData[topIndex].mychecked = true
-        this.authData[topIndex].indeterminate = false
-      } else if (unTickCount === len) { // 子级全不勾选
-        this.authData[topIndex].mychecked = false
-        this.authData[topIndex].indeterminate = false
-      } else {
-        this.authData[topIndex].mychecked = true
-        this.authData[topIndex].indeterminate = true // 添加不确定状态
-      }
     },
     // 表格选择框的改变事件 监听
     selectChangeFun(selection) {
@@ -330,19 +280,12 @@ export default {
       }
       this.multipleSelection = data
     },
-    // 批量禁用套餐
-    handleDeleteSetMeal() {
-      deleteUser(this.multipleSelection.toString()).then(response => {
-        this.getList()
-      })
-    },
-
     // 监听dialog的关闭事件
     handleCloseDialog() {
       this.form = {}
       this.authData = []
       this.type = 'insert'
-      this.$refs['mealForm'].resetFields()
+      this.$refs['userData'].resetFields()
     },
     // 监听dialog的打开事件
     handleOpenDialog() {

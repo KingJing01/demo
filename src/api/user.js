@@ -11,27 +11,24 @@ export function getUserList(info) {
     params: info
   })
 }
-// 新增角色信息
+// 新增用户信息
 export function addUserInfo(info) {
   return request({
     url: '/user',
     method: 'post',
     data: {
-      'roleName': info.roleName,
-      'perId': info.perId,
-      'perName': info.perName,
-      'sysCode': info.sysCode
+      info
     }
   })
 }
-// 删除角色信息
+// 删除用户信息
 export function deleteUser(ids) {
   return request({
     url: '/user/' + ids,
     method: 'delete'
   })
 }
-// 更新角色信息
+// 更新用户信息
 export function updateUserInfo(info) {
   return request({
     url: '/user',

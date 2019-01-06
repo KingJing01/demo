@@ -1,5 +1,5 @@
 <template>
-  <el-form ref="mealForm" :model="form" :rules="formRules" size="small" label-width="100px">
+  <el-form ref="userForm" :model="form" :rules="formRules" size="small" label-width="100px">
     <el-form-item
       label="登录名"
       prop="UserName"
@@ -39,32 +39,33 @@
     </el-form-item>
     <template>
       <div v-for="(radio, topIndex) in radioData" :key="topIndex">
-        <el-row>
-          <el-col :span="6">
-            <el-form-item
-              :label="radio.name"
-          /></el-col>
-          <el-col :span="18">
-            <el-radio-group v-model="radio.name">
-              <el-radio v-for="child in radio.childrenList" :label="child.childCode" :key="child.childCode" @change="handleRadioChange(radio.name,child.childCode)">{{ child.childName }}</el-radio>
-            </el-radio-group>
-          </el-col>
-        </el-row>
-      </div>
-    </template>
-  </el-form>
-</template>
+        <el-form-item :label="radio.name" prop="resource">
+          <el-radio-group v-model="radio.data">
+            <el-radio v-for="child in radio.childrenList" :label="child.childCode" :key="child.childCode" @change="handleRadioChange(radio.name,child.childCode)">{{ child.childName }}</el-radio>
+          </el-radio-group>
+        </el-form-item>
+
+    </div></template>
+</el-form></template>
 <script>
 import { sysDataSelect } from '@/api/sysconfig'
 import { getRoleDataBySysCodes } from '@/api/role'
 export default {
+  props: {
+    data: {
+      type: Object,
+      default: null
+    }
+  },
   data: function() {
     return {
       radio: '',
       checkedApplications: [],
       radioData: [],
       options: {},
-      form: {},
+      form: {
+        selectData: new Map()
+      },
       formRules: {
         EmailAddress: [{ required: true, trigger: 'change', message: '邮箱为必填项' }],
         PhoneNumber: [{ required: true, trigger: 'change', message: '手机号为必填项' }],
@@ -90,6 +91,17 @@ export default {
     // 单选按钮的修改事件
     handleRadioChange(name, code) {
       console.log(name, code)
+      this.form.selectData.set(name, code)
+      debugger
+      this.data.formData = this.form
+    },
+    validData() {
+      this.$refs.userForm.validate(valid => {
+        this.data.valid = valid
+      })
+    },
+    cancleValid() {
+      this.$refs['userForm'].resetFields()
     }
   }
 }

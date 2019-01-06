@@ -73,7 +73,7 @@ func AddTenant(m *Tenant, syScode []string, perId []string, perMenu []string, us
 	user := User{}
 	user.CreationTime = currTime
 	user.CreatorUserId = userID
-	user.SsoID = int(ssoId)
+	user.SsoID = int64(ssoId)
 	user.EmailAddress = m.Email
 	user.PhoneNumber = m.LinkPhone
 	user.TenantId = m.Id

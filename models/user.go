@@ -33,7 +33,7 @@ type User struct {
 	PhoneNumber            string    `orm:"column(PhoneNumber);size(32);null"`
 	TenantId               int64     `orm:"column(TenantId);null"`
 	SysCode                string    `orm:"column(SysCode)"`
-	SsoID                  int       `orm:"column(SsoId)"`
+	SsoID                  int64     `orm:"column(SsoId)"`
 	UserUrl                string    `orm:"column(UserUrl)"`
 }
 
@@ -47,10 +47,21 @@ func init() {
 
 // AddUser insert a new User into database and returns
 // last inserted Id on success.
-func AddUser(m *User, selectData []interface{}, tenantID int64) (id int64, err error) {
+func AddUser(m *User, selectData []map[string]interface{}, tenantID int64) (id int64, err error) {
 	o := orm.NewOrm()
 	o.Begin()
-	m.TenantId = tenantID
+	//新增一个ssouer
+	ssoUser := SsoUser{}
+	ssoUser.Passwd = "123456"
+	ssoUser.Phone = m.PhoneNumber
+	ssoUser.Email = m.EmailAddress
+	ssoID, err := o.Insert(&ssoUser)
+	if err != nil {
+		//回滚
+		o.Rollback()
+		return 0, err
+	}
+	m.SsoID = ssoID
 	id, err = o.Insert(m)
 	if err != nil {
 		return 0, err
@@ -185,7 +196,7 @@ func LoginCheck(username string, password string, SysCode string) (result bool, 
 	return true, user, nil
 }
 
-func RegistUser(loginInfo *input.LoginInfo, SysCode string) (ssoId int, err error) {
+func RegistUser(loginInfo *input.LoginInfo, SysCode string) (ssoId int64, err error) {
 	o := orm.NewOrm()
 	o.Begin()
 	ssoUser := new(SsoUser)

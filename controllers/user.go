@@ -40,7 +40,7 @@ func (c *UserController) Post() {
 	var v models.User
 	var mystruct map[string]interface{}
 	json.Unmarshal(c.Ctx.Input.RequestBody, &mystruct)
-	selectData := mystruct["selectData"].([]interface{})
+	selectData := mystruct["selectData"].([]map[string]interface{})
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 		v.CreatorUserId = userID
 		v.CreationTime = time.Now()

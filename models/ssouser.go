@@ -10,7 +10,7 @@ import (
 )
 
 type SsoUser struct {
-	Id     int    `orm:"column(Id);auto"`
+	Id     int64  `orm:"column(Id);auto"`
 	Phone  string `orm:"column(Phone);size(20)"`
 	Passwd string `orm:"column(Passwd);size(45)"`
 	Email  string `orm:"column(Email);size(50)"`
@@ -34,7 +34,7 @@ func AddSsoUser(m *SsoUser) (id int64, err error) {
 
 // GetSsouserById retrieves Ssouser by Id. Returns error if
 // Id doesn't exist
-func GetSsouserById(id int) (v *SsoUser, err error) {
+func GetSsouserById(id int64) (v *SsoUser, err error) {
 	o := orm.NewOrm()
 	v = &SsoUser{Id: id}
 	if err = o.Read(v); err == nil {
@@ -138,7 +138,7 @@ func UpdateSsouserById(m *SsoUser) (err error) {
 
 // DeleteSsoUser deletes Ssouser by Id and returns error if
 // the record to be deleted doesn't exist
-func DeleteSsoUser(id int) (err error) {
+func DeleteSsoUser(id int64) (err error) {
 	o := orm.NewOrm()
 	v := SsoUser{Id: id}
 	// ascertain id exists in the database

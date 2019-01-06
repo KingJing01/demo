@@ -28,7 +28,6 @@
       />
     </el-form-item>
     <el-form-item
-      prop="SysCode"
       label="系统名称"
     >
       <template>
@@ -41,7 +40,7 @@
       <div v-for="(radio, topIndex) in radioData" :key="topIndex">
         <el-form-item :label="radio.name" prop="resource">
           <el-radio-group v-model="radio.data">
-            <el-radio v-for="child in radio.childrenList" :label="child.childCode" :key="child.childCode" @change="handleRadioChange(radio.name,child.childCode)">{{ child.childName }}</el-radio>
+            <el-radio v-for="child in radio.childrenList" :label="child.childCode" :key="child.childCode" @change="handleRadioChange(radio.key,child.childCode)">{{ child.childName }}</el-radio>
           </el-radio-group>
         </el-form-item>
 

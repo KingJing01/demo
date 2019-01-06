@@ -285,7 +285,7 @@ export default {
       this.form = {}
       this.authData = []
       this.type = 'insert'
-      this.$refs['userData'].resetFields()
+      this.$refs['userData'].cancleValid()
     },
     // 监听dialog的打开事件
     handleOpenDialog() {

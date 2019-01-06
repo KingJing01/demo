@@ -70,7 +70,6 @@ func AddUser(m *User, selectData []map[string]interface{}, tenantID int64) (id i
 		m.SysCode = sysCode
 		userrole.SysCode = sysCode
 		userrole.RoleId = value[sysCode].(int)
-		o.Insert(userrole)
 		id, err = o.Insert(m)
 	}
 	m.SsoID = ssoID

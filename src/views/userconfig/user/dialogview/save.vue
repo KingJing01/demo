@@ -92,7 +92,6 @@ export default {
     handleRadioChange(name, code) {
       console.log(name, code)
       this.form.selectData.set(name, code)
-      debugger
       this.data.formData = this.form
     },
     validData() {

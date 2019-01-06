@@ -31,7 +31,7 @@ type User struct {
 	UserName               string    `orm:"column(UserName);size(32)"`
 	PasswordResetCode      string    `orm:"column(PasswordResetCode);size(328);null"`
 	PhoneNumber            string    `orm:"column(PhoneNumber);size(32);null"`
-	TenantId               int       `orm:"column(TenantId);null"`
+	TenantId               int64     `orm:"column(TenantId);null"`
 	SysCode                string    `orm:"column(SysCode)"`
 	SsoID                  int       `orm:"column(SsoId)"`
 	UserUrl                string    `orm:"column(UserUrl)"`
@@ -47,9 +47,15 @@ func init() {
 
 // AddUser insert a new User into database and returns
 // last inserted Id on success.
-func AddUser(m *User) (id int64, err error) {
+func AddUser(m *User, selectData []interface{}, tenantID int64) (id int64, err error) {
 	o := orm.NewOrm()
+	o.Begin()
+	m.TenantId = tenantID
 	id, err = o.Insert(m)
+	if err != nil {
+		return 0, err
+	}
+	o.Commit()
 	return
 }
 

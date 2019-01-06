@@ -15,7 +15,7 @@ type Userrole struct {
 	CreationTime  time.Time `orm:"column(CreationTime);type(datetime)"`
 	CreatorUserId int64     `orm:"column(CreatorUserId);null"`
 	RoleId        int       `orm:"column(RoleId)"`
-	TenantId      int       `orm:"column(TenantId);null"`
+	TenantId      int64     `orm:"column(TenantId);null"`
 	UserId        int64     `orm:"column(UserId)"`
 	SysCode       string    `orm:"column(SysCode);size(20);null"`
 }

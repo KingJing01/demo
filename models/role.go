@@ -296,7 +296,7 @@ func GetRoleBySysCode(sysCode string, tenantID int64) (data []out.ComponentData,
 	}
 	length := len(param) - 1
 	params := param[0:length]
-	var sql = `select t.SysCode parent_key,t1.SysName parent_name, group_concat(t.RoleCode) child_key,group_concat(t.RoleName) child_name from role t left join application t1 on t.SysCode = t1.SysCode
+	var sql = `select t.SysCode parent_key,t1.SysName parent_name, group_concat(t.Id) child_key,group_concat(t.RoleName) child_name from role t left join application t1 on t.SysCode = t1.SysCode
 		where  t.tenantId = ? and t.isValid = 0 and t.isDeleted = 0 and t.SysCode in ( ` + params + ") group by t.SysCode"
 	o := orm.NewOrm()
 	_, err = o.Raw(sql, tenantID).QueryRows(&data)

@@ -10,7 +10,7 @@ import (
 )
 
 type Tenant struct {
-	Id                   int       `orm:"column(Id);auto"`
+	Id                   int64     `orm:"column(Id);auto"`
 	TenantName           string    `orm:"column(TenantName);size(64)"`
 	TenantAddress        string    `orm:"column(TenantAddress);size(200)"`
 	OrganizationCode     string    `orm:"column(OrganizationCode);size(45)"`
@@ -131,7 +131,7 @@ func AddTenant(m *Tenant, syScode []string, perId []string, perMenu []string, us
 
 // GetTenantById retrieves Tenant by Id. Returns error if
 // Id doesn't exist
-func GetTenantById(id int) (v *Tenant, err error) {
+func GetTenantById(id int64) (v *Tenant, err error) {
 	o := orm.NewOrm()
 	v = &Tenant{Id: id}
 	//v.IsDeleted = 0
@@ -143,7 +143,7 @@ func GetTenantById(id int) (v *Tenant, err error) {
 
 // UpdateTenant updates Tenant by Id and returns error if
 // the record to be updated doesn't exist
-func UpdateTenantById(m *Tenant, sysCode string, perIdStr string, perMenu string, tenId int, userID int64) (err error) {
+func UpdateTenantById(m *Tenant, sysCode string, perIdStr string, perMenu string, tenId int64, userID int64) (err error) {
 	o := orm.NewOrm()
 	o.Begin()
 	v := Tenant{Id: tenId}
@@ -169,7 +169,7 @@ func UpdateTenantById(m *Tenant, sysCode string, perIdStr string, perMenu string
 
 // DeleteTenant deletes Tenant by Id and returns error if
 // the record to be deleted doesn't exist
-func DeleteTenant(id int, userID int64) (err error) {
+func DeleteTenant(id int64, userID int64) (err error) {
 	o := orm.NewOrm()
 	v := Tenant{Id: id}
 	// ascertain id exists in the database
@@ -221,7 +221,7 @@ func CountTenantInfo(tenantName string, sysName string) (total int64) {
 }
 
 // 获取企业所拥有的所有权限
-func GetPerInfoForTenant(sysCode string, tenantId int) (result []out.PermissionCheckInfo, err error) {
+func GetPerInfoForTenant(sysCode string, tenantId int64) (result []out.PermissionCheckInfo, err error) {
 	o := orm.NewOrm()
 	_, err = o.Raw(`SELECT t5.DisplayName display_name ,t5.NAME name,GROUP_CONCAT(t5.perName) code_name,	GROUP_CONCAT(t5.perId) code,GROUP_CONCAT(t5.flag) flag
 	FROM (SELECT t3.DisplayName, t3.MenuCode as NAME,t1.DisplayName perName,t1. NAME perId,CASE 	WHEN t2. NAME IS NULL THEN 	0 ELSE 1 END flag
@@ -233,7 +233,7 @@ func GetPerInfoForTenant(sysCode string, tenantId int) (result []out.PermissionC
 }
 
 // 更新权限信息
-func UpdateTenantPermission(sysCode string, perIdStr string, perMenu string, tenID int, ownerID int64) (err error) {
+func UpdateTenantPermission(sysCode string, perIdStr string, perMenu string, tenID int64, ownerID int64) (err error) {
 	err = DeleteTenatPermssion(sysCode, tenID)
 	if err != nil {
 		return err
@@ -250,7 +250,7 @@ func UpdateTenantPermission(sysCode string, perIdStr string, perMenu string, ten
 }
 
 //新增套餐已经勾选的信息
-func InsertTenantPermission(sysCode string, perIdStr string, tenId int, ownerID int64) (err error) {
+func InsertTenantPermission(sysCode string, perIdStr string, tenId int64, ownerID int64) (err error) {
 	arr := strings.Split(perIdStr, ",")
 	var param string
 	for _, x := range arr {
@@ -267,7 +267,7 @@ func InsertTenantPermission(sysCode string, perIdStr string, tenId int, ownerID 
 }
 
 //删除原先配置的权限信息
-func DeleteTenatPermssion(sysCode string, tenId int) (err error) {
+func DeleteTenatPermssion(sysCode string, tenId int64) (err error) {
 	o := orm.NewOrm()
 	_, err = o.Raw("DELETE FROM	permission WHERE TenantId = ? and SysCode=? and RoleId=0 ", tenId, sysCode).Exec()
 	return err

@@ -3,9 +3,11 @@ package controllers
 import (
 	"demo/models"
 	out "demo/outmodels"
+	tool "demo/tools"
 	tools "demo/tools"
 	"encoding/json"
 	"strconv"
+	"time"
 
 	"github.com/astaxie/beego"
 )
@@ -33,9 +35,16 @@ func (c *UserController) URLMapping() {
 // @Failure 403 body is empty
 // @router / [post]
 func (c *UserController) Post() {
+	originToken := c.Ctx.Request.Header.Get("Authorization")
+	_, tenantID, userID, _ := tool.GetInfoFromToken(originToken)
 	var v models.User
+	var mystruct map[string]interface{}
+	json.Unmarshal(c.Ctx.Input.RequestBody, &mystruct)
+	selectData := mystruct["selectData"].([]interface{})
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
-		if _, err := models.AddUser(&v); err == nil {
+		v.CreatorUserId = userID
+		v.CreationTime = time.Now()
+		if _, err := models.AddUser(&v, selectData, tenantID); err == nil {
 			c.Ctx.Output.SetStatus(201)
 			c.Data["json"] = v
 		} else {

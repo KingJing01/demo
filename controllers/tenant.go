@@ -71,7 +71,7 @@ func (c *TenantController) Post() {
 func (c *TenantController) GetOne() {
 	result := &out.OperResult{}
 	idStr := c.Ctx.Input.Param(":id")
-	id, _ := strconv.Atoi(idStr)
+	id, _ := strconv.ParseInt(idStr, 10, 64)
 	v, err := models.GetTenantById(id)
 	if err != nil {
 		result.Result = 0
@@ -149,7 +149,7 @@ func (c *TenantController) Put() {
 	originToken := c.Ctx.Request.Header.Get("Authorization")
 	_, _, userID, _ := tool.GetInfoFromToken(originToken)
 	idStr := c.Ctx.Input.Param(":id")
-	id, _ := strconv.Atoi(idStr)
+	id, _ := strconv.ParseInt(idStr, 10, 64)
 	v := models.Tenant{Id: id}
 	var mystruct map[string]interface{}
 	json.Unmarshal(c.Ctx.Input.RequestBody, &mystruct)
@@ -186,7 +186,7 @@ func (c *TenantController) Delete() {
 	originToken := c.Ctx.Request.Header.Get("Authorization")
 	_, _, userID, _ := tool.GetInfoFromToken(originToken)
 	idStr := c.Ctx.Input.Param(":id")
-	id, _ := strconv.Atoi(idStr)
+	id, _ := strconv.ParseInt(idStr, 10, 64)
 	if err := models.DeleteTenant(id, userID); err == nil {
 		result.Result = 1
 		c.Data["json"] = result
@@ -209,7 +209,7 @@ func (c *TenantController) GetTenantPermission() {
 	result := &out.OperResult{}
 	sysCode := c.GetString("sysCode")
 	idStr := c.GetString("tenId")
-	id, _ := strconv.Atoi(idStr)
+	id, _ := strconv.ParseInt(idStr, 10, 64)
 	v, err := models.GetPerInfoForTenant(sysCode, id)
 	if err != nil {
 		result.Result = 0

@@ -35,6 +35,7 @@ func (c *UserController) URLMapping() {
 // @Failure 403 body is empty
 // @router / [post]
 func (c *UserController) Post() {
+	result := &out.OperResult{}
 	originToken := c.Ctx.Request.Header.Get("Authorization")
 	_, tenantID, userID, _ := tool.GetInfoFromToken(originToken)
 	var v models.User
@@ -46,13 +47,17 @@ func (c *UserController) Post() {
 		v.CreatorUserId = userID
 		v.CreationTime = time.Now()
 		if _, err := models.AddUser(&v, roleIds, sysCodes, tenantID, userID); err == nil {
-			c.Ctx.Output.SetStatus(201)
-			c.Data["json"] = v
+			result.Result = 1
+			c.Data["json"] = result
 		} else {
-			c.Data["json"] = err.Error()
+			result.Result = 0
+			result.Message = err.Error()
+			c.Data["json"] = result
 		}
 	} else {
-		c.Data["json"] = err.Error()
+		result.Result = 0
+		result.Message = err.Error()
+		c.Data["json"] = result
 	}
 	c.ServeJSON()
 }
@@ -65,13 +70,18 @@ func (c *UserController) Post() {
 // @Failure 403 :id is empty
 // @router /:id [get]
 func (c *UserController) GetOne() {
+	result := &out.OperResult{}
 	idStr := c.Ctx.Input.Param(":id")
 	id, _ := strconv.ParseInt(idStr, 10, 64)
 	v, err := models.GetUserById(id)
 	if err != nil {
-		c.Data["json"] = err.Error()
+		result.Data = v
+		result.Result = 1
+		c.Data["json"] = result
 	} else {
-		c.Data["json"] = v
+		result.Result = 0
+		result.Message = err.Error()
+		c.Data["json"] = result
 	}
 	c.ServeJSON()
 }

@@ -99,11 +99,12 @@ func AddUser(m *User, roleIds []string, sysCodes []string, tenantID int64, userI
 // Id doesn't exist
 func GetUserById(id int64) (v *User, err error) {
 	o := orm.NewOrm()
-	v = &User{Id: id}
-	if err = o.Read(v); err == nil {
-		return v, nil
+	err = o.Raw(`select t1.Id,t1.UserName,t1.PhoneNumber,t1.EmailAddress,t1.SysCode,t3.RoleName,t2.RoleId from user t1 left join userrole
+	 t2 on t1.Id = t2.UserId left join role t3 on t2.RoleId = t3.id where t1.id= ?`, id).QueryRow(&v)
+	if err != nil {
+		return nil, err
 	}
-	return nil, err
+	return v, err
 }
 
 // GetAllUser retrieves all User matches certain condition. Returns empty list if

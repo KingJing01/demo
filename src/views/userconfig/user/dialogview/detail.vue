@@ -72,7 +72,6 @@ export default {
   created() {
     this.getSysList()
     this.getUserInfoById()
-    this
   },
   methods: {
     // 获取系统下拉数据

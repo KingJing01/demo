@@ -137,7 +137,7 @@
     > <h4 v-if="type==='detail'" slot="title">用户详情</h4>
       <h4 v-else-if="type==='update'" slot="title">修改用户</h4>
       <h4 v-else slot="title">新增用户</h4>
-      <div v-if="type==='detail'"><DetailPage :data="form"/></div>
+      <div v-if="type==='detail'"><DetailPage ref="userData" :data="form"/></div>
       <div v-else-if="type==='update'"><UpdatePage ref="userData" :data="form"/></div>
       <div v-else><SavePage ref="userData" :data="form"/></div>
       <div
@@ -158,7 +158,6 @@
 <script>
 import { getUserList, updateUserInfo, addUserInfo, updateUserValidStatus, deleteUser } from '@/api/user'
 import { sysDataSelect } from '@/api/sysconfig'
-import { getPerInfoBySysCodeUpdate } from '@/api/permission'
 
 import DetailPage from './dialogview/detail'
 import SavePage from './dialogview/save'
@@ -177,7 +176,6 @@ export default {
       dialogTableVisible: false,
       dialogFormVisible: false,
       formLabelWidth: '100px',
-      dialogInfoVisable: false,
       options: [],
       authData: [],
       multipleSelection: [],
@@ -199,13 +197,7 @@ export default {
     handleClick(row) {
       this.type = 'update'
       this.dialogFormVisible = true
-      this.form.setMealName = row.SetMealName
-      this.form.setMealCode = row.SetMealCode
-      this.form.sysCode = row.SysCode
-      this.form.id = row.Id
-      getPerInfoBySysCodeUpdate(row.SysCode, row.SetMealCode).then(response => {
-        this.authData = response.Data
-      })
+      this.form.Id = row.Id
     },
     // 获取列表数据
     getList() {
@@ -215,14 +207,12 @@ export default {
       })
     },
     handleClose(done) {
-      this.dialogInfoVisable = false
       done()
     },
 
     // 重置按钮
     onReset() {
       this.search = { pageSize: 5, offset: 0 }
-      this.dialogInfoVisable = false
       this.getList()
     },
     handleSizeChange(val) {
@@ -240,31 +230,26 @@ export default {
     saveData() {
       this.$refs.userData.validData()
       const valid = this.form.valid
-      debugger
       if (valid) {
-        if (this.dialogInfoVisable === false) {
-          // 新增操作
-          if (this.type === 'insert') {
-            addUserInfo(this.form.formData).then(response => {
-              if (response.Result === 0) {
-                this.$message.error(response.Message)
-              } else {
-                this.dialogFormVisible = false
-                this.getList()
-              }
-            })
-          } else {
-            updateUserInfo(this.form).then(response => {
-              if (response.Result === 0) {
-                this.$message.error(response.Message)
-              } else {
-                this.dialogFormVisible = false
-                this.getList()
-              }
-            })
-          }
+        // 新增操作
+        if (this.type === 'insert') {
+          addUserInfo(this.form.formData).then(response => {
+            if (response.Result === 0) {
+              this.$message.error(response.Message)
+            } else {
+              this.dialogFormVisible = false
+              this.getList()
+            }
+          })
         } else {
-          console.log('修改信息')
+          updateUserInfo(this.form.formData).then(response => {
+            if (response.Result === 0) {
+              this.$message.error(response.Message)
+            } else {
+              this.dialogFormVisible = false
+              this.getList()
+            }
+          })
         }
       }
     },

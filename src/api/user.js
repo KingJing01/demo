@@ -36,7 +36,7 @@ export function deleteUser(ids) {
 // 更新用户信息
 export function updateUserInfo(info) {
   return request({
-    url: '/user',
+    url: '/user/' + info.Id,
     method: 'put',
     data: info
   })

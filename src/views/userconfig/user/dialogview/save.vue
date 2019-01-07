@@ -84,7 +84,7 @@ export default {
     },
     // 系统修改刷新数据
     handlecheckedAppChange(val) {
-      getRoleDataBySysCodes(val).then(response => {
+      getRoleDataBySysCodes(val.join(',')).then(response => {
         this.radioData = response.Data
       })
     },

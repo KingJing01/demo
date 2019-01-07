@@ -298,11 +298,7 @@ export default {
     handleRowClick(row, event) {
       this.type = 'detail'
       this.dialogFormVisible = true
-      this.form.setMealName = row.SetMealName
-      this.form.sysName = row.SysName
-      getPerInfoBySysCodeUpdate(row.SysCode, row.SetMealCode).then(response => {
-        this.authData = response.Data
-      })
+      this.form.Id = row.Id
     },
     // 表格按钮切换事件
     handleSwitchChange(row, index) {

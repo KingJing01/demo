@@ -44,11 +44,17 @@ export function updateUserInfo(info) {
 
 // 更新用户有效状态 updateUserValidStatus
 export function updateUserValidStatus(info) {
-  debugger
   return request({
     url: '/user/updateUserValidStatus/' + info.Id,
     method: 'put',
     data: info.IsValid
+  })
+}
+// 获取单个用户信息
+export function getUserInfoById(id) {
+  return request({
+    url: '/user/' + id,
+    method: 'get'
   })
 }
 

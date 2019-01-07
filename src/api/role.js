@@ -55,7 +55,7 @@ export function getRoleDataBySysCodes(info) {
     url: '/role/getRoleBySysCode',
     method: 'get',
     params: {
-      sysCode: info.join(',')
+      sysCode: info
     }
   })
 }

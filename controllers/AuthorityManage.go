@@ -221,7 +221,7 @@ func (c *AuthorityManageController) GetUserInfo() {
 	}
 	tmp := strconv.FormatFloat(claims["jti"].(float64), 'f', -1, 64)
 	userid, _ := strconv.ParseInt(tmp, 10, 64)
-	u, _ := models.GetUserById(userid)
+	u, _ := models.GetUserByID(userid)
 	permissions, _ := models.GetPermissionByUser(userid, sysCode)
 	var arrPermission []string
 	for _, v := range permissions {

@@ -73,8 +73,8 @@ func (c *UserController) GetOne() {
 	result := &out.OperResult{}
 	idStr := c.Ctx.Input.Param(":id")
 	id, _ := strconv.ParseInt(idStr, 10, 64)
-	v, err := models.GetUserById(id)
-	if err != nil {
+	v, err := models.GetUserByID(id)
+	if err == nil {
 		result.Data = v
 		result.Result = 1
 		c.Data["json"] = result

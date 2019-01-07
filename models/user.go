@@ -4,7 +4,6 @@ import (
 	input "demo/inputmodels"
 	out "demo/outmodels"
 	"errors"
-	"fmt"
 	"reflect"
 	"strconv"
 	"strings"
@@ -185,16 +184,30 @@ func GetAllUser(query map[string]string, fields []string, sortby []string, order
 	return nil, err
 }
 
-// UpdateUser updates User by Id and returns error if
+// UpdateUserByID updates User by Id and returns error if
 // the record to be updated doesn't exist
-func UpdateUserById(m *User) (err error) {
+func UpdateUserByID(m *User, roleIds string, userID int64) (err error) {
 	o := orm.NewOrm()
-	v := User{Id: m.Id}
-	// ascertain id exists in the database
-	if err = o.Read(&v); err == nil {
-		var num int64
-		if num, err = o.Update(m); err == nil {
-			fmt.Println("Number of records updated in database:", num)
+	var maps []orm.Params
+	o.Raw(`select count(0) total from (select t.Id from user t  where t.SsoId =(select SsoId from user where Id = ?) and t.Id != ? and t.IsDeleted=0 and t.IsValid=0) t3
+	left join userrole t2 on t2.UserId = t3.Id where t2.SysCode =?`, m.Id, m.Id, m.SysCode).Values(&maps)
+	total, _ := strconv.ParseInt(maps[0]["total"].(string), 10, 64)
+	if total > 0 {
+		return errors.New("当前系统下已有角色,无法修改")
+	} else {
+		v := &User{Id: m.Id}
+		if err = o.Read(v); err == nil {
+			m.CreationTime = v.CreationTime
+			m.CreatorUserId = v.CreatorUserId
+			m.TenantId = v.TenantId
+			m.SsoID = v.SsoID
+			m.LastModificationTime = time.Now()
+			m.LastModifierUserId = userID
+			_, err = o.Update(m)
+			_, err = o.Raw("update userrole set RoleId=? ,SysCode=? where UserId=?", roleIds, m.SysCode, m.Id).Exec()
+			if err != nil {
+				o.Rollback()
+			}
 		}
 	}
 	return

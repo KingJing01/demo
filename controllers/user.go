@@ -155,17 +155,29 @@ func (c *UserController) GetAll() {
 // @Failure 403 :id is not int
 // @router /:id [put]
 func (c *UserController) Put() {
+	result := &out.OperResult{}
 	idStr := c.Ctx.Input.Param(":id")
 	id, _ := strconv.ParseInt(idStr, 10, 64)
+	var mystruct map[string]interface{}
+	json.Unmarshal(c.Ctx.Input.RequestBody, &mystruct)
+	roleIds := mystruct["RoleIds"].(string)
+	originToken := c.Ctx.Request.Header.Get("Authorization")
+	_, _, userID, _ := tools.GetInfoFromToken(originToken)
 	v := models.User{Id: id}
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
-		if err := models.UpdateUserById(&v); err == nil {
-			c.Data["json"] = "OK"
+		if err := models.UpdateUserByID(&v, roleIds, userID); err == nil {
+			result.Data = v
+			result.Result = 1
+			c.Data["json"] = result
 		} else {
-			c.Data["json"] = err.Error()
+			result.Result = 0
+			result.Message = err.Error()
+			c.Data["json"] = result
 		}
 	} else {
-		c.Data["json"] = err.Error()
+		result.Result = 0
+		result.Message = err.Error()
+		c.Data["json"] = result
 	}
 	c.ServeJSON()
 }

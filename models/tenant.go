@@ -82,7 +82,7 @@ func AddTenant(m *Tenant, syScode []string, perId []string, perMenu []string, us
 	var tenAppList []TenantApplication
 	tenApp.TenantId = m.Id
 	//用户 租户 角色关联关系表插入
-	userRole := Userrole{}
+	userRole := UserRole{}
 	userRole.TenantId = m.Id
 	userRole.RoleId = 32
 	userRole.CreationTime = currTime

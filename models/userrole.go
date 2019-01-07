@@ -10,7 +10,7 @@ import (
 	"github.com/astaxie/beego/orm"
 )
 
-type Userrole struct {
+type UserRole struct {
 	Id            int       `orm:"column(Id);auto"`
 	CreationTime  time.Time `orm:"column(CreationTime);type(datetime)"`
 	CreatorUserId int64     `orm:"column(CreatorUserId);null"`
@@ -20,17 +20,17 @@ type Userrole struct {
 	SysCode       string    `orm:"column(SysCode);size(20);null"`
 }
 
-func (t *Userrole) TableName() string {
+func (t *UserRole) TableName() string {
 	return "userrole"
 }
 
 func init() {
-	orm.RegisterModel(new(Userrole))
+	orm.RegisterModel(new(UserRole))
 }
 
 // AddUserrole insert a new Userrole into database and returns
 // last inserted Id on success.
-func AddUserrole(m *Userrole) (id int64, err error) {
+func AddUserrole(m *UserRole) (id int64, err error) {
 	o := orm.NewOrm()
 	id, err = o.Insert(m)
 	return
@@ -38,9 +38,9 @@ func AddUserrole(m *Userrole) (id int64, err error) {
 
 // GetUserroleById retrieves Userrole by Id. Returns error if
 // Id doesn't exist
-func GetUserroleById(id int) (v *Userrole, err error) {
+func GetUserroleById(id int) (v *UserRole, err error) {
 	o := orm.NewOrm()
-	v = &Userrole{Id: id}
+	v = &UserRole{Id: id}
 	if err = o.Read(v); err == nil {
 		return v, nil
 	}
@@ -52,7 +52,7 @@ func GetUserroleById(id int) (v *Userrole, err error) {
 func GetAllUserrole(query map[string]string, fields []string, sortby []string, order []string,
 	offset int64, limit int64) (ml []interface{}, err error) {
 	o := orm.NewOrm()
-	qs := o.QueryTable(new(Userrole))
+	qs := o.QueryTable(new(UserRole))
 	// query k=v
 	for k, v := range query {
 		// rewrite dot-notation to Object__Attribute
@@ -102,7 +102,7 @@ func GetAllUserrole(query map[string]string, fields []string, sortby []string, o
 		}
 	}
 
-	var l []Userrole
+	var l []UserRole
 	qs = qs.OrderBy(sortFields...)
 	if _, err = qs.Limit(limit, offset).All(&l, fields...); err == nil {
 		if len(fields) == 0 {
@@ -127,9 +127,9 @@ func GetAllUserrole(query map[string]string, fields []string, sortby []string, o
 
 // UpdateUserrole updates Userrole by Id and returns error if
 // the record to be updated doesn't exist
-func UpdateUserroleById(m *Userrole) (err error) {
+func UpdateUserroleById(m *UserRole) (err error) {
 	o := orm.NewOrm()
-	v := Userrole{Id: m.Id}
+	v := UserRole{Id: m.Id}
 	// ascertain id exists in the database
 	if err = o.Read(&v); err == nil {
 		var num int64
@@ -144,11 +144,11 @@ func UpdateUserroleById(m *Userrole) (err error) {
 // the record to be deleted doesn't exist
 func DeleteUserrole(id int) (err error) {
 	o := orm.NewOrm()
-	v := Userrole{Id: id}
+	v := UserRole{Id: id}
 	// ascertain id exists in the database
 	if err = o.Read(&v); err == nil {
 		var num int64
-		if num, err = o.Delete(&Userrole{Id: id}); err == nil {
+		if num, err = o.Delete(&UserRole{Id: id}); err == nil {
 			fmt.Println("Number of records deleted in database:", num)
 		}
 	}

@@ -32,7 +32,7 @@ func (c *UserroleController) URLMapping() {
 // @Failure 403 body is empty
 // @router / [post]
 func (c *UserroleController) Post() {
-	var v models.Userrole
+	var v models.UserRole
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 		if _, err := models.AddUserrole(&v); err == nil {
 			c.Ctx.Output.SetStatus(201)
@@ -139,7 +139,7 @@ func (c *UserroleController) GetAll() {
 func (c *UserroleController) Put() {
 	idStr := c.Ctx.Input.Param(":id")
 	id, _ := strconv.Atoi(idStr)
-	v := models.Userrole{Id: id}
+	v := models.UserRole{Id: id}
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 		if err := models.UpdateUserroleById(&v); err == nil {
 			c.Data["json"] = "OK"

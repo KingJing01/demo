@@ -47,7 +47,7 @@ func init() {
 
 // AddUser insert a new User into database and returns
 // last inserted Id on success.
-func AddUser(m *User, selectData []map[string]interface{}, tenantID int64) (id int64, err error) {
+func AddUser(m *User, roleIds []string, sysCodes []string, tenantID int64, userID int64) (id int64, err error) {
 	o := orm.NewOrm()
 	o.Begin()
 	//新增一个ssouer
@@ -61,21 +61,35 @@ func AddUser(m *User, selectData []map[string]interface{}, tenantID int64) (id i
 		o.Rollback()
 		return 0, err
 	}
-	userrole := Userrole{}
+	userrole := UserRole{}
 	userrole.CreationTime = time.Now()
 	userrole.TenantId = tenantID
 	m.SsoID = ssoID
-	for code, value := range selectData {
-		sysCode := strconv.Itoa(code)
-		m.SysCode = sysCode
-		userrole.SysCode = sysCode
-		userrole.RoleId = value[sysCode].(int)
-		id, err = o.Insert(m)
-	}
-	m.SsoID = ssoID
-	id, err = o.Insert(m)
-	if err != nil {
-		return 0, err
+	m.TenantId = tenantID
+	for j, t := range roleIds {
+		for k, z := range sysCodes {
+			if j == k {
+				m.SysCode = z
+				userrole.SysCode = z
+				roleID, _ := strconv.Atoi(t)
+				userrole.RoleId = roleID
+
+				id, err = o.Insert(m)
+				if err != nil {
+					o.Rollback()
+					return 0, err
+				}
+				userrole.UserId = m.Id
+				userrole.CreatorUserId = userID
+				id, err = o.Insert(&userrole)
+				if err != nil {
+					o.Rollback()
+					return 0, err
+				}
+				m.Id = 0
+				userrole.Id = 0
+			}
+		}
 	}
 	o.Commit()
 	return
@@ -241,7 +255,7 @@ func PasswdUpdate(info *input.LoginInfo, SysCode string) (err error) {
 // 获取角色列表的信息
 func GetUserList(roleName string, sysName string, userName string, offset int64, limit int64, tenantID int64) (result []out.UserInfo, err error) {
 	o := orm.NewOrm()
-	var sql = `SELECT t2.EmailAddress emial_address ,t2.PhoneNumber phone_number,t2.UserName user_name,t2.Id id,t3.SysName sys_name,t4.RoleName role_name,
+	var sql = `SELECT t2.EmailAddress email_address ,t2.PhoneNumber phone_number,t2.UserName user_name,t2.Id id,t3.SysName sys_name,t4.RoleName role_name,
 	t4.AuthText auth_text,t4.IsValid is_valid FROM	USER t2 LEFT JOIN  userrole t1  ON t1.UserId = t2.Id
 	LEFT JOIN application t3 ON t2.SysCode = t3.SysCode LEFT JOIN role t4 ON t1.RoleId = t4.Id
 	where t2.TenantId=?  and t2.IsDeleted=0`

@@ -62,8 +62,9 @@ export default {
       checkedApplications: [],
       radioData: [],
       options: {},
+      selectData: new Map(),
       form: {
-        selectData: new Map()
+
       },
       formRules: {
         EmailAddress: [{ required: true, trigger: 'change', message: '邮箱为必填项' }],
@@ -90,7 +91,15 @@ export default {
     // 单选按钮的修改事件
     handleRadioChange(name, code) {
       console.log(name, code)
-      this.form.selectData.set(name, code)
+      this.selectData.set(name, code)
+      var sysCode = new Array(0)
+      var roleId = new Array(0)
+      this.selectData.forEach(function(item, key, mapObj) {
+        sysCode.push(key)
+        roleId.push(item)
+      })
+      this.form.roleIds = roleId
+      this.form.sysCodes = sysCode
       this.data.formData = this.form
     },
     validData() {

@@ -50,7 +50,7 @@
         align="center"
       />
       <el-table-column
-        prop="UserCode"
+        prop="Id"
         label="用户编号"
         align="center"
       />
@@ -65,6 +65,7 @@
         align="center"
       />
       <el-table-column
+        :show-overflow-tooltip="true"
         prop="EmailAddress"
         label="邮箱"
         align="center"

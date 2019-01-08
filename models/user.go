@@ -65,7 +65,7 @@ func AddUser(m *User, roleIds []string, sysCodes []string, tenantID int64, userI
 	userrole.TenantId = tenantID
 	m.SsoID = ssoID
 	m.TenantId = tenantID
-	m.Password = "123456"
+	m.Password = "123456" //GetDefaultPassword()
 	for j, t := range roleIds {
 		for k, z := range sysCodes {
 			if j == k {

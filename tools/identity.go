@@ -1,7 +1,9 @@
 package tools
 
 import (
+	"crypto/sha256"
 	"demo/models"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"strconv"
@@ -85,4 +87,12 @@ func GetInfoFromToken(stoken string) (result bool, tenantID int64, userID int64,
 	tmpUserID := strconv.FormatFloat(claims["jti"].(float64), 'f', -1, 64)
 	userID, _ = strconv.ParseInt(tmpUserID, 10, 64)
 	return true, tenantID, userID, err
+}
+
+func GetDefaultPassword() (passwd string) {
+	hash := sha256.New()
+	hash.Write([]byte("U123456"))
+	md := hash.Sum(nil)
+	passwd = hex.EncodeToString(md)
+	return passwd
 }

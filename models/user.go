@@ -223,9 +223,9 @@ func LoginCheck(username string, password string, SysCode string) (result bool, 
 	result = true
 	//登录名格式分析  手机号码直接 ssoUser验证 其他的使用user--->sso关联
 	if resultMobile.Ok {
-		err = o.Raw("select t2.*, t1.Phone  SsoPhone from ssouser t1 left join user t2 on t1.id = t2.SsoId where t2.SysCode=? and t1.Phone=? and t1.Passwd=? ", SysCode, username, password).QueryRow(&u)
+		err = o.Raw("select t2.*, t1.Phone  SsoPhone from ssouser t1 left join user t2 on t1.id = t2.SsoId where t2.SysCode=? and t1.Phone=? and t2.Password=? ", SysCode, username, password).QueryRow(&u)
 	} else {
-		err = o.Raw("select t2.*,t1.Phone SsoPhone from ssouser t1 left join user t2 on t1.id = t2.SsoId where t2.SysCode=? and t2.UserName=? and t1.Passwd=? ", SysCode, username, password).QueryRow(&u)
+		err = o.Raw("select t2.*,t1.Phone SsoPhone from ssouser t1 left join user t2 on t1.id = t2.SsoId where t2.SysCode=? and t2.UserName=? and t2.Password=? ", SysCode, username, password).QueryRow(&u)
 	}
 	user = *u
 	// 判断是否有错误的返回

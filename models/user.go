@@ -30,6 +30,7 @@ type User struct {
 	UserName               string    `orm:"column(UserName);size(32)"`
 	PasswordResetCode      string    `orm:"column(PasswordResetCode);size(328);null"`
 	PhoneNumber            string    `orm:"column(PhoneNumber);size(32);null"`
+	Password               string    `orm:"column(Password);size(40);null"`
 	TenantId               int64     `orm:"column(TenantId);null"`
 	SysCode                string    `orm:"column(SysCode)"`
 	SsoID                  int64     `orm:"column(SsoId)"`
@@ -51,7 +52,6 @@ func AddUser(m *User, roleIds []string, sysCodes []string, tenantID int64, userI
 	o.Begin()
 	//新增一个ssouer
 	ssoUser := SsoUser{}
-	ssoUser.Passwd = "123456"
 	ssoUser.Phone = m.PhoneNumber
 	ssoUser.Email = m.EmailAddress
 	ssoID, err := o.Insert(&ssoUser)
@@ -65,6 +65,7 @@ func AddUser(m *User, roleIds []string, sysCodes []string, tenantID int64, userI
 	userrole.TenantId = tenantID
 	m.SsoID = ssoID
 	m.TenantId = tenantID
+	m.Password = "123456"
 	for j, t := range roleIds {
 		for k, z := range sysCodes {
 			if j == k {
@@ -240,13 +241,13 @@ func RegistUser(loginInfo *input.LoginInfo, SysCode string) (ssoId int64, err er
 	o.Begin()
 	ssoUser := new(SsoUser)
 	ssoUser.Phone = loginInfo.UserName
-	ssoUser.Passwd = loginInfo.Password
 	_, err = o.Insert(ssoUser)
 	if err != nil {
 		o.Rollback()
 	}
 	ssoId = ssoUser.Id
 	user := new(User)
+	user.Password = loginInfo.Password
 	user.Name = loginInfo.UserName
 	user.PhoneNumber = loginInfo.UserName
 	user.SsoID = ssoUser.Id

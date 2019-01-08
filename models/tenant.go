@@ -61,7 +61,6 @@ func AddTenant(m *Tenant, syScode []string, perId []string, perMenu []string, us
 	}
 	//新增一个ssouer
 	ssoUser := SsoUser{}
-	ssoUser.Passwd = "123456"
 	ssoUser.Phone = m.LinkPhone
 	ssoUser.Email = m.Email
 	ssoId, err := o.Insert(&ssoUser)
@@ -74,6 +73,7 @@ func AddTenant(m *Tenant, syScode []string, perId []string, perMenu []string, us
 	user.CreationTime = currTime
 	user.CreatorUserId = userID
 	user.SsoID = int64(ssoId)
+	user.Password = "123456"
 	user.EmailAddress = m.Email
 	user.PhoneNumber = m.LinkPhone
 	user.TenantId = m.Id

@@ -10,10 +10,9 @@ import (
 )
 
 type SsoUser struct {
-	Id     int64  `orm:"column(Id);auto"`
-	Phone  string `orm:"column(Phone);size(20)"`
-	Passwd string `orm:"column(Passwd);size(45)"`
-	Email  string `orm:"column(Email);size(50)"`
+	Id    int64  `orm:"column(Id);auto"`
+	Phone string `orm:"column(Phone);size(20)"`
+	Email string `orm:"column(Email);size(50)"`
 }
 
 func (t *SsoUser) TableName() string {

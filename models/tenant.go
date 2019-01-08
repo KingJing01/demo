@@ -73,7 +73,7 @@ func AddTenant(m *Tenant, syScode []string, perId []string, perMenu []string, us
 	user.CreationTime = currTime
 	user.CreatorUserId = userID
 	user.SsoID = int64(ssoID)
-	user.Password = "123456" // tools.GetDefaultPassword()
+	user.Password = GetDefaultPassword("")
 	user.EmailAddress = m.Email
 	user.PhoneNumber = m.LinkPhone
 	user.TenantId = m.Id

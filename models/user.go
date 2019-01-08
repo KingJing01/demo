@@ -1,8 +1,10 @@
 package models
 
 import (
+	"crypto/sha256"
 	input "demo/inputmodels"
 	out "demo/outmodels"
+	"encoding/hex"
 	"errors"
 	"reflect"
 	"strconv"
@@ -30,7 +32,7 @@ type User struct {
 	UserName               string    `orm:"column(UserName);size(32)"`
 	PasswordResetCode      string    `orm:"column(PasswordResetCode);size(328);null"`
 	PhoneNumber            string    `orm:"column(PhoneNumber);size(32);null"`
-	Password               string    `orm:"column(Password);size(40);null"`
+	Password               string    `orm:"column(Password);size(64);null"`
 	TenantId               int64     `orm:"column(TenantId);null"`
 	SysCode                string    `orm:"column(SysCode)"`
 	SsoID                  int64     `orm:"column(SsoId)"`
@@ -65,7 +67,7 @@ func AddUser(m *User, roleIds []string, sysCodes []string, tenantID int64, userI
 	userrole.TenantId = tenantID
 	m.SsoID = ssoID
 	m.TenantId = tenantID
-	m.Password = "123456" //GetDefaultPassword()
+	m.Password = GetDefaultPassword("")
 	for j, t := range roleIds {
 		for k, z := range sysCodes {
 			if j == k {
@@ -194,7 +196,7 @@ func UpdateUserByID(m *User, roleIds string, userID int64) (err error) {
 	left join userrole t2 on t2.UserId = t3.Id where t2.SysCode =?`, m.Id, m.Id, m.SysCode).Values(&maps)
 	total, _ := strconv.ParseInt(maps[0]["total"].(string), 10, 64)
 	if total > 0 {
-		return errors.New("当前系统下已有角色,无法修改")
+		return errors.New("用户在所选系统已有角色无法修改")
 	} else {
 		v := &User{Id: m.Id}
 		if err = o.Read(v); err == nil {
@@ -218,6 +220,7 @@ func UpdateUserByID(m *User, roleIds string, userID int64) (err error) {
 func LoginCheck(username string, password string, SysCode string) (result bool, user User, err error) {
 	valid := validation.Validation{}
 	resultMobile := valid.Mobile(username, "username")
+	password = GetDefaultPassword(password)
 	o := orm.NewOrm()
 	u := &User{}
 	result = true
@@ -247,7 +250,7 @@ func RegistUser(loginInfo *input.LoginInfo, SysCode string) (ssoId int64, err er
 	}
 	ssoId = ssoUser.Id
 	user := new(User)
-	user.Password = loginInfo.Password
+	user.Password = GetDefaultPassword(loginInfo.Password)
 	user.Name = loginInfo.UserName
 	user.PhoneNumber = loginInfo.UserName
 	user.SsoID = ssoUser.Id
@@ -335,4 +338,16 @@ func DeleteUser(ids string, userID int64) (err error) {
 	o := orm.NewOrm()
 	_, err = o.Raw(sql, time.Now(), userID).Exec()
 	return
+}
+
+//GetDefaultPassword 参数为"" 生成默认的加密密码 sha256 不为空对密码进行加密
+func GetDefaultPassword(val string) (passwd string) {
+	if val == "" {
+		val = "U123456"
+	}
+	hash := sha256.New()
+	hash.Write([]byte(val))
+	md := hash.Sum(nil)
+	passwd = hex.EncodeToString(md)
+	return passwd
 }

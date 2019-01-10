@@ -29,16 +29,14 @@
     </el-form-item>
     <el-form-item
       label="系统名称"
-      prop="SysCode"
     >
-      <el-select v-model="form.SysCode" placeholder="请选择" @change="handleSysChange">
-        <el-option
-          v-for="item in options"
-          :key="item.SysCode"
-          :label="item.SysName"
-          :value="item.SysCode"/>
-      </el-select>
+      <template>
+        <el-checkbox-group v-model="checkedApplications" @change="handlecheckedAppChange">
+          <el-checkbox v-for="(sys, index) in options" :label="sys.SysCode" :key="index">{{ sys.SysName }}</el-checkbox>
+        </el-checkbox-group>
+      </template>
     </el-form-item>
+
     <template>
       <div v-for="(radio, topIndex) in radioData" :key="topIndex">
         <el-form-item :label="radio.name" prop="resource">

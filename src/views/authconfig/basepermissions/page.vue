@@ -82,7 +82,7 @@
     </div>
     <el-row id="action_line">
       <el-button @click="handleInsert"> 新增菜单</el-button>
-      <el-button type="primary">生成套餐</el-button>
+      <el-button type="primary" @click="handleSetMeal">生成套餐</el-button>
     </el-row>
 
     <!-- 分页控件  end -->
@@ -194,6 +194,7 @@ export default {
       formLabelWidth: '100px',
       dialogInfoVisable: false,
       selection: [], // 列表选择框的信息
+      selectionSysCodes: [], // 勾选的系统信息
       options: [], // 系统下拉数据
       formRules: {
         SysCode: [{ required: true, trigger: 'change', message: '系统为必填项' }],
@@ -308,8 +309,15 @@ export default {
       var data = { displayName: '', name: '' }
       this.form.PerData.push(data)
     },
-    handleSelectionChange(selection) {
-      this.selection = selection
+    handleSelectionChange(select) {
+      var data = []
+      var sysData = []
+      for (var i = 0; i < select.length; i++) {
+        data.push(select[i].Id)
+        sysData.push(select[i].SysCode)
+      }
+      this.selection = data
+      this.selectionSysCodes = sysData
     },
     // 双击点击事件
     handleRowClick(row, event) {
@@ -326,6 +334,14 @@ export default {
         return item.SysCode === val
       })
       this.form.SysName = obj.SysName
+    },
+    // 生成套餐
+    handleSetMeal() {
+      var arr = Array.from(new Set(this.selectionSysCodes))
+      if (arr.length > 1) {
+        this.$message({ message: '请选取同一系统下的权限', type: 'warning' })
+        return
+      }
     }
   }
 }

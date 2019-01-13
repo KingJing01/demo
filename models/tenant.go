@@ -155,8 +155,7 @@ func UpdateTenantById(m *Tenant, sysCode string, perIdStr string, perMenu string
 		_, err = o.Update(m)
 	}
 	var maps []orm.Params
-	o.Raw(`select t1.UserId from userrole t1 left join user t2 
-	on t1.UserId = t2.Id where t1.TenantId = ? and t1.RoleId=1 and t2.SysCode=?`, tenId, sysCode).Values(&maps)
+	o.Raw("select t1.UserId from userrole t1 left join user t2 on t1.UserId = t2.Id where t1.TenantId = ? and t1.RoleId=1 and t2.SysCode=?", tenId, sysCode).Values(&maps)
 	tempOwnerID := maps[0]["UserId"].(string)
 	ownerID, _ := strconv.ParseInt(tempOwnerID, 10, 64)
 	//权限信息修改

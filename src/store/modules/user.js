@@ -1,5 +1,6 @@
 import { login, logout, getInfo } from '@/api/login'
 import { getToken, setToken, removeToken } from '@/utils/auth'
+import router from '../../router'
 
 const user = {
   state: {
@@ -44,15 +45,23 @@ const user = {
       return new Promise((resolve, reject) => {
         getInfo(state.token).then(response => {
           const data = response
+          if (data.Result === 0) {
+            reject(data.Message)
+            commit('SET_TOKEN', '')
+            commit('SET_ROLES', [])
+            removeToken()
+            router.forward('/login')
+          } else {
+            commit('SET_ROLES', ['admin'])
+            commit('SET_NAME', data.UserName)
+            commit('SET_AVATAR', data.UserName)
+            resolve(response)
+          }
           /* if (data.roles && data.roles.length > 0) { // 验证返回的roles是否是一个非空数组
             commit('SET_ROLES', data.UserName)
           } else {
             reject('getInfo: roles must be a non-null array !')
           }*/
-          commit('SET_ROLES', ['admin'])
-          commit('SET_NAME', data.UserName)
-          commit('SET_AVATAR', data.UserName)
-          resolve(response)
         }).catch(error => {
           reject(error)
         })

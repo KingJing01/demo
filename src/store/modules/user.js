@@ -46,7 +46,7 @@ const user = {
         getInfo(state.token).then(response => {
           const data = response
           if (data.Result === 0) {
-            reject(data.Message)
+            reject('登陆信息失效，请重新登陆')
             commit('SET_TOKEN', '')
             commit('SET_ROLES', [])
             removeToken()

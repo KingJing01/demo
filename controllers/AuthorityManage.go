@@ -219,6 +219,7 @@ func (c *AuthorityManageController) GetUserInfo() {
 		c.ServeJSON()
 		return
 	}
+
 	tmp := strconv.FormatFloat(claims["jti"].(float64), 'f', -1, 64)
 	userid, _ := strconv.ParseInt(tmp, 10, 64)
 	u, _ := models.GetUserByID(userid)

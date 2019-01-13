@@ -72,7 +72,6 @@ func AddUser(m *User, roleIds []string, sysCodes []string, tenantID int64, userI
 		for k, z := range sysCodes {
 			if j == k {
 				m.SysCode = z
-				userrole.SysCode = z
 				roleID, _ := strconv.Atoi(t)
 				userrole.RoleId = roleID
 

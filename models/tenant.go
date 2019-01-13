@@ -84,7 +84,8 @@ func AddTenant(m *Tenant, syScode []string, perId []string, perMenu []string, us
 	//用户 租户 角色关联关系表插入
 	userRole := UserRole{}
 	userRole.TenantId = m.Id
-	userRole.RoleId = 32
+	// 平台管理员的默认id 为1
+	userRole.RoleId = 1
 	userRole.CreationTime = currTime
 	userRole.CreatorUserId = userID
 	for i, arg := range syScode {
@@ -99,7 +100,6 @@ func AddTenant(m *Tenant, syScode []string, perId []string, perMenu []string, us
 		tenApp.SysCode = arg
 		tenApp.MenuText = perMenu[i]
 		tenAppList = append(tenAppList, tenApp)
-		userRole.SysCode = arg
 		userRole.UserId = user.Id
 		_, err = o.Insert(&userRole)
 		if err != nil {
@@ -155,7 +155,8 @@ func UpdateTenantById(m *Tenant, sysCode string, perIdStr string, perMenu string
 		_, err = o.Update(m)
 	}
 	var maps []orm.Params
-	o.Raw("select UserId from userrole where TenantId = ? and SysCode=? and RoleId=1", tenId, sysCode).Values(&maps)
+	o.Raw(`select t1.UserId from userrole t1 left join user t2 
+	on t1.UserId = t2.Id where t1.TenantId = ? and t1.RoleId=1 and t2.SysCode=?`, tenId, sysCode).Values(&maps)
 	tempOwnerID := maps[0]["UserId"].(string)
 	ownerID, _ := strconv.ParseInt(tempOwnerID, 10, 64)
 	//权限信息修改

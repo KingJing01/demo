@@ -40,7 +40,7 @@
     <template>
       <div v-for="(radio, topIndex) in radioData" :key="topIndex">
         <el-form-item :label="radio.name" prop="resource">
-          <el-radio-group v-model="form.RoleCode">
+          <el-radio-group v-model="radio.data">
             <el-radio v-for="child in radio.childrenList" :label="child.childCode" :key="child.childCode" @change="handleRadioChange(radio.key,child.childCode)">{{ child.childName }}</el-radio>
           </el-radio-group>
         </el-form-item>
@@ -64,13 +64,13 @@ export default {
       userId: this.data.Id,
       options: {},
       form: {},
-      radioData: {}
+      radioData: {},
+      checkedApplications: []
     }
   },
   created() {
     this.getSysList()
     this.getUserInfoById()
-    this
   },
   methods: {
     // 获取系统下拉数据
@@ -91,11 +91,6 @@ export default {
     cancleValid() {
       this.$refs['userForm'].resetFields()
     },
-    handleSysChange(val) {
-      getRoleDataBySysCodes(val).then(response => {
-        this.radioData = response.Data
-      })
-    },
     validData() {
       this.$refs.userForm.validate(valid => {
         this.data.valid = valid
@@ -105,6 +100,12 @@ export default {
     handleRadioChange(name, code) {
       this.form.RoleIds = code
       this.data.formData = this.form
+    },
+    // 系统修改刷新数据
+    handlecheckedAppChange(val) {
+      getRoleDataBySysCodes(val.join(',')).then(response => {
+        this.radioData = response.Data
+      })
     }
 
   }

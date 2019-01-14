@@ -90,7 +90,7 @@ export default {
     },
     // 单选按钮的修改事件
     handleRadioChange(name, code) {
-      console.log(name, code)
+      debugger
       this.selectData.set(name, code)
       var sysCode = new Array(0)
       var roleId = new Array(0)

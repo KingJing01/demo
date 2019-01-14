@@ -40,7 +40,7 @@
       <div v-for="(radio, topIndex) in radioData" :key="topIndex">
         <el-form-item :label="radio.name" prop="resource">
           <el-radio-group v-model="radio.data">
-            <el-radio v-for="child in radio.childrenList" :label="child.childCode" :key="child.childCode" @change="handleRadioChange(radio.key,child.childCode)">{{ child.childName }}</el-radio>
+            <el-radio v-for="child in radio.childrenList" :label="child.childCode" :key="child.childCode">{{ child.childName }}</el-radio>
           </el-radio-group>
         </el-form-item>
 
@@ -87,20 +87,6 @@ export default {
       getRoleDataBySysCodes(val.join(',')).then(response => {
         this.radioData = response.Data
       })
-    },
-    // 单选按钮的修改事件
-    handleRadioChange(name, code) {
-      debugger
-      this.selectData.set(name, code)
-      var sysCode = new Array(0)
-      var roleId = new Array(0)
-      this.selectData.forEach(function(item, key, mapObj) {
-        sysCode.push(key)
-        roleId.push(item)
-      })
-      this.form.roleIds = roleId
-      this.form.sysCodes = sysCode
-      this.data.formData = this.form
     },
     validData() {
       this.$refs.userForm.validate(valid => {

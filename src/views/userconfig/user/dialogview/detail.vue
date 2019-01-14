@@ -92,7 +92,6 @@ export default {
     cancleValid() {
       this.$refs['userForm'].resetFields()
     }
-
   }
 }
 </script>

@@ -62,10 +62,17 @@ export default {
   data: function() {
     return {
       userId: this.data.Id,
-      options: {},
       form: {},
-      radioData: {},
-      checkedApplications: []
+      radio: '',
+      checkedApplications: [],
+      radioData: [],
+      options: {},
+      selectData: new Map(),
+      formRules: {
+        EmailAddress: [{ required: true, trigger: 'change', message: '邮箱为必填项' }],
+        PhoneNumber: [{ required: true, trigger: 'change', message: '手机号为必填项' }],
+        UserName: [{ required: true, trigger: 'blur', message: '用户名为必填项' }, { max: 20, message: '输入内容最大长度为20', trigger: 'blur' }]
+      }
     }
   },
   created() {
@@ -96,16 +103,24 @@ export default {
         this.data.valid = valid
       })
     },
-    // 单选按钮的修改事件
-    handleRadioChange(name, code) {
-      this.form.RoleIds = code
-      this.data.formData = this.form
-    },
     // 系统修改刷新数据
     handlecheckedAppChange(val) {
       getRoleDataBySysCodes(val.join(',')).then(response => {
         this.radioData = response.Data
       })
+    },
+    // 单选按钮的修改事件
+    handleRadioChange(name, code) {
+      this.selectData.set(name, code)
+      var sysCode = new Array(0)
+      var roleId = new Array(0)
+      this.selectData.forEach(function(item, key, mapObj) {
+        sysCode.push(key)
+        roleId.push(item)
+      })
+      this.form.roleIds = roleId
+      this.form.sysCodes = sysCode
+      this.data.formData = this.form
     }
 
   }

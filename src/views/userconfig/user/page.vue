@@ -141,7 +141,7 @@
       <h4 v-else slot="title">新增用户</h4>
       <div v-if="type==='detail'"><DetailPage ref="userData" :data="form"/></div>
       <div v-else-if="type==='update'"><UpdatePage ref="userData" :data="form"/></div>
-      <div v-else-if="type==='detail'"><SavePage ref="userData" :data="form"/></div>
+      <div v-else-if="type==='insert'"><SavePage ref="userData" :data="form"/></div>
       <div v-else><UpdateNewPage ref="userData" :data="form"/></div>
       <div
         slot="footer"
@@ -291,7 +291,6 @@ export default {
     },
     // 表格按钮切换事件
     handleSwitchChange(row, index) {
-      debugger
       updateUserValidStatus(row).then(response => {
         if (response.Result !== 1) {
           this.$message({
@@ -331,7 +330,7 @@ export default {
         }
       })
     },
-    handleAddExistUser() {
+    handleAddExistUser(data) {
       if (this.multipleSelection.length !== 1) {
         this.$message({
           showClose: true,
@@ -340,6 +339,7 @@ export default {
         })
         return
       }
+      this.form.Id = this.multipleSelection.toString()
       this.type = 'updateNew'
       this.dialogFormVisible = true
     }

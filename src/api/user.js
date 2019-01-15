@@ -21,8 +21,8 @@ export function addUserInfo(info) {
       EmailAddress: info.EmailAddress,
       PhoneNumber: info.PhoneNumber,
       UserName: info.UserName,
-      RoleIds: info.roleIds,
-      SysCodes: info.sysCodes
+      RoleIds: info.RoleIds,
+      SysCodes: info.SysCodes
     }
   })
 }

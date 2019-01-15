@@ -230,6 +230,7 @@ export default {
     saveData() {
       this.$refs.userData.validData()
       const valid = this.form.valid
+      debugger
       if (valid) {
         // 新增操作
         if (this.type === 'insert') {

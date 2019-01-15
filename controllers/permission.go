@@ -202,7 +202,7 @@ func (c *PermissionController) GetPerInfoBySysCode() {
 	result := &out.OperResult{}
 	sysCode := c.Ctx.Input.Param(":sysCode")
 	if data, err := models.GetPerInfoBySysCode(sysCode, tenantID); len(data) > 0 {
-		permissionList := tool.ParsePermissionDataForCheckbox(data)
+		permissionList := out.ParsePermissionDataForCheckbox(data)
 		result.Result = 1
 		result.Data = permissionList
 		c.Data["json"] = result
@@ -226,7 +226,7 @@ func (c *PermissionController) GetPerInfoBySysCodeUpdate() {
 	sysCode := c.GetString("sysCode")
 	setMealCode := c.GetString("setMealCode")
 	if data, err := models.GetPermBySetMealCode(setMealCode, sysCode); err == nil {
-		permissionList := tool.ParsePermissionDataForCheckboxUpdate(data)
+		permissionList := out.ParsePermissionDataForCheckboxUpdate(data)
 		result.Result = 1
 		result.Data = permissionList
 		c.Data["json"] = result
@@ -252,7 +252,7 @@ func (c *PermissionController) GetPerInfoByRoleID() {
 	roleID := c.Ctx.Input.Param(":roleId")
 	sysCode := c.GetString("sysCode")
 	if data, err := models.GetPerInfoByRoleCode(roleID, sysCode, tenantID, userID); len(data) > 0 {
-		permissionList := tool.ParsePermissionDataForCheckboxUpdate(data)
+		permissionList := out.ParsePermissionDataForCheckboxUpdate(data)
 		result.Result = 1
 		result.Data = permissionList
 		c.Data["json"] = result

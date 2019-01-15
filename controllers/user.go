@@ -160,12 +160,14 @@ func (c *UserController) Put() {
 	id, _ := strconv.ParseInt(idStr, 10, 64)
 	var mystruct map[string]interface{}
 	json.Unmarshal(c.Ctx.Input.RequestBody, &mystruct)
-	roleIds := mystruct["RoleIds"].(string)
+	roleIds := tool.ParseInterfaceArr(mystruct["RoleIds"].([]interface{}))
+	sysCodes := tool.ParseInterfaceArr(mystruct["SysCodes"].([]interface{}))
+	sysCode := tool.ParseStringArr(sysCodes)
 	originToken := c.Ctx.Request.Header.Get("Authorization")
 	_, _, userID, _ := tools.GetInfoFromToken(originToken)
 	v := models.User{Id: id}
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
-		if err := models.UpdateUserByID(&v, roleIds, userID); err == nil {
+		if err := models.UpdateUserByID(&v, roleIds, sysCode, sysCodes, userID); err == nil {
 			result.Data = v
 			result.Result = 1
 			c.Data["json"] = result

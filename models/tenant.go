@@ -101,6 +101,7 @@ func AddTenant(m *Tenant, syScode []string, perId []string, perMenu []string, us
 		tenApp.MenuText = perMenu[i]
 		tenAppList = append(tenAppList, tenApp)
 		userRole.UserId = user.Id
+		userRole.SysCode = arg
 		_, err = o.Insert(&userRole)
 		if err != nil {
 			//回滚

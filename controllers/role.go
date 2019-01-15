@@ -223,7 +223,7 @@ func (c *RoleController) GetRoleBySysCode() {
 	result := &out.OperResult{}
 	sysCode := c.GetString("sysCode")
 	if data, err := models.GetRoleBySysCode(sysCode, tenantID); err == nil {
-		radioData := tools.ParseCheckRadioData(data)
+		radioData := out.ParseCheckRadioData(data)
 		result.Result = 1
 		result.Data = radioData
 		c.Data["json"] = result

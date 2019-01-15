@@ -68,13 +68,14 @@ func AddUser(m *User, roleIds []string, sysCodes []string, tenantID int64, userI
 	m.SsoID = ssoID
 	m.TenantId = tenantID
 	m.Password = GetDefaultPassword("")
+	m.CreatorUserId = userID
 	for j, t := range roleIds {
 		for k, z := range sysCodes {
 			if j == k {
 				m.SysCode = z
 				roleID, _ := strconv.Atoi(t)
+				userrole.SysCode = z
 				userrole.RoleId = roleID
-
 				id, err = o.Insert(m)
 				if err != nil {
 					o.Rollback()
@@ -188,11 +189,12 @@ func GetAllUser(query map[string]string, fields []string, sortby []string, order
 
 // UpdateUserByID updates User by Id and returns error if
 // the record to be updated doesn't exist
-func UpdateUserByID(m *User, roleIds string, userID int64) (err error) {
+func UpdateUserByID(m *User, roleIds []string, sysCode string, sysCodes []string, userID int64) (err error) {
 	o := orm.NewOrm()
 	var maps []orm.Params
-	o.Raw(`select count(0) total from (select t.Id from user t  where t.SsoId =(select SsoId from user where Id = ?) and t.Id != ? and t.IsDeleted=0 and t.IsValid=0) t3
-	left join userrole t2 on t2.UserId = t3.Id where t2.SysCode =?`, m.Id, m.Id, m.SysCode).Values(&maps)
+	sql := `select count(0) total from (select t.Id,t.SysCode from user t  where t.SsoId =(select SsoId from user where Id = ?) and t.Id != ? and t.IsDeleted=0 and t.IsValid=0) t3
+	left join userrole t2 on t2.UserId = t3.Id where t3.SysCode in (` + sysCode + `)`
+	o.Raw(sql, m.Id, m.Id).Values(&maps)
 	total, _ := strconv.ParseInt(maps[0]["total"].(string), 10, 64)
 	if total > 0 {
 		return errors.New("用户在所选系统已有角色无法修改")
@@ -278,7 +280,7 @@ func GetUserList(roleName string, sysName string, userName string, offset int64,
 	where t2.TenantId=?  and t2.IsDeleted=0`
 	conditions := []string{}
 	if roleName != "" {
-		conditions = append(conditions, " t1.roleName like '%"+roleName+"%'")
+		conditions = append(conditions, " t4.roleName like '%"+roleName+"%'")
 	}
 	if sysName != "" {
 		conditions = append(conditions, " t3.SysName  like '%"+sysName+"%'")
@@ -300,7 +302,7 @@ func CountUserInfo(roleName string, sysName string, userName string, tenantID in
 	conditions := []string{}
 	var sql = "SELECT count(0) total FROM	USER t2 LEFT JOIN  userrole t1  ON t1.UserId = t2.Id LEFT JOIN application t3 ON t2.SysCode = t3.SysCode LEFT JOIN role t4 ON t1.RoleId = t4.Id where t2.TenantId=? and t2.IsDeleted=0"
 	if roleName != "" {
-		conditions = append(conditions, " t1.RoleName like '%"+roleName+"%'")
+		conditions = append(conditions, " t4.RoleName like '%"+roleName+"%'")
 	}
 	if sysName != "" {
 		conditions = append(conditions, " t3.SysName  like '%"+sysName+"%'")

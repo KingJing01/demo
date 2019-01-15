@@ -216,7 +216,7 @@ func (c *TenantController) GetTenantPermission() {
 		result.Message = err.Error()
 		c.Data["json"] = result
 	} else {
-		permissionList := tool.ParsePermissionDataForCheckboxUpdate(v)
+		permissionList := out.ParsePermissionDataForCheckboxUpdate(v)
 		result.Result = 1
 		result.Data = permissionList
 		c.Data["json"] = result

@@ -35,6 +35,7 @@
     <el-row id="action_line" style="margin-bottom:10px">
       <el-button @click="dialogFormVisible = true">新增用户</el-button>
       <el-button type="primary" @click="handleDeleteUser">删除用户</el-button>
+      <el-button type="success" @click="handleAddExistUser">新增</el-button>
     </el-row>
     <!-- 基础权限列表  start -->
     <el-table
@@ -136,10 +137,12 @@
       @open="handleOpenDialog"
     > <h4 v-if="type==='detail'" slot="title">用户详情</h4>
       <h4 v-else-if="type==='update'" slot="title">修改用户</h4>
+      <h4 v-else-if="type==='updateNew'" slot="title">更新用户</h4>
       <h4 v-else slot="title">新增用户</h4>
       <div v-if="type==='detail'"><DetailPage ref="userData" :data="form"/></div>
       <div v-else-if="type==='update'"><UpdatePage ref="userData" :data="form"/></div>
-      <div v-else><SavePage ref="userData" :data="form"/></div>
+      <div v-else-if="type==='detail'"><SavePage ref="userData" :data="form"/></div>
+      <div v-else><UpdateNewPage ref="userData" :data="form"/></div>
       <div
         slot="footer"
         class="dialog-footer"
@@ -162,8 +165,9 @@ import { sysDataSelect } from '@/api/sysconfig'
 import DetailPage from './dialogview/detail'
 import SavePage from './dialogview/save'
 import UpdatePage from './dialogview/update'
+import UpdateNewPage from './dialogview/updateuser'
 export default {
-  components: { DetailPage, SavePage, UpdatePage },
+  components: { DetailPage, SavePage, UpdatePage, UpdateNewPage },
   data() {
     return {
       type: 'insert',
@@ -230,7 +234,6 @@ export default {
     saveData() {
       this.$refs.userData.validData()
       const valid = this.form.valid
-      debugger
       if (valid) {
         // 新增操作
         if (this.type === 'insert') {
@@ -327,6 +330,18 @@ export default {
           })
         }
       })
+    },
+    handleAddExistUser() {
+      if (this.multipleSelection.length !== 1) {
+        this.$message({
+          showClose: true,
+          message: '有且只有一个用户',
+          type: 'warning'
+        })
+        return
+      }
+      this.type = 'updateNew'
+      this.dialogFormVisible = true
     }
   }
 }

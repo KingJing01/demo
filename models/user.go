@@ -189,29 +189,20 @@ func GetAllUser(query map[string]string, fields []string, sortby []string, order
 
 // UpdateUserByID updates User by Id and returns error if
 // the record to be updated doesn't exist
-func UpdateUserByID(m *User, roleIds []string, sysCode string, sysCodes []string, userID int64) (err error) {
+func UpdateUserByID(m *User, roleCode string, userID int64) (err error) {
 	o := orm.NewOrm()
-	var maps []orm.Params
-	sql := `select count(0) total from (select t.Id,t.SysCode from user t  where t.SsoId =(select SsoId from user where Id = ?) and t.Id != ? and t.IsDeleted=0 and t.IsValid=0) t3
-	left join userrole t2 on t2.UserId = t3.Id where t3.SysCode in (` + sysCode + `)`
-	o.Raw(sql, m.Id, m.Id).Values(&maps)
-	total, _ := strconv.ParseInt(maps[0]["total"].(string), 10, 64)
-	if total > 0 {
-		return errors.New("用户在所选系统已有角色无法修改")
-	} else {
-		v := &User{Id: m.Id}
-		if err = o.Read(v); err == nil {
-			m.CreationTime = v.CreationTime
-			m.CreatorUserId = v.CreatorUserId
-			m.TenantId = v.TenantId
-			m.SsoID = v.SsoID
-			m.LastModificationTime = time.Now()
-			m.LastModifierUserId = userID
-			_, err = o.Update(m)
-			_, err = o.Raw("update userrole set RoleId=? ,SysCode=? where UserId=?", roleIds, m.SysCode, m.Id).Exec()
-			if err != nil {
-				o.Rollback()
-			}
+	v := &User{Id: m.Id}
+	if err = o.Read(v); err == nil {
+		m.CreationTime = v.CreationTime
+		m.CreatorUserId = v.CreatorUserId
+		m.TenantId = v.TenantId
+		m.SsoID = v.SsoID
+		m.LastModificationTime = time.Now()
+		m.LastModifierUserId = userID
+		_, err = o.Update(m)
+		_, err = o.Raw("update userrole set RoleId=?  where  SysCode=? and UserId=?", roleCode, m.SysCode, m.Id).Exec()
+		if err != nil {
+			o.Rollback()
 		}
 	}
 	return

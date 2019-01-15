@@ -118,8 +118,8 @@ export default {
         sysCode.push(key)
         roleId.push(item)
       })
-      this.form.roleIds = roleId
-      this.form.sysCodes = sysCode
+      this.form.RoleIds = roleId
+      this.form.SysCodes = sysCode
       this.data.formData = this.form
     }
 

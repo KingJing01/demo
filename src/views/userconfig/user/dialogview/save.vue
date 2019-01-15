@@ -95,6 +95,19 @@ export default {
     },
     cancleValid() {
       this.$refs['userForm'].resetFields()
+    },
+    // 单选按钮的修改事件
+    handleRadioChange(name, code) {
+      this.selectData.set(name, code)
+      var sysCode = new Array(0)
+      var roleId = new Array(0)
+      this.selectData.forEach(function(item, key, mapObj) {
+        sysCode.push(key)
+        roleId.push(item)
+      })
+      this.form.RoleIds = roleId
+      this.form.SysCodes = sysCode
+      this.data.formData = this.form
     }
   }
 }

@@ -190,7 +190,7 @@ export default {
       type: 'insert',
       tableData: [],
       search: {
-        pageSize: 5,
+        pageSize: 10,
         offset: 0
       },
       form: { },
@@ -241,7 +241,7 @@ export default {
 
     // 重置按钮
     onReset() {
-      this.search = { pageSize: 5, offset: 0 }
+      this.search = { pageSize: 10, offset: 0 }
       this.dialogInfoVisable = false
       this.getList()
     },

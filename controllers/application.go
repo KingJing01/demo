@@ -223,10 +223,11 @@ func (c *ApplicationController) GetSelectData() {
 // @router /:id [put]
 func (c *ApplicationController) Put() {
 	result := &out.OperResult{}
-	userID := c.GetSession("userId")
-	if userID == nil {
-		result.Result = 0
-		result.Message = "seesion失效"
+	originToken := c.Ctx.Request.Header.Get("Authorization")
+	_, _, userID, _ := tool.GetInfoFromToken(originToken)
+	if userID == 0 {
+		result.Result = 2
+		result.Message = "登陆信息失效，请重新登陆"
 		c.Data["json"] = result
 		c.ServeJSON()
 		return
@@ -236,7 +237,7 @@ func (c *ApplicationController) Put() {
 	v := models.Application{Id: id}
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 		v.LastModificationTime = time.Now()
-		v.LastModificationUserId = userID.(int64)
+		v.LastModificationUserId = userID
 		if err := models.UpdateApplicationById(&v); err == nil {
 			result.Result = 1
 			c.Data["json"] = result

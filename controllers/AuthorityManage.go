@@ -91,11 +91,11 @@ func (c *AuthorityManageController) SysLogin() {
 func (c *AuthorityManageController) Login() {
 	lresult := &out.LoginResult{}
 	originToken := c.Ctx.Request.Header.Get("Authorization")
-	sysCode := c.Ctx.Request.Header.Get("SysCode")
 	// 判断 token 是否有值  token为空表示第一次登陆  不为空验证 token是否有效
 	if originToken == "" {
 		l := &input.LoginInfo{}
 		json.Unmarshal(c.Ctx.Input.RequestBody, l)
+		sysCode := l.SysCode
 		valid := validation.Validation{}
 		resultUserName := valid.Required(l.UserName, "username").Message("请输入用户名")
 		if resultUserName.Ok == false {
@@ -113,7 +113,7 @@ func (c *AuthorityManageController) Login() {
 			c.ServeJSON()
 			return
 		}
-		resultSysID := valid.Required(sysCode, "sysCode").Message("系统号不能为空")
+		resultSysID := valid.Required(sysCode, "sysCode").Message("身份不能为空")
 		if resultSysID.Ok == false {
 			lresult.Result = 0
 			lresult.Message = resultSysID.Error.Message

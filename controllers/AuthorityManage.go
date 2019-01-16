@@ -79,7 +79,7 @@ func (c *AuthorityManageController) SysLogin() {
 	c.TplName = "login.html"
 }
 
-// Login 系统登陆
+// Login PC端系统登陆
 // @Title Login
 // @Description  系统登陆
 // @Param   body     body    inputmodels.LoginInfo  true        "登陆信息  username password"
@@ -192,6 +192,112 @@ func (c *AuthorityManageController) Login() {
 		tools.Globalcluster.Close()
 	}
 
+}
+
+// AuthLogin 权限端系统登陆
+// @Title Login
+// @Description  系统登陆
+// @Param   body     body    inputmodels.LoginInfo  true        "登陆信息  username password"
+// @Param   Authorization     header    string  false        "Token信息"
+// @Param   SysCode     header    string  true        "系统编码"
+// @Success 200  result:1(success)  0(false)
+// @Failure 404 User not found
+// @router /authLogin [post]
+func (c *AuthorityManageController) AuthLogin() {
+	lresult := &out.LoginResult{}
+	originToken := c.Ctx.Request.Header.Get("Authorization")
+	// 判断 token 是否有值  token为空表示第一次登陆  不为空验证 token是否有效
+	if originToken == "" {
+		l := &input.LoginInfo{}
+		json.Unmarshal(c.Ctx.Input.RequestBody, l)
+		sysCode := l.SysCode
+		valid := validation.Validation{}
+		resultUserName := valid.Required(l.UserName, "username").Message("请输入用户名")
+		if resultUserName.Ok == false {
+			lresult.Result = 0
+			lresult.Message = resultUserName.Error.Message
+			c.Data["json"] = lresult
+			c.ServeJSON()
+			return
+		}
+		resultPass := valid.Required(l.Password, "password").Message("请输入密码")
+		if resultPass.Ok == false {
+			lresult.Result = 0
+			lresult.Message = resultPass.Error.Message
+			c.Data["json"] = lresult
+			c.ServeJSON()
+			return
+		}
+		result, user, err := models.AuthLoginCheck(l.UserName, l.Password)
+		respmessage := ""
+		if result == false {
+			if err == nil {
+				respmessage = "用户名和密码不匹配，重新登陆"
+			} else {
+				if err == orm.ErrNoRows {
+					respmessage = "用户名和密码不匹配，重新登陆"
+				} else {
+					respmessage = err.Error()
+				}
+			}
+			lresult.Result = 0
+			lresult.Message = respmessage
+			c.Data["json"] = lresult
+			c.ServeJSON()
+			return
+		}
+		token := jwt.New(jwt.SigningMethodHS256)
+		claims := make(jwt.MapClaims)
+		// jwt 唯一标识存放userId
+		claims["jti"] = user.Id
+		// jwt 有效时间
+		claims["exp"] = time.Now().Add(time.Minute * time.Duration(10)).Unix()
+		// jwt 发布时间
+		claims["iat"] = time.Now().Unix()
+		// jwt 发布者 存放用户
+		claims["iss"] = user.TenantId
+		token.Claims = claims
+		tokenString, err := token.SignedString([]byte(SecretKey))
+		//获取用户对应的系统权限
+		permissions := models.GetPermissionByUser(user.Id)
+		arrPermission := out.ParsePermissionData(permissions)
+		authData, _ := json.Marshal(arrPermission)
+		// 设置 user 信息
+		var userOut out.UserInfoToken
+		userOut.UserName = user.UserName
+		userOut.Phone = user.PhoneNumber
+		tokenMap := make(map[string]string)
+		tokenMap["ssoId"] = string(user.SsoID)
+		jsonUser, _ := json.Marshal(userOut)
+		tokenMap["userInfo"] = string(jsonUser)
+		tools.InitRedis()
+		skey := fmt.Sprintf("%s%s", strconv.FormatInt(user.SsoID, 10), sysCode)
+		tools.Globalcluster.Do("set", skey, authData)
+		tools.Globalcluster.Do("set", tokenString, user.SsoID)
+		tools.Globalcluster.Do("EXPIRE", tokenString, 3600)
+		tools.Globalcluster.Close()
+		lresult.Result = 1
+		lresult.Token = tokenString
+		c.Data["json"] = lresult
+		c.Ctx.SetCookie("xy_token", tokenString, 12*3600, "/", ".free.idcfengye.com")
+		c.ServeJSON()
+	} else {
+		respmessage := &out.OperResult{}
+		tools.InitRedis()
+		exists, _ := tools.Globalcluster.Do("EXISTS", originToken)
+		if exists.(int64) != 0 {
+			respmessage.Result = 1
+			respmessage.Message = "token有效"
+			c.Data["json"] = respmessage
+			c.ServeJSON()
+		} else {
+			respmessage.Result = 0
+			respmessage.Message = "token失效"
+			c.Data["json"] = respmessage
+			c.ServeJSON()
+		}
+		tools.Globalcluster.Close()
+	}
 }
 
 // GetUserInfo 根据TOKEN获取用户信息 已废弃

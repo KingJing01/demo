@@ -231,6 +231,20 @@ func LoginCheck(username string, password string, SysCode string) (result bool, 
 	return true, user, nil
 }
 
+//根据用户名、密码查询
+func AuthLoginCheck(username string, password string) (result bool, user User, err error) {
+	o := orm.NewOrm()
+	password = GetDefaultPassword(password)
+	err = o.Raw(`SELECT t1.* FROM USER t1 LEFT JOIN userrole t2 on t1.Id =t2.UserId WHERE t1.IsDeleted = 0
+	AND t2.RoleId in (0,1) AND (t1.PhoneNumber = ? OR t1.UserName = ? OR t1.EmailAddress = ?)
+	AND t1. PASSWORD = ?`, username, username, username, password).QueryRow(&user)
+	// 判断是否有错误的返回
+	if err != nil {
+		return false, user, err
+	}
+	return true, user, nil
+}
+
 func RegistUser(loginInfo *input.LoginInfo, SysCode string) (ssoId int64, err error) {
 	o := orm.NewOrm()
 	o.Begin()
@@ -335,7 +349,7 @@ func DeleteUser(ids string, userID int64) (err error) {
 //GetDefaultPassword 参数为"" 生成默认的加密密码 sha256 不为空对密码进行加密
 func GetDefaultPassword(val string) (passwd string) {
 	if val == "" {
-		val = "U123456"
+		val = "123456"
 	}
 	hash := sha256.New()
 	hash.Write([]byte(val))

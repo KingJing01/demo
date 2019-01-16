@@ -51,6 +51,7 @@
         align="center"
       />
       <el-table-column
+        :show-overflow-tooltip="true"
         prop="MenuText"
         label="操作名称"
         align="center"

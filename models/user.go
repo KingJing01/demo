@@ -245,7 +245,7 @@ func RegistUser(loginInfo *input.LoginInfo, SysCode string) (ssoId int64, err er
 	user.Password = GetDefaultPassword(loginInfo.Password)
 	user.Name = loginInfo.UserName
 	user.PhoneNumber = loginInfo.UserName
-	user.SsoID = ssoUser.Id
+	user.SsoID = ssoId
 	user.SysCode = SysCode
 	user.CreationTime = time.Now()
 	_, err = o.Insert(user)

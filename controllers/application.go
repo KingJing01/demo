@@ -38,6 +38,13 @@ func (c *ApplicationController) Post() {
 	result := &out.OperResult{}
 	originToken := c.Ctx.Request.Header.Get("Authorization")
 	_, _, userID, _ := tool.GetInfoFromToken(originToken)
+	if userID == 0 {
+		result.Result = 2
+		result.Message = "登陆信息失效，请重新登陆"
+		c.Data["json"] = result
+		c.ServeJSON()
+		return
+	}
 	var v models.Application
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 		v.CreationTime = time.Now()
@@ -144,17 +151,18 @@ func (c *ApplicationController) GetAll() {
 // @router /:id [delete]
 func (c *ApplicationController) Delete() {
 	result := &out.OperResult{}
-	userID := c.GetSession("userId")
-	if userID == nil {
-		result.Result = 0
-		result.Message = "seesion失效"
+	originToken := c.Ctx.Request.Header.Get("Authorization")
+	_, _, userID, _ := tool.GetInfoFromToken(originToken)
+	if userID == 0 {
+		result.Result = 2
+		result.Message = "登陆信息失效，请重新登陆"
 		c.Data["json"] = result
 		c.ServeJSON()
 		return
 	}
 	idStr := c.Ctx.Input.Param(":id")
 	id, _ := strconv.Atoi(idStr)
-	if err := models.DeleteApplication(id, userID.(int64)); err == nil {
+	if err := models.DeleteApplication(id, userID); err == nil {
 		result.Result = 1
 		c.Data["json"] = result
 	} else {

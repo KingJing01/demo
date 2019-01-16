@@ -139,8 +139,6 @@ func (c *AuthorityManageController) Login() {
 			c.ServeJSON()
 			return
 		}
-		c.SetSession("userId", user.Id)
-		c.SetSession("tenantId", user.TenantId)
 		token := jwt.New(jwt.SigningMethodHS256)
 		claims := make(jwt.MapClaims)
 		// jwt 唯一标识存放userId
@@ -169,7 +167,7 @@ func (c *AuthorityManageController) Login() {
 		jsonUser, _ := json.Marshal(userOut)
 		tokenMap["userInfo"] = string(jsonUser)
 		tools.InitRedis()
-		skey := fmt.Sprintf("%s%s", strconv.FormatInt(user.Id, 10), sysCode)
+		skey := fmt.Sprintf("%s%s", strconv.FormatInt(user.SsoID, 10), sysCode)
 		tools.Globalcluster.Do("set", skey, authData)
 		tools.Globalcluster.Do("set", tokenString, user.SsoID)
 		tools.Globalcluster.Do("EXPIRE", tokenString, 3600)

@@ -13,7 +13,6 @@ export function getUserList(info) {
 }
 // 新增用户信息
 export function addUserInfo(info) {
-  debugger
   return request({
     url: '/user',
     method: 'post',

@@ -228,12 +228,10 @@ func GetPermissionByUserAndPermission(userid int64, permissionName string) (p *P
 	return p, nil
 }
 
-func GetPermissionByUser(userid int64, sysCode string) (permissions []Permission, num int64) {
+func GetPermissionByUser(userid int64) (perInfos []out.PerInfo) {
 	o := orm.NewOrm()
-	/* 获取用户信息下的操作权限
-	num, _ = o.QueryTable("permission").Filter("UserId", userid).Filter("SysCode", sysCode).All(&permissions) */
-	o.Raw("select * from permission where MenuCode in (select MenuCode from permission where UserId=? and IsMenu=1 group by MenuCode) and IsMenu=0", userid).QueryRows(&permissions)
-	return permissions, num
+	o.Raw("select t2.childData display_name ,t1.Name name from permission t1 right join (select GROUP_CONCAT(Name) childData ,MenuCode from permission where UserId=?  group by MenuCode ) t2 on t1.MenuCode = t2.MenuCode where t1.IsMenu=0", userid).QueryRows(&perInfos)
+	return perInfos
 }
 
 // 获取列表的信息

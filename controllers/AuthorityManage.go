@@ -152,11 +152,8 @@ func (c *AuthorityManageController) Login() {
 		token.Claims = claims
 		tokenString, err := token.SignedString([]byte(SecretKey))
 		//获取用户对应的系统权限
-		permissions, _ := models.GetPermissionByUser(user.Id, sysCode)
-		var arrPermission []string
-		for _, v := range permissions {
-			arrPermission = append(arrPermission, v.Name)
-		}
+		permissions := models.GetPermissionByUser(user.Id)
+		arrPermission := out.ParsePermissionData(permissions)
 		authData, _ := json.Marshal(arrPermission)
 		// 设置 user 信息
 		var userOut out.UserInfoToken
@@ -197,7 +194,7 @@ func (c *AuthorityManageController) Login() {
 
 }
 
-// GetUserInfo 根据TOKEN获取用户信息
+// GetUserInfo 根据TOKEN获取用户信息 已废弃
 // @Title GetUserInfo
 // @Description 根据TOKEN获取用户信息
 // @Param   Authorization     header    string  true        "Token信息"
@@ -207,7 +204,6 @@ func (c *AuthorityManageController) Login() {
 // @router /GetUserInfo [get]
 func (c *AuthorityManageController) GetUserInfo() {
 	token := c.Ctx.Request.Header.Get("Authorization")
-	sysCode := c.Ctx.Request.Header.Get("SysCode")
 	result := &out.OperResult{}
 	ok, claims, err := tools.CheckLogin(token)
 	if !ok {
@@ -221,11 +217,8 @@ func (c *AuthorityManageController) GetUserInfo() {
 	tmp := strconv.FormatFloat(claims["jti"].(float64), 'f', -1, 64)
 	userid, _ := strconv.ParseInt(tmp, 10, 64)
 	u, _ := models.GetUserByID(userid)
-	permissions, _ := models.GetPermissionByUser(userid, sysCode)
-	var arrPermission []string
-	for _, v := range permissions {
-		arrPermission = append(arrPermission, v.Name)
-	}
+	permissions := models.GetPermissionByUser(userid)
+	arrPermission := out.ParsePermissionData(permissions)
 	data := make(map[string]interface{})
 	data["userInfo"] = u
 	data["permissions"] = arrPermission

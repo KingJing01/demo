@@ -116,3 +116,16 @@ func ParseCheckRadioData(data []ComponentData) (result []map[string]interface{})
 	}
 	return result
 }
+
+//ParsePermissionData  解析数据
+func ParsePermissionData(data []PerInfo) (result []map[string]interface{}) {
+	for _, x := range data {
+		mapResult := make(map[string]interface{})
+		mapResult["name"] = x.Name
+		// 中文权限拆为数组
+		displayArr := strings.Split(x.DisplayName, ",")
+		mapResult["childrenList"] = displayArr
+		result = append(result, mapResult)
+	}
+	return result
+}

@@ -296,16 +296,17 @@ func (c *AuthorityManageController) AuthLogin() {
 	}
 }
 
-// GetUserInfo 根据TOKEN获取用户信息 已废弃
-// @Title GetUserInfo
+// GetUserPermission 根据TOKEN获取用户信息 已废弃
+// @Title GetUserPermission
 // @Description 根据TOKEN获取用户信息
 // @Param   Authorization     header    string  true        "Token信息"
 // @Param   SysCode     header    string  true        "系统编码"
 // @Success 200  result:1(success)  0(false)
 // @Failure 404  User not found
-// @router /GetUserInfo [get]
-func (c *AuthorityManageController) GetUserInfo() {
+// @router /GetUserPermission [get]
+func (c *AuthorityManageController) GetUserPermission() {
 	token := c.Ctx.Request.Header.Get("Authorization")
+	sysCode := c.Ctx.Request.Header.Get("SysCode")
 	result := &out.OperResult{}
 	ok, claims, err := tools.CheckLogin(token)
 	if !ok {
@@ -315,14 +316,11 @@ func (c *AuthorityManageController) GetUserInfo() {
 		c.ServeJSON()
 		return
 	}
-
 	tmp := strconv.FormatFloat(claims["jti"].(float64), 'f', -1, 64)
 	userid, _ := strconv.ParseInt(tmp, 10, 64)
-	u, _ := models.GetUserByID(userid)
-	permissions := models.GetPermissionByUser(userid, "")
+	permissions := models.GetPermissionByUser(userid, sysCode)
 	arrPermission := out.ParsePermissionData(permissions)
 	data := make(map[string]interface{})
-	data["userInfo"] = u
 	data["permissions"] = arrPermission
 	result.Result = 1
 	result.Data = data

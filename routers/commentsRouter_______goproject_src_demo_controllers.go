@@ -81,8 +81,8 @@ func init() {
 
     beego.GlobalControllerRouter["demo/controllers:AuthorityManageController"] = append(beego.GlobalControllerRouter["demo/controllers:AuthorityManageController"],
         beego.ControllerComments{
-            Method: "GetUserInfo",
-            Router: `/GetUserInfo`,
+            Method: "GetUserPermission",
+            Router: `/GetUserPermission`,
             AllowHTTPMethods: []string{"get"},
             MethodParams: param.Make(),
             Filters: nil,

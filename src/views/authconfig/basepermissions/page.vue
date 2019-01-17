@@ -196,7 +196,7 @@ export default {
       dialogInfoVisable: false,
       selection: [], // 列表选择框的信息
       selectionSysCodes: [], // 勾选的系统信息
-      options: [], // 系统下拉数据
+      options: [], //  系统下拉数据
       formRules: {
         SysCode: [{ required: true, trigger: 'change', message: '系统为必填项' }],
         Name: [{ required: true, trigger: 'blur', message: '菜单编码为必填项' }, { min: 3, max: 20, message: '输入内容最大长度为20', trigger: 'blur' }],
@@ -222,6 +222,7 @@ export default {
       this.dialogFormVisible = true
       getPerInfoByMenuId(row.Id).then(response => {
         this.form = response.Data
+        if (!response.Data.PerData) this.form.PerData = []
       })
     },
     // 获取列表数据
@@ -292,7 +293,7 @@ export default {
     },
     // 监听dialog的打开事件
     handleOpenDialog() {
-      sysDataSelect().then(response => {
+      sysDataSelect(0).then(response => {
         this.options = response.Data
       })
     },

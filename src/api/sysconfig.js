@@ -52,9 +52,9 @@ export function updateSysInfo(info) {
 }
 
 // select 系统下拉数据
-export function sysDataSelect() {
+export function sysDataSelect(data) {
   return request({
-    url: '/application/getSelectData',
+    url: '/application/getSelectData/' + data,
     method: 'post'
   })
 }

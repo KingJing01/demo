@@ -125,13 +125,25 @@
               auto-complete="off"
             />
           </el-form-item>
-
           <el-form-item
             :label-width="formLabelWidth"
-            label="系统名称"
+            label="主系统名称"
+            prop="primarySysCode"
+          >
+            <el-select v-model="form.primarySysCode" placeholder="请选择" @change="changeSysSelect">
+              <el-option
+                v-for="item in primaryOptions"
+                :key="item.SysCode"
+                :label="item.SysName"
+                :value="item.SysCode"/>
+            </el-select>
+          </el-form-item>
+          <el-form-item
+            :label-width="formLabelWidth"
+            label="子系统名称"
             prop="sysCode"
           >
-            <el-select v-model="form.sysCode" placeholder="请选择" @change="changeSysSelect">
+            <el-select v-model="form.sysCode" placeholder="请选择">
               <el-option
                 v-for="item in options"
                 :key="item.SysCode"
@@ -198,10 +210,12 @@ export default {
       dialogFormVisible: false,
       formLabelWidth: '100px',
       dialogInfoVisable: false,
-      options: [],
+      primaryOptions: [], // 主系统
+      options: [], // 子系统
       authData: [],
       multipleSelection: [],
       formRules: {
+        primarkSysCode: [{ required: true, trigger: 'change', message: '系统为必填项' }],
         sysCode: [{ required: true, trigger: 'change', message: '系统为必填项' }],
         setMealName: [{ required: true, trigger: 'blur', message: '套餐名为必填项' }]
       }
@@ -369,7 +383,10 @@ export default {
     },
     // 监听dialog的打开事件
     handleOpenDialog() {
-      sysDataSelect().then(response => {
+      sysDataSelect(0).then(response => {
+        this.primaryOptions = response.Data
+      })
+      sysDataSelect(1).then(response => {
         this.options = response.Data
       })
     },

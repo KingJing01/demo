@@ -142,7 +142,7 @@ export default {
   methods: {
     // 获取企业checkbox和套餐的radio数据
     getSysData() {
-      sysDataSelect().then(response => {
+      sysDataSelect(1).then(response => {
         this.SysOptions = response.Data
       })
     },

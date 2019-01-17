@@ -29,6 +29,10 @@
     </el-form>
     <!-- 查询 form end -->
     <!-- 基础权限列表  start -->
+    <el-row id="action_line">
+      <el-button @click="dialogFormVisible = true">新增套餐</el-button>
+      <el-button type="primary" @click="handleDeleteSetMeal">禁用套餐</el-button>
+    </el-row>
     <el-table
       :data="tableData"
       style="width: 90%"
@@ -97,10 +101,6 @@
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"/>
     </div>
-    <el-row id="action_line">
-      <el-button @click="dialogFormVisible = true">新增套餐</el-button>
-      <el-button type="primary" @click="handleDeleteSetMeal">禁用套餐</el-button>
-    </el-row>
 
     <!-- 分页控件  end -->
     <!-- 弹出层 信息录入和修改  start -->

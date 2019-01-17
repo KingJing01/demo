@@ -27,6 +27,10 @@
       </el-form-item>
     </el-form>
     <!-- 查询 form end -->
+    <el-row id="action_line">
+      <el-button @click="handleInsert"> 新增菜单</el-button>
+      <el-button type="primary" @click="handleSetMeal">生成套餐</el-button>
+    </el-row>
     <!-- 基础权限列表  start -->
     <el-table
       :data="tableData"
@@ -81,10 +85,6 @@
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"/>
     </div>
-    <el-row id="action_line">
-      <el-button @click="handleInsert"> 新增菜单</el-button>
-      <el-button type="primary" @click="handleSetMeal">生成套餐</el-button>
-    </el-row>
 
     <!-- 分页控件  end -->
     <!-- 弹出层 信息录入和修改  start -->

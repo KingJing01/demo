@@ -228,9 +228,11 @@ func GetPermissionByUserAndPermission(userid int64, permissionName string) (p *P
 	return p, nil
 }
 
-func GetPermissionByUser(userid int64) (perInfos []out.PerInfo) {
+func GetPermissionByUser(userid int64, sysCode string) (perInfos []out.PerInfo) {
 	o := orm.NewOrm()
-	o.Raw("select t2.childData display_name ,t1.Name name from permission t1 right join (select GROUP_CONCAT(Name) childData ,MenuCode from permission where UserId=?  group by MenuCode ) t2 on t1.MenuCode = t2.MenuCode where t1.IsMenu=0", userid).QueryRows(&perInfos)
+	if sysCode != "" {
+		o.Raw("select t2.childData display_name ,t1.Name name from permission t1 right join (select GROUP_CONCAT(Name) childData ,MenuCode from permission where UserId=? and t1.SysCode=?  group by MenuCode ) t2 on t1.MenuCode = t2.MenuCode where t1.IsMenu=0", userid, sysCode).QueryRows(&perInfos)
+	}
 	return perInfos
 }
 

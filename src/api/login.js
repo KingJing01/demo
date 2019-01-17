@@ -13,7 +13,7 @@ export function login(username, password, sysCode) {
 
 export function getInfo(token) {
   return request({
-    url: '/authoritymanage/GetUserInfo',
+    url: '/authoritymanage/GetUserPermission',
     method: 'get'
   })
 }

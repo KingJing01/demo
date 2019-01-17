@@ -115,3 +115,11 @@ type ComponentData struct {
 	// 子组件的显示名
 	ChildName string
 }
+
+// TMSUser tms系统用户信息
+type TMSUser struct {
+	UserCode string
+	SsoUid   string
+	Mobile   string
+	Email    string
+}

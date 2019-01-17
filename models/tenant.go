@@ -45,7 +45,7 @@ func init() {
 
 // AddTenant insert a new Tenant into database and returns
 // last inserted Id on success.
-func AddTenant(m *Tenant, syScode []string, perId []string, perMenu []string, userID int64) (err error) {
+func AddTenant(m *Tenant, syScode []string, perId []string, perMenu []string, userID int64) (err error, tmsUser out.TMSUser) {
 	currTime := time.Now()
 	o := orm.NewOrm()
 	//开启事务
@@ -57,7 +57,7 @@ func AddTenant(m *Tenant, syScode []string, perId []string, perMenu []string, us
 	if err != nil {
 		//回滚
 		o.Rollback()
-		return err
+		return err, tmsUser
 	}
 	//新增一个ssouer
 	ssoUser := SsoUser{}
@@ -67,7 +67,7 @@ func AddTenant(m *Tenant, syScode []string, perId []string, perMenu []string, us
 	if err != nil {
 		//回滚
 		o.Rollback()
-		return err
+		return err, tmsUser
 	}
 	user := User{}
 	user.CreationTime = currTime
@@ -76,6 +76,7 @@ func AddTenant(m *Tenant, syScode []string, perId []string, perMenu []string, us
 	user.Password = GetDefaultPassword("")
 	user.EmailAddress = m.Email
 	user.PhoneNumber = m.LinkPhone
+	user.UserName = m.LinkPhone
 	user.TenantId = m.Id
 	//循环
 	tenApp := TenantApplication{}
@@ -95,7 +96,7 @@ func AddTenant(m *Tenant, syScode []string, perId []string, perMenu []string, us
 		if err != nil {
 			//回滚
 			o.Rollback()
-			return err
+			return err, tmsUser
 		}
 		tenApp.SysCode = arg
 		tenApp.MenuText = perMenu[i]
@@ -106,14 +107,14 @@ func AddTenant(m *Tenant, syScode []string, perId []string, perMenu []string, us
 		if err != nil {
 			//回滚
 			o.Rollback()
-			return err
+			return err, tmsUser
 		}
 		// permission 表 插入租户拥有的权限
 		err = InsertTenantPermission(arg, perId[i], m.Id, user.Id)
 		if err != nil {
 			//回滚
 			o.Rollback()
-			return err
+			return err, tmsUser
 		}
 		user.Id = 0
 		userRole.Id = 0
@@ -123,11 +124,21 @@ func AddTenant(m *Tenant, syScode []string, perId []string, perMenu []string, us
 	if err != nil {
 		//回滚
 		o.Rollback()
-		return err
+		return err, tmsUser
 	}
 	//事务提交
 	o.Commit()
-	return
+	/**
+	userCode string
+	ssoUid   string
+	mobile   string
+	email    string
+	**/
+	tmsUser.SsoUid = strconv.FormatInt(ssoID, 10)
+	tmsUser.UserCode = user.UserName
+	tmsUser.Email = user.EmailAddress
+	tmsUser.Mobile = user.PhoneNumber
+	return err, tmsUser
 }
 
 // GetTenantById retrieves Tenant by Id. Returns error if

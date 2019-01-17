@@ -45,7 +45,11 @@ func (c *TenantController) Post() {
 	perMenu := tool.ParseInterfaceArr(mystruct["perMenu"].([]interface{}))
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 		v.LastModificationTime = time.Now()
-		if err := models.AddTenant(&v, sysCode, perID, perMenu, userID); err == nil {
+		if err, tmsUser := models.AddTenant(&v, sysCode, perID, perMenu, userID); err == nil {
+			respCode, _ := out.SendUserInfoToTms(tmsUser)
+			if respCode != 200 {
+				result.Message = "数据已入库,tms推送失败"
+			}
 			result.Result = 1
 			c.Data["json"] = result
 		} else {

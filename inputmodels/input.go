@@ -4,7 +4,6 @@ package inputmodels
 type LoginInfo struct {
 	UserName string `form:"username"`
 	Password string `form:"password"`
-	SysCode  string `form:"sysCode"`
 }
 
 type SetMeatInput struct {

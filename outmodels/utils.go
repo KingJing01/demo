@@ -1,9 +1,51 @@
 package outmodels
 
 import (
+	"bytes"
+	"fmt"
+	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/astaxie/beego"
 )
+
+const (
+	//TMSAddUser  tms 新增用户地址
+	TMSAddUser = "httpEdi/user/addUser.do"
+)
+
+func GetServerUrl() (url string) {
+	return beego.AppConfig.String("TMSAddUser")
+}
+
+//ParseUser 请求数据解析
+func ParseUser(tmsUser TMSUser) (result *bytes.Buffer) {
+	//json序列化
+	post := "{\"userCode\":\"" + tmsUser.UserCode +
+		"\",\"ssoUid\":\"" + tmsUser.SsoUid +
+		"\",\"mobile\":\"" + tmsUser.Mobile +
+		"\",\"email\":\"" + tmsUser.Email +
+		"\"}"
+	var jsonStr = []byte(post)
+	return bytes.NewBuffer(jsonStr)
+}
+
+//SendUserInfoToTms 向tms推送用用户数据
+func SendUserInfoToTms(tmsUser TMSUser) (respCode int, err error) {
+	jsonStr := ParseUser(tmsUser)
+	url := fmt.Sprintf("%s%s", GetServerUrl(), TMSAddUser)
+	req, err := http.NewRequest("POST", url, jsonStr)
+	//设置请求头为 application/json
+	req.Header.Set("Content-Type", "application/json")
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
+	return resp.StatusCode, err
+}
 
 /* authData: [
    {

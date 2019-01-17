@@ -220,13 +220,13 @@
                 }
             }
         },
-        "/authoritymanage/GetUserInfo": {
+        "/authoritymanage/GetUserPermission": {
             "get": {
                 "tags": [
                     "authoritymanage"
                 ],
                 "description": "根据TOKEN获取用户信息",
-                "operationId": "AuthorityManageController.GetUserInfo",
+                "operationId": "AuthorityManageController.GetUserPermission",
                 "parameters": [
                     {
                         "in": "header",
@@ -1789,9 +1789,6 @@
             "type": "object",
             "properties": {
                 "Password": {
-                    "type": "string"
-                },
-                "SysCode": {
                     "type": "string"
                 },
                 "UserName": {

@@ -108,6 +108,13 @@ export default {
       this.form.RoleIds = roleId
       this.form.SysCodes = sysCode
       this.data.formData = this.form
+    },
+    cleanData() {
+      this.selectData = new Map()
+      this.radio = ''
+      this.checkedApplications = []
+      this.radioData = []
+      this.options = {}
     }
   }
 }

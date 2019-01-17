@@ -101,6 +101,10 @@ export default {
     handleRadioChange(name, code) {
       this.form.RoleCode = code
       this.data.formData = this.form
+    },
+    cleanData() {
+      this.radioData = []
+      this.options = {}
     }
   }
 }

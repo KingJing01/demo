@@ -259,6 +259,7 @@ export default {
       this.form = {}
       this.type = 'insert'
       this.$refs.userData.cancleValid()
+      this.$refs.userData.cleanData()
     }
   }
 }

@@ -258,7 +258,7 @@
                 "tags": [
                     "authoritymanage"
                 ],
-                "description": "系统登陆",
+                "description": "PC端系统系统登陆",
                 "operationId": "AuthorityManageController.Login",
                 "parameters": [
                     {
@@ -274,13 +274,6 @@
                         "in": "header",
                         "name": "Authorization",
                         "description": "Token信息",
-                        "type": "string"
-                    },
-                    {
-                        "in": "header",
-                        "name": "SysCode",
-                        "description": "系统编码",
-                        "required": true,
                         "type": "string"
                     }
                 ],
@@ -320,6 +313,40 @@
                 "responses": {
                     "200": {
                         "description": "result:1(success)  0(false)"
+                    }
+                }
+            }
+        },
+        "/authoritymanage/authLogin": {
+            "post": {
+                "tags": [
+                    "authoritymanage"
+                ],
+                "description": "权限端系统登陆",
+                "operationId": "AuthorityManageController.Login",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "登陆信息  username password",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/inputmodels.LoginInfo"
+                        }
+                    },
+                    {
+                        "in": "header",
+                        "name": "Authorization",
+                        "description": "Token信息",
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "result:1(success)  0(false)"
+                    },
+                    "404": {
+                        "description": "User not found"
                     }
                 }
             }
@@ -412,6 +439,13 @@
                         "description": "Token信息",
                         "required": true,
                         "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "menuCode",
+                        "description": "权限编码",
+                        "required": true,
+                        "type": "string"
                     }
                 ],
                 "responses": {
@@ -490,6 +524,32 @@
                     },
                     "403": {
                         "description": "body is empty"
+                    }
+                }
+            }
+        },
+        "/permission/getPerInfoByRoleId/{roleId}": {
+            "get": {
+                "tags": [
+                    "permission"
+                ],
+                "description": "根据角色编号获取权限",
+                "operationId": "PermissionController.GetPerInfoByRoleID",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "roleCode",
+                        "description": "系统编号",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "result:1(success)  0(false)"
+                    },
+                    "403": {
+                        "description": "sysCode is empty"
                     }
                 }
             }
@@ -641,110 +701,40 @@
                 "tags": [
                     "role"
                 ],
-                "description": "get Role",
+                "description": "获取角色信息",
                 "operationId": "RoleController.Get All",
                 "parameters": [
                     {
                         "in": "query",
-                        "name": "query",
-                        "description": "Filter. e.g. col1:v1,col2:v2 ...",
+                        "name": "roleName",
+                        "description": "角色名称名称",
                         "type": "string"
                     },
                     {
                         "in": "query",
-                        "name": "fields",
-                        "description": "Fields returned. e.g. col1,col2 ...",
+                        "name": "sysName",
+                        "description": "系统名称",
                         "type": "string"
                     },
                     {
                         "in": "query",
-                        "name": "sortby",
-                        "description": "Sorted-by fields. e.g. col1,col2 ...",
-                        "type": "string"
-                    },
-                    {
-                        "in": "query",
-                        "name": "order",
-                        "description": "Order corresponding to each sortby field, if single value, apply to all sortby fields. e.g. desc,asc ...",
-                        "type": "string"
-                    },
-                    {
-                        "in": "query",
-                        "name": "limit",
-                        "description": "Limit the size of result set. Must be an integer",
+                        "name": "pageSize",
+                        "description": "一页显示数据量 后台默认为10",
                         "type": "string"
                     },
                     {
                         "in": "query",
                         "name": "offset",
-                        "description": "Start position of result set. Must be an integer",
+                        "description": "数据下标",
                         "type": "string"
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "",
-                        "schema": {
-                            "$ref": "#/definitions/models.Role"
-                        }
+                        "description": "[object] models.SetMeal"
                     },
                     "403": {
                         "description": ""
-                    }
-                }
-            },
-            "post": {
-                "tags": [
-                    "role"
-                ],
-                "description": "create Role",
-                "operationId": "RoleController.Post",
-                "parameters": [
-                    {
-                        "in": "body",
-                        "name": "body",
-                        "description": "body for Role content",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.Role"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "{int} models.Role"
-                    },
-                    "403": {
-                        "description": "body is empty"
-                    }
-                }
-            }
-        },
-        "/role/{id}": {
-            "get": {
-                "tags": [
-                    "role"
-                ],
-                "description": "get Role by id",
-                "operationId": "RoleController.Get One",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "id",
-                        "description": "The key for staticblock",
-                        "required": true,
-                        "type": "string"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "",
-                        "schema": {
-                            "$ref": "#/definitions/models.Role"
-                        }
-                    },
-                    "403": {
-                        "description": ":id is empty"
                     }
                 }
             },
@@ -781,6 +771,113 @@
                     },
                     "403": {
                         "description": ":id is not int"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "role"
+                ],
+                "description": "create Role",
+                "operationId": "RoleController.Post",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "body for Role content",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Role"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "{int} models.Role"
+                    },
+                    "403": {
+                        "description": "body is empty"
+                    }
+                }
+            }
+        },
+        "/role/getRoleBySysCode": {
+            "get": {
+                "tags": [
+                    "role"
+                ],
+                "description": "根据系统获取系统下的角色",
+                "operationId": "RoleController.UpdateValidStatus",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "sysCodes",
+                        "description": "需要查询的系统编号",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{string} get success!"
+                    },
+                    "403": {
+                        "description": "sysCodes is empty"
+                    }
+                }
+            }
+        },
+        "/role/updateValidStatus/{id}": {
+            "put": {
+                "tags": [
+                    "role"
+                ],
+                "description": "列表修改角色有效状态",
+                "operationId": "RoleController.Delete",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "The id you want to delete",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{string} delete success!"
+                    },
+                    "403": {
+                        "description": "id is empty"
+                    }
+                }
+            }
+        },
+        "/role/{id}": {
+            "get": {
+                "tags": [
+                    "role"
+                ],
+                "description": "get Role by id",
+                "operationId": "RoleController.Get One",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "The key for staticblock",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.Role"
+                        }
+                    },
+                    "403": {
+                        "description": ":id is empty"
                     }
                 }
             },
@@ -1321,52 +1418,43 @@
                 "tags": [
                     "user"
                 ],
-                "description": "get User",
+                "description": "获取用户信息",
                 "operationId": "UserController.Get All",
                 "parameters": [
                     {
                         "in": "query",
-                        "name": "query",
-                        "description": "Filter. e.g. col1:v1,col2:v2 ...",
+                        "name": "roleName",
+                        "description": "角色名称名称",
                         "type": "string"
                     },
                     {
                         "in": "query",
-                        "name": "fields",
-                        "description": "Fields returned. e.g. col1,col2 ...",
+                        "name": "sysName",
+                        "description": "系统名称",
                         "type": "string"
                     },
                     {
                         "in": "query",
-                        "name": "sortby",
-                        "description": "Sorted-by fields. e.g. col1,col2 ...",
+                        "name": "userName",
+                        "description": "登录名",
                         "type": "string"
                     },
                     {
                         "in": "query",
-                        "name": "order",
-                        "description": "Order corresponding to each sortby field, if single value, apply to all sortby fields. e.g. desc,asc ...",
-                        "type": "string"
-                    },
-                    {
-                        "in": "query",
-                        "name": "limit",
-                        "description": "Limit the size of result set. Must be an integer",
+                        "name": "pageSize",
+                        "description": "一页显示数据量 后台默认为10",
                         "type": "string"
                     },
                     {
                         "in": "query",
                         "name": "offset",
-                        "description": "Start position of result set. Must be an integer",
+                        "description": "数据下标",
                         "type": "string"
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "",
-                        "schema": {
-                            "$ref": "#/definitions/models.User"
-                        }
+                        "description": "[object] models.SetMeal"
                     },
                     "403": {
                         "description": ""
@@ -1396,6 +1484,32 @@
                     },
                     "403": {
                         "description": "body is empty"
+                    }
+                }
+            }
+        },
+        "/user/updateUserValidStatus/{id}": {
+            "put": {
+                "tags": [
+                    "user"
+                ],
+                "description": "列表修改角色有效状态",
+                "operationId": "UserController.Delete",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "The id you want to delete",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{string} delete success!"
+                    },
+                    "403": {
+                        "description": "id is empty"
                     }
                 }
             }
@@ -1468,7 +1582,7 @@
                 "tags": [
                     "user"
                 ],
-                "description": "delete the User",
+                "description": "delete the USer",
                 "operationId": "UserController.Delete",
                 "parameters": [
                     {
@@ -1538,7 +1652,7 @@
                     "200": {
                         "description": "",
                         "schema": {
-                            "$ref": "#/definitions/models.Userrole"
+                            "$ref": "#/definitions/.Userrole"
                         }
                     },
                     "403": {
@@ -1559,7 +1673,7 @@
                         "description": "body for Userrole content",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Userrole"
+                            "$ref": "#/definitions/.Userrole"
                         }
                     }
                 ],
@@ -1593,7 +1707,7 @@
                     "200": {
                         "description": "",
                         "schema": {
-                            "$ref": "#/definitions/models.Userrole"
+                            "$ref": "#/definitions/.Userrole"
                         }
                     },
                     "403": {
@@ -1621,7 +1735,7 @@
                         "description": "body for Userrole content",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Userrole"
+                            "$ref": "#/definitions/.Userrole"
                         }
                     }
                 ],
@@ -1629,7 +1743,7 @@
                     "200": {
                         "description": "",
                         "schema": {
-                            "$ref": "#/definitions/models.Userrole"
+                            "$ref": "#/definitions/.Userrole"
                         }
                     },
                     "403": {
@@ -1667,11 +1781,17 @@
         ".Ssouser": {
             "type": "object"
         },
+        ".Userrole": {
+            "type": "object"
+        },
         "inputmodels.LoginInfo": {
             "title": "LoginInfo",
             "type": "object",
             "properties": {
                 "Password": {
+                    "type": "string"
+                },
+                "SysCode": {
                     "type": "string"
                 },
                 "UserName": {
@@ -1833,18 +1953,18 @@
             "title": "Role",
             "type": "object",
             "properties": {
-                "ConcurrencyStamp": {
+                "AuthText": {
                     "type": "string"
                 },
                 "CreationTime": {
                     "type": "string",
                     "format": "datetime"
                 },
-                "CreatorUserId": {
+                "CreatorUserID": {
                     "type": "integer",
                     "format": "int64"
                 },
-                "DeleterUserId": {
+                "DeleterUserID": {
                     "type": "integer",
                     "format": "int64"
                 },
@@ -1852,43 +1972,36 @@
                     "type": "string",
                     "format": "datetime"
                 },
-                "Description": {
-                    "type": "string"
-                },
-                "DisplayName": {
-                    "type": "string"
-                },
-                "Id": {
+                "ID": {
                     "type": "integer",
                     "format": "int64"
-                },
-                "IsDefault": {
-                    "type": "integer",
-                    "format": "int32"
                 },
                 "IsDeleted": {
                     "type": "integer",
                     "format": "int32"
                 },
-                "IsStatic": {
+                "IsValid": {
                     "type": "integer",
-                    "format": "int32"
+                    "format": "int64"
                 },
                 "LastModificationTime": {
                     "type": "string",
                     "format": "datetime"
                 },
-                "LastModifierUserId": {
+                "LastModifierUserID": {
                     "type": "integer",
                     "format": "int64"
                 },
-                "Name": {
+                "RoleCode": {
                     "type": "string"
                 },
-                "NormalizedName": {
+                "RoleName": {
                     "type": "string"
                 },
-                "TenantId": {
+                "SysCode": {
+                    "type": "string"
+                },
+                "TenantID": {
                     "type": "integer",
                     "format": "int64"
                 }
@@ -2059,6 +2172,9 @@
                 "Name": {
                     "type": "string"
                 },
+                "Password": {
+                    "type": "string"
+                },
                 "PasswordResetCode": {
                     "type": "string"
                 },
@@ -2081,39 +2197,6 @@
                 },
                 "UserUrl": {
                     "type": "string"
-                }
-            }
-        },
-        "models.Userrole": {
-            "title": "Userrole",
-            "type": "object",
-            "properties": {
-                "CreationTime": {
-                    "type": "string",
-                    "format": "datetime"
-                },
-                "CreatorUserId": {
-                    "type": "integer",
-                    "format": "int64"
-                },
-                "Id": {
-                    "type": "integer",
-                    "format": "int64"
-                },
-                "RoleId": {
-                    "type": "integer",
-                    "format": "int64"
-                },
-                "SysCode": {
-                    "type": "string"
-                },
-                "TenantId": {
-                    "type": "integer",
-                    "format": "int64"
-                },
-                "UserId": {
-                    "type": "integer",
-                    "format": "int64"
                 }
             }
         }

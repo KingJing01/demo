@@ -108,6 +108,15 @@ func init() {
 
     beego.GlobalControllerRouter["demo/controllers:AuthorityManageController"] = append(beego.GlobalControllerRouter["demo/controllers:AuthorityManageController"],
         beego.ControllerComments{
+            Method: "AuthLogin",
+            Router: `/authLogin`,
+            AllowHTTPMethods: []string{"post"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
+    beego.GlobalControllerRouter["demo/controllers:AuthorityManageController"] = append(beego.GlobalControllerRouter["demo/controllers:AuthorityManageController"],
+        beego.ControllerComments{
             Method: "PasswdUpdate",
             Router: `/passwdUpdate`,
             AllowHTTPMethods: []string{"put"},

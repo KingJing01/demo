@@ -81,10 +81,9 @@ func (c *AuthorityManageController) SysLogin() {
 
 // Login PC端系统登陆
 // @Title Login
-// @Description  系统登陆
+// @Description  PC端系统系统登陆
 // @Param   body     body    inputmodels.LoginInfo  true        "登陆信息  username password"
 // @Param   Authorization     header    string  false        "Token信息"
-// @Param   SysCode     header    string  true        "系统编码"
 // @Success 200  result:1(success)  0(false)
 // @Failure 404 User not found
 // @router /Login [post]
@@ -196,10 +195,9 @@ func (c *AuthorityManageController) Login() {
 
 // AuthLogin 权限端系统登陆
 // @Title Login
-// @Description  系统登陆
+// @Description  权限端系统登陆
 // @Param   body     body    inputmodels.LoginInfo  true        "登陆信息  username password"
 // @Param   Authorization     header    string  false        "Token信息"
-// @Param   SysCode     header    string  true        "系统编码"
 // @Success 200  result:1(success)  0(false)
 // @Failure 404 User not found
 // @router /authLogin [post]
@@ -210,7 +208,6 @@ func (c *AuthorityManageController) AuthLogin() {
 	if originToken == "" {
 		l := &input.LoginInfo{}
 		json.Unmarshal(c.Ctx.Input.RequestBody, l)
-		sysCode := l.SysCode
 		valid := validation.Validation{}
 		resultUserName := valid.Required(l.UserName, "username").Message("请输入用户名")
 		if resultUserName.Ok == false {
@@ -271,7 +268,7 @@ func (c *AuthorityManageController) AuthLogin() {
 		jsonUser, _ := json.Marshal(userOut)
 		tokenMap["userInfo"] = string(jsonUser)
 		tools.InitRedis()
-		skey := fmt.Sprintf("%s%s", strconv.FormatInt(user.SsoID, 10), sysCode)
+		skey := fmt.Sprintf("%s%s", strconv.FormatInt(user.SsoID, 10), "uam")
 		tools.Globalcluster.Do("set", skey, authData)
 		tools.Globalcluster.Do("set", tokenString, user.SsoID)
 		tools.Globalcluster.Do("EXPIRE", tokenString, 3600)
@@ -279,7 +276,6 @@ func (c *AuthorityManageController) AuthLogin() {
 		lresult.Result = 1
 		lresult.Token = tokenString
 		c.Data["json"] = lresult
-		c.Ctx.SetCookie("xy_token", tokenString, 12*3600, "/", ".free.idcfengye.com")
 		c.ServeJSON()
 	} else {
 		respmessage := &out.OperResult{}

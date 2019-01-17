@@ -72,8 +72,10 @@ func AddPermission(m map[string]interface{}, userID int64) (id int64, err error)
 	permiss.IsMenu = 0
 	rs := []rune(menuText)
 	lth := len(rs)
-	menuText = string(rs[1:lth])
-	permiss.MenuText = menuText
+	if lth > 0 {
+		menuText = string(rs[1:lth])
+		permiss.MenuText = menuText
+	}
 	permissionList = append(permissionList, permiss)
 	id, err = o.InsertMulti(len(arr)+1, permissionList)
 	return

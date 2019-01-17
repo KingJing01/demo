@@ -34,17 +34,18 @@ func (c *PermissionController) URLMapping() {
 // @router / [post]
 func (c *PermissionController) Post() {
 	result := &out.OperResult{}
-	userID := c.GetSession("userId")
-	if userID == nil {
-		result.Result = 0
-		result.Message = "seesion失效"
+	originToken := c.Ctx.Request.Header.Get("Authorization")
+	_, _, userID, _ := tool.GetInfoFromToken(originToken)
+	if userID == 0 {
+		result.Result = 2
+		result.Message = "登陆信息失效，请重新登陆"
 		c.Data["json"] = result
 		c.ServeJSON()
 		return
 	}
 	var mystruct map[string]interface{}
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &mystruct); err == nil {
-		if _, err := models.AddPermission(mystruct, userID.(int64)); err == nil {
+		if _, err := models.AddPermission(mystruct, userID); err == nil {
 			result.Result = 1
 			c.Data["json"] = result
 		} else {

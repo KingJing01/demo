@@ -18,6 +18,7 @@ type Application struct {
 	SysCode                string    `orm:"column(SysCode);size(20)"`
 	SysName                string    `orm:"column(SysName);size(45)"`
 	SysUrl                 string    `orm:"column(SysUrl);size(255)"`
+	Level                  int       `orm:"column(Level);1;"`
 	CreationTime           time.Time `orm:"column(CreationTime);type(datetime);time"`
 	CreatorUserId          int64     `orm:"column(CreatorUserId);null"`
 	LastModificationTime   time.Time `orm:"column(LastModificationTime);type(datetime);time"`
@@ -236,12 +237,12 @@ func CountApplicationInfo(sysCode string, sysName string) (total int64) {
 }
 
 //GetSelectData 获取下拉框数据
-func GetSelectData(tenantID int64) (sysInfo []out.SysInfo) {
+func GetSelectData(tenantID int64, level int) (sysInfo []out.SysInfo) {
 	o := orm.NewOrm()
 	if tenantID == 0 {
-		o.Raw("select SysCode sys_code,SysName sys_name from application where IsValid = 0 ").QueryRows(&sysInfo)
+		o.Raw("select SysCode sys_code,SysName sys_name from application where IsValid = 0 and Level=? ", level).QueryRows(&sysInfo)
 	} else {
-		o.Raw("select t1.SysCode sys_code ,t2.SysName sys_name from tenantapplication t1 LEFT JOIN application t2 on t1.SysCode = t2.SysCode where t1.TenantId = ? and t2.IsValid=0 ", tenantID).QueryRows(&sysInfo)
+		o.Raw("select t1.SysCode sys_code ,t2.SysName sys_name from tenantapplication t1 LEFT JOIN application t2 on t1.SysCode = t2.SysCode where t1.TenantId = ? and t2.IsValid=0 and t2.Level = ?", tenantID, level).QueryRows(&sysInfo)
 	}
 	return sysInfo
 }

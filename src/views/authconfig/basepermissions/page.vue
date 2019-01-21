@@ -199,8 +199,8 @@ export default {
       options: [], //  系统下拉数据
       formRules: {
         SysCode: [{ required: true, trigger: 'change', message: '系统为必填项' }],
-        Name: [{ required: true, trigger: 'blur', message: '菜单编码为必填项' }, { min: 3, max: 20, message: '输入内容最大长度为20', trigger: 'blur' }],
-        DisplayName: [{ required: true, trigger: 'blur', message: '菜单名称为必填项' }, { min: 3, max: 20, message: '输入内容最大长度为20', trigger: 'blur' }]
+        Name: [{ required: true, trigger: 'blur', message: '菜单编码为必填项' }, { max: 40, message: '输入内容最大长度为40', trigger: 'blur' }],
+        DisplayName: [{ required: true, trigger: 'blur', message: '菜单名称为必填项' }, { max: 20, message: '输入内容最大长度为20', trigger: 'blur' }]
       }
     }
   },

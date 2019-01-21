@@ -152,7 +152,7 @@ func (c *AuthorityManageController) Login() {
 		tokenString, err := token.SignedString([]byte(SecretKey))
 		//获取用户对应的系统权限
 		permissions := models.GetPermissionByUser(user.Id, sysCode)
-		arrPermission := out.ParsePermissionData(permissions)
+		arrPermission := out.ParsePermissionList(permissions)
 		authData, _ := json.Marshal(arrPermission)
 		// 设置 user 信息
 		var userOut out.UserInfoToken
@@ -257,7 +257,7 @@ func (c *AuthorityManageController) AuthLogin() {
 		tokenString, err := token.SignedString([]byte(SecretKey))
 		//获取用户对应的系统权限
 		permissions := models.GetPermissionByUser(user.Id, "")
-		arrPermission := out.ParsePermissionData(permissions)
+		arrPermission := out.ParsePermissionList(permissions)
 		authData, _ := json.Marshal(arrPermission)
 		// 设置 user 信息
 		var userOut out.UserInfoToken
@@ -319,7 +319,7 @@ func (c *AuthorityManageController) GetUserPermission() {
 	tmp := strconv.FormatFloat(claims["jti"].(float64), 'f', -1, 64)
 	userid, _ := strconv.ParseInt(tmp, 10, 64)
 	permissions := models.GetPermissionByUser(userid, sysCode)
-	arrPermission := out.ParsePermissionData(permissions)
+	arrPermission := out.ParsePermissionList(permissions)
 	data := make(map[string]interface{})
 	data["permissions"] = arrPermission
 	result.Result = 1

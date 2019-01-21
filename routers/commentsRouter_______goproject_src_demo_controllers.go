@@ -64,7 +64,7 @@ func init() {
     beego.GlobalControllerRouter["demo/controllers:ApplicationController"] = append(beego.GlobalControllerRouter["demo/controllers:ApplicationController"],
         beego.ControllerComments{
             Method: "GetSelectData",
-            Router: `/getSelectData`,
+            Router: `/getSelectData/:level`,
             AllowHTTPMethods: []string{"post"},
             MethodParams: param.Make(),
             Filters: nil,

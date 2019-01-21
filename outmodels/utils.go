@@ -23,9 +23,12 @@ func GetServerUrl() (url string) {
 func ParseUser(tmsUser TMSUser) (result *bytes.Buffer) {
 	//json序列化
 	post := "{\"userCode\":\"" + tmsUser.UserCode +
-		"\",\"ssoUid\":\"" + tmsUser.SsoUid +
+		"\",\"ssoUid\":\"" + tmsUser.SsoUID +
 		"\",\"mobile\":\"" + tmsUser.Mobile +
 		"\",\"email\":\"" + tmsUser.Email +
+		"\",\"sysId\":\"" + tmsUser.SysID +
+		"\",\"companyId\":\"" + tmsUser.CompanyID +
+		"\",\"companyName\":\"" + tmsUser.CompanyName +
 		"\"}"
 	var jsonStr = []byte(post)
 	return bytes.NewBuffer(jsonStr)
@@ -164,10 +167,23 @@ func ParsePermissionData(data []PerInfo) (result []map[string]interface{}) {
 	for _, x := range data {
 		mapResult := make(map[string]interface{})
 		mapResult["name"] = x.Name
-		// 中文权限拆为数组
+		// 权限拆为数组
 		displayArr := strings.Split(x.DisplayName, ",")
 		mapResult["childrenList"] = displayArr
 		result = append(result, mapResult)
+	}
+	return result
+}
+
+//ParsePermissionList 将数据返回为list数组
+func ParsePermissionList(data []PerInfo) (result []string) {
+	for _, x := range data {
+		result = append(result, x.Name)
+		// 权限拆为数组
+		displayArr := strings.Split(x.DisplayName, ",")
+		for _, y := range displayArr {
+			result = append(result, y)
+		}
 	}
 	return result
 }

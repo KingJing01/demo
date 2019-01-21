@@ -89,7 +89,9 @@ func AddTenant(m *Tenant, syScode []string, perId []string, perMenu []string, us
 	userRole.RoleId = 1
 	userRole.CreationTime = currTime
 	userRole.CreatorUserId = userID
+	sysCodeStr := ""
 	for i, arg := range syScode {
+		sysCodeStr += arg + ","
 		user.SysCode = arg
 		// 新增user
 		_, err = o.Insert(&user)
@@ -134,10 +136,13 @@ func AddTenant(m *Tenant, syScode []string, perId []string, perMenu []string, us
 	mobile   string
 	email    string
 	**/
-	tmsUser.SsoUid = strconv.FormatInt(ssoID, 10)
+	tmsUser.SsoUID = strconv.FormatInt(ssoID, 10)
 	tmsUser.UserCode = user.UserName
 	tmsUser.Email = user.EmailAddress
 	tmsUser.Mobile = user.PhoneNumber
+	tmsUser.CompanyID = strconv.FormatInt(m.Id, 10)
+	tmsUser.CompanyName = m.TenantName
+	tmsUser.SysID = sysCodeStr
 	return err, tmsUser
 }
 

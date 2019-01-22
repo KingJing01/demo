@@ -10,6 +10,15 @@
       />
     </el-form-item>
     <el-form-item
+      label="姓名"
+      prop="Name"
+    >
+      <el-input
+        v-model="form.Name"
+        auto-complete="off"
+      />
+    </el-form-item>
+    <el-form-item
       label="手机号"
       prop="PhoneNumber"
     >

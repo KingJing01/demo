@@ -10,6 +10,15 @@
       />
     </el-form-item>
     <el-form-item
+      label="姓名"
+      prop="Name"
+    >
+      <el-input
+        v-model="form.Name"
+        auto-complete="off"
+      />
+    </el-form-item>
+    <el-form-item
       label="手机号"
       prop="PhoneNumber"
     >
@@ -68,6 +77,7 @@ export default {
       },
       formData: {},
       formRules: {
+        Name: [{ required: true, trigger: 'change', message: '姓名为必填项' }],
         EmailAddress: [{ required: true, trigger: 'change', message: '邮箱为必填项' }],
         PhoneNumber: [{ required: true, trigger: 'change', message: '手机号为必填项' }],
         UserName: [{ required: true, trigger: 'blur', message: '用户名为必填项' }, { max: 20, message: '输入内容最大长度为20', trigger: 'blur' }]

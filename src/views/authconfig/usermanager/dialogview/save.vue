@@ -12,8 +12,17 @@
     </el-form-item>
     <el-form-item
       :label-width="formLabelWidth"
+      label="公司简称"
+      prop="ShortName"
+    >
+      <el-input
+        v-model="formData.ShortName"
+        auto-complete="off"
+      />
+    </el-form-item>
+    <el-form-item
+      :label-width="formLabelWidth"
       label="公司地址"
-      prop="TenantAddress"
     >
       <el-input
         v-model="formData.TenantAddress"
@@ -55,6 +64,7 @@
       <el-col :span="12"> <el-form-item
         :label-width="formLabelWidth"
         label="公司联系人"
+        prop="LinkMan"
       >
         <el-input
           v-model="formData.LinkMan"
@@ -132,7 +142,9 @@ export default {
           { pattern: /^[A-Za-z\d]+([-_.][A-Za-z\d]+)*@([A-Za-z\d]+[-.])+[A-Za-z\d]{2,4}$/, trigger: 'blur', message: '请输入正确格式的邮箱' }],
         LinkPhone: [{ required: true, trigger: 'blur', message: '联系人电话为必输项' },
           { pattern: /^1[345678]\d{9}$/, trigger: 'blur', message: '请输入正确格式的手机号' }],
-        SysCode: [{ required: true, trigger: 'blur', message: '系统为必选项' }]
+        SysCode: [{ required: true, trigger: 'blur', message: '系统为必选项' }],
+        ShortName: [{ required: true, trigger: 'blur', message: '公司简称为必选项' }],
+        LinkMan: [{ required: true, trigger: 'blur', message: '公司联系人为必选项' }]
       }
     }
   },

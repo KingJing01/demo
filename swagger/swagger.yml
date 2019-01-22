@@ -126,7 +126,7 @@ paths:
           description: '{string} valid success!'
         "403":
           description: SysName is empty
-  /application/getSelectData:
+  /application/getSelectData/{level}:
     post:
       tags:
       - application
@@ -1229,6 +1229,9 @@ definitions:
         type: string
         format: datetime
       LastModificationUserId:
+        type: integer
+        format: int64
+      Level:
         type: integer
         format: int64
       SysCode:

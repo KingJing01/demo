@@ -5,6 +5,7 @@ import (
 	out "demo/outmodels"
 	tool "demo/tools"
 	"encoding/json"
+	"fmt"
 	"strconv"
 	"time"
 
@@ -47,6 +48,7 @@ func (c *TenantController) Post() {
 		v.LastModificationTime = time.Now()
 		if err, tmsUser := models.AddTenant(&v, sysCode, perID, perMenu, userID); err == nil {
 			respCode, _ := out.SendUserInfoToTms(tmsUser)
+			fmt.Println("################接口返回的标记值################ ", respCode)
 			if respCode != 200 {
 				result.Message = "数据已入库,tms推送失败"
 			}

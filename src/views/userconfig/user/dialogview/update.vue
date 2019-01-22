@@ -76,7 +76,7 @@ export default {
   methods: {
     // 获取系统下拉数据
     getSysList() {
-      sysDataSelect().then(response => {
+      sysDataSelect(1).then(response => {
         this.options = response.Data
       })
     },

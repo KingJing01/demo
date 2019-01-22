@@ -76,7 +76,7 @@ export default {
   methods: {
     // 获取系统下拉数据
     getSysList(sysCode) {
-      sysDataSelect().then(response => {
+      sysDataSelect(1).then(response => {
         var data = response.Data
         data.splice(data.findIndex(item => item.SysCode === sysCode), 1)
         this.options = data
@@ -91,6 +91,11 @@ export default {
     },
     cancleValid() {
       this.$refs['userForm'].resetFields()
+    },
+    validData() {
+      this.$refs.userForm.validate(valid => {
+        this.data.valid = valid
+      })
     },
     // 系统修改刷新数据
     handlecheckedAppChange(val) {

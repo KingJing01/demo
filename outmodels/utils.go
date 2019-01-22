@@ -29,6 +29,9 @@ func ParseUser(tmsUser TMSUser) (result *bytes.Buffer) {
 		"\",\"sysId\":\"" + tmsUser.SysID +
 		"\",\"companyId\":\"" + tmsUser.CompanyID +
 		"\",\"companyName\":\"" + tmsUser.CompanyName +
+		"\",\"isAdmin\":\"" + tmsUser.IsAdmin +
+		"\",\"contact\":\"" + tmsUser.Contact +
+		"\",\"shortCompanyName\":\"" + tmsUser.ShortCompanyName +
 		"\"}"
 	var jsonStr = []byte(post)
 	return bytes.NewBuffer(jsonStr)

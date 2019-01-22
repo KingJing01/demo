@@ -11,7 +11,8 @@ import (
 
 type Tenant struct {
 	Id                   int64     `orm:"column(Id);auto"`
-	TenantName           string    `orm:"column(TenantName);size(64)"`
+	ShortName            string    `orm:"column(ShortName);size(45)"`
+	TenantName           string    `orm:"column(TenantName);size(45)"`
 	TenantAddress        string    `orm:"column(TenantAddress);size(200)"`
 	OrganizationCode     string    `orm:"column(OrganizationCode);size(45)"`
 	BusinessLisenceUrl   string    `orm:"column(BusinessLisenceUrl);size(200)"`
@@ -143,6 +144,9 @@ func AddTenant(m *Tenant, syScode []string, perId []string, perMenu []string, us
 	tmsUser.CompanyID = strconv.FormatInt(m.Id, 10)
 	tmsUser.CompanyName = m.TenantName
 	tmsUser.SysID = sysCodeStr
+	tmsUser.ShortCompanyName = m.ShortName
+	tmsUser.Contact = m.LinkMan
+	tmsUser.IsAdmin = "1"
 	return err, tmsUser
 }
 

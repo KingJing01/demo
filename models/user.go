@@ -71,6 +71,7 @@ func AddUser(m *User, roleIds []string, sysCodes []string, tenantID int64, userI
 	m.CreatorUserId = userID
 	sysCodeStr := ""
 	for j, t := range roleIds {
+
 		for k, z := range sysCodes {
 			if j == k {
 				sysCodeStr += z + ","
@@ -79,6 +80,15 @@ func AddUser(m *User, roleIds []string, sysCodes []string, tenantID int64, userI
 				userrole.SysCode = z
 				userrole.RoleId = roleID
 				_, err = o.Insert(m)
+				if err != nil {
+					o.Rollback()
+					return tmsUser, err
+				}
+				//角色权限插入
+				var sql = `INSERT INTO permission (NAME,tenantId,DisplayName,SysCode,MenuCode,CreationTime,IsMenu,RoleId,UserId
+						) SELECT NAME,tenantId,DisplayName,SysCode,MenuCode,?,IsMenu,RoleId,? FROM permission t1
+						WHERE t1.TenantId = ? AND IsMenu = 1 AND t1.RoleId =?`
+				_, err = o.Raw(sql, time.Now(), m.Id, tenantID, t).Exec()
 				if err != nil {
 					o.Rollback()
 					return tmsUser, err
@@ -97,6 +107,7 @@ func AddUser(m *User, roleIds []string, sysCodes []string, tenantID int64, userI
 	}
 	v := Tenant{Id: tenantID}
 	o.Read(&v)
+
 	o.Commit()
 	tmsUser.SsoUID = strconv.FormatInt(ssoID, 10)
 	tmsUser.UserCode = m.UserName
@@ -105,6 +116,9 @@ func AddUser(m *User, roleIds []string, sysCodes []string, tenantID int64, userI
 	tmsUser.CompanyID = strconv.FormatInt(tenantID, 10)
 	tmsUser.CompanyName = v.TenantName
 	tmsUser.SysID = sysCodeStr
+	tmsUser.Contact = m.Name
+	tmsUser.ShortCompanyName = v.ShortName
+	tmsUser.IsAdmin = "0"
 	return
 }
 
@@ -222,16 +236,17 @@ func UpdateUserByID(m *User, roleCode string, userID int64) (err error) {
 //根据用户名、密码查询
 func LoginCheck(username string, password string, SysCode string) (result bool, user User, err error) {
 	valid := validation.Validation{}
-	resultMobile := valid.Mobile(username, "username")
+	resultEmail := valid.Email(username, "username")
 	password = GetDefaultPassword(password)
 	o := orm.NewOrm()
 	u := &User{}
 	result = true
-	//登录名格式分析  手机号码直接 ssoUser验证 其他的使用user--->sso关联
-	if resultMobile.Ok {
-		err = o.Raw("select t2.*, t1.Phone  SsoPhone from ssouser t1 left join user t2 on t1.id = t2.SsoId where t2.SysCode=? and t1.Phone=? and t2.Password=? ", SysCode, username, password).QueryRow(&u)
+	err = o.Raw("select t2.*, t1.Phone  SsoPhone from ssouser t1 left join user t2 on t1.id = t2.SsoId where t2.SysCode=? and t1.Phone=? and t2.Password=? ", SysCode, username, password).QueryRow(&u)
+	//登录名格式分析  邮箱 登陆  用户名和手机号
+	if resultEmail.Ok {
+		err = o.Raw("SELECT t1.* FROM USER t1  WHERE t1.IsDeleted = 0 and t1.SysCode=? and t1.EmailAddress=? and t1.Password=?", SysCode, username, password).QueryRow(&u)
 	} else {
-		err = o.Raw("select t2.*,t1.Phone SsoPhone from ssouser t1 left join user t2 on t1.id = t2.SsoId where t2.SysCode=? and t2.UserName=? and t2.Password=? ", SysCode, username, password).QueryRow(&u)
+		err = o.Raw("SELECT t1.* FROM USER t1  WHERE t1.IsDeleted = 0 and t1.SysCode=? and (t1.PhoneNumber=? or t1.UserName=?) and t1.Password=?", SysCode, username, username, password).QueryRow(&u)
 	}
 	user = *u
 	// 判断是否有错误的返回

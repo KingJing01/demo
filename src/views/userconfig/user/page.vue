@@ -317,6 +317,14 @@ export default {
     },
     // 批量禁用套餐
     handleDeleteUser() {
+      if (this.multipleSelection.length === 0) {
+        this.$message({
+          showClose: true,
+          message: '请勾选一个用户',
+          type: 'warning'
+        })
+        return
+      }
       deleteUser(this.multipleSelection.toString()).then(response => {
         if (response.Result === 1) {
           this.getList()

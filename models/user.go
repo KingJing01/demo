@@ -49,7 +49,7 @@ func init() {
 
 // AddUser insert a new User into database and returns
 // last inserted Id on success.
-func AddUser(m *User, roleIds []string, sysCodes []string, tenantID int64, userID int64) (id int64, err error) {
+func AddUser(m *User, roleIds []string, sysCodes []string, tenantID int64, userID int64) (tmsUser out.TMSUser, err error) {
 	o := orm.NewOrm()
 	o.Begin()
 	//新增一个ssouer
@@ -60,7 +60,7 @@ func AddUser(m *User, roleIds []string, sysCodes []string, tenantID int64, userI
 	if err != nil {
 		//回滚
 		o.Rollback()
-		return 0, err
+		return tmsUser, err
 	}
 	userrole := UserRole{}
 	userrole.CreationTime = time.Now()
@@ -69,31 +69,42 @@ func AddUser(m *User, roleIds []string, sysCodes []string, tenantID int64, userI
 	m.TenantId = tenantID
 	m.Password = GetDefaultPassword("")
 	m.CreatorUserId = userID
+	sysCodeStr := ""
 	for j, t := range roleIds {
 		for k, z := range sysCodes {
 			if j == k {
+				sysCodeStr += z + ","
 				m.SysCode = z
 				roleID, _ := strconv.Atoi(t)
 				userrole.SysCode = z
 				userrole.RoleId = roleID
-				id, err = o.Insert(m)
+				_, err = o.Insert(m)
 				if err != nil {
 					o.Rollback()
-					return 0, err
+					return tmsUser, err
 				}
 				userrole.UserId = m.Id
 				userrole.CreatorUserId = userID
-				id, err = o.Insert(&userrole)
+				_, err = o.Insert(&userrole)
 				if err != nil {
 					o.Rollback()
-					return 0, err
+					return tmsUser, err
 				}
 				m.Id = 0
 				userrole.Id = 0
 			}
 		}
 	}
+	v := Tenant{Id: tenantID}
+	o.Read(&v)
 	o.Commit()
+	tmsUser.SsoUID = strconv.FormatInt(ssoID, 10)
+	tmsUser.UserCode = m.UserName
+	tmsUser.Email = m.EmailAddress
+	tmsUser.Mobile = m.PhoneNumber
+	tmsUser.CompanyID = strconv.FormatInt(m.Id, 10)
+	tmsUser.CompanyName = v.TenantName
+	tmsUser.SysID = sysCodeStr
 	return
 }
 

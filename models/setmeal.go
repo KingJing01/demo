@@ -14,7 +14,7 @@ type SetMeal struct {
 	Id                     int       `orm:"column(Id);auto;pk"`
 	SetMealName            string    `orm:"column(SetMealName);size(45)"`
 	SetMealCode            string    `orm:"column(SetMealCode);size(45)"`
-	PermissionText         string    `orm:"column(PermissionText);size(200)"`
+	PermissionText         string    `orm:"column(PermissionText);size(400)"`
 	CreationTime           time.Time `orm:"column(CreationTime);type(datetime);time"`
 	CreatorUserId          int64     `orm:"column(CreatorUserId);null"`
 	LastModificationTime   time.Time `orm:"column(LastModificationTime);type(datetime);time"`

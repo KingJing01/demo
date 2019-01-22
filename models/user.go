@@ -102,7 +102,7 @@ func AddUser(m *User, roleIds []string, sysCodes []string, tenantID int64, userI
 	tmsUser.UserCode = m.UserName
 	tmsUser.Email = m.EmailAddress
 	tmsUser.Mobile = m.PhoneNumber
-	tmsUser.CompanyID = strconv.FormatInt(m.Id, 10)
+	tmsUser.CompanyID = strconv.FormatInt(tenantID, 10)
 	tmsUser.CompanyName = v.TenantName
 	tmsUser.SysID = sysCodeStr
 	return

@@ -66,7 +66,7 @@ export default {
       form: {
 
       },
-      type: 1,
+      formData: {},
       formRules: {
         EmailAddress: [{ required: true, trigger: 'change', message: '邮箱为必填项' }],
         PhoneNumber: [{ required: true, trigger: 'change', message: '手机号为必填项' }],

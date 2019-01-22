@@ -185,6 +185,11 @@ export default {
     },
     cancleValid() {
       this.$refs['userFormUpdate'].resetFields()
+    },
+    cleanData() {
+      this.SelectData = [] // 记录选择的系统数据 tab迭代使用
+      this.childPerSelect = []// 记录历史选择的套餐及权限信息
+      this.checkedApplications = []
     }
   }
 }

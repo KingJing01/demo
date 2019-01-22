@@ -378,7 +378,7 @@ export default {
     },
     // 监听dialog的打开事件
     handleOpenDialog() {
-      sysDataSelect().then(response => {
+      sysDataSelect(1).then(response => {
         this.options = response.Data
       })
     },

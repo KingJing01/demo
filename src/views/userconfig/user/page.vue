@@ -160,7 +160,6 @@
 </template>
 <script>
 import { getUserList, updateUserInfo, addUserInfo, updateUserValidStatus, deleteUser } from '@/api/user'
-import { sysDataSelect } from '@/api/sysconfig'
 
 import DetailPage from './dialogview/detail'
 import SavePage from './dialogview/save'
@@ -280,9 +279,8 @@ export default {
     },
     // 监听dialog的打开事件
     handleOpenDialog() {
-      sysDataSelect().then(response => {
-        this.options = response.Data
-      })
+      this.$refs.userData.getSysList()
+      this.$refs.userData.cancleValid()
     },
     // 双击点击事件
     handleRowClick(row, event) {

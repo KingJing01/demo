@@ -66,19 +66,21 @@ export default {
       form: {
 
       },
+      type: 1,
       formRules: {
         EmailAddress: [{ required: true, trigger: 'change', message: '邮箱为必填项' }],
         PhoneNumber: [{ required: true, trigger: 'change', message: '手机号为必填项' }],
         UserName: [{ required: true, trigger: 'blur', message: '用户名为必填项' }, { max: 20, message: '输入内容最大长度为20', trigger: 'blur' }]
       }
     }
-  }, created() {
+  },
+  created() {
     this.getSysList()
   },
   methods: {
     // 获取系统下拉数据
     getSysList() {
-      sysDataSelect().then(response => {
+      sysDataSelect(1).then(response => {
         this.options = response.Data
       })
     },

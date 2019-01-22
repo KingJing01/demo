@@ -21,7 +21,8 @@ export function addUserInfo(info) {
       PhoneNumber: info.PhoneNumber,
       UserName: info.UserName,
       RoleIds: info.RoleIds,
-      SysCodes: info.SysCodes
+      SysCodes: info.SysCodes,
+      Name: info.Name
     }
   })
 }

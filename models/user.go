@@ -126,7 +126,7 @@ func AddUser(m *User, roleIds []string, sysCodes []string, tenantID int64, userI
 // Id doesn't exist
 func GetUserByID(id int64) (v *out.UserInfo, err error) {
 	o := orm.NewOrm()
-	err = o.Raw(`select t1.Id id ,t1.UserName user_name,t1.PhoneNumber phone_number,t1.EmailAddress email_address,t1.SysCode sys_code,t3.RoleName role_name,t2.RoleId role_code from user t1 left join userrole
+	err = o.Raw(`select t1.Id id ,t1.UserName user_name,t1.Name name,t1.PhoneNumber phone_number,t1.EmailAddress email_address,t1.SysCode sys_code,t3.RoleName role_name,t2.RoleId role_code from user t1 left join userrole
 	 t2 on t1.Id = t2.UserId left join role t3 on t2.RoleId = t3.id where t1.id= ?`, id).QueryRow(&v)
 	if err != nil {
 		return nil, err

@@ -102,6 +102,7 @@ type UserInfo struct {
 	EmailAddress string
 	PhoneNumber  string
 	UserName     string
+	Name         string
 }
 
 // ComponentData 组件数据

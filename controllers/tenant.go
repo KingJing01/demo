@@ -47,6 +47,10 @@ func (c *TenantController) Post() {
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 		v.LastModificationTime = time.Now()
 		if err, tmsUser := models.AddTenant(&v, sysCode, perID, perMenu, userID); err == nil {
+			tool.InitRedis()
+			jsonBytes, _ := json.Marshal(v)
+			tool.Globalcluster.Do("set", v.Id, string(jsonBytes))
+			tool.Globalcluster.Close()
 			respCode, _ := out.SendUserInfoToTms(tmsUser)
 			fmt.Println("################接口返回的标记值################ ", respCode)
 			if respCode != 200 {
@@ -165,6 +169,10 @@ func (c *TenantController) Put() {
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 		v.LastModificationTime = time.Now()
 		if err := models.UpdateTenantById(&v, sysCode, perIDStr, perMenu, v.Id, userID); err == nil {
+			tool.InitRedis()
+			jsonBytes, _ := json.Marshal(v)
+			tool.Globalcluster.Do("set", v.Id, string(jsonBytes))
+			tool.Globalcluster.Close()
 			result.Result = 1
 			c.Data["json"] = result
 		} else {

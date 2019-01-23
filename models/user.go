@@ -241,7 +241,6 @@ func LoginCheck(username string, password string, SysCode string) (result bool, 
 	o := orm.NewOrm()
 	u := &User{}
 	result = true
-	err = o.Raw("select t2.*, t1.Phone  SsoPhone from ssouser t1 left join user t2 on t1.id = t2.SsoId where t2.SysCode=? and t1.Phone=? and t2.Password=? ", SysCode, username, password).QueryRow(&u)
 	//登录名格式分析  邮箱 登陆  用户名和手机号
 	if resultEmail.Ok {
 		err = o.Raw("SELECT t1.* FROM USER t1  WHERE t1.IsDeleted = 0 and t1.SysCode=? and t1.EmailAddress=? and t1.Password=?", SysCode, username, password).QueryRow(&u)

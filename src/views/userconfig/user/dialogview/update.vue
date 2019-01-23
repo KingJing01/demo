@@ -1,5 +1,5 @@
 <template>
-  <el-form ref="userForm" :model="form" size="small" label-width="100px">
+  <el-form ref="userForm" :model="form" :rules="formRules" size="small" label-width="100px">
     <el-form-item
       label="登录名"
       prop="UserName"
@@ -75,13 +75,20 @@ export default {
       userId: this.data.Id,
       options: {},
       form: {},
-      radioData: {}
+      radioData: {},
+      formRules: {
+        Name: [{ required: true, trigger: 'change', message: '姓名为必填项' }],
+        EmailAddress: [{ required: true, trigger: 'change', message: '邮箱为必填项' }],
+        PhoneNumber: [{ required: true, trigger: 'change', message: '手机号为必填项' }],
+        UserName: [{ required: true, trigger: 'blur', message: '用户名为必填项' }, { max: 20, message: '输入内容最大长度为20', trigger: 'blur' }]
+      }
     }
   },
   created() {
     this.getSysList()
     this.getUserInfoById()
   },
+
   methods: {
     // 获取系统下拉数据
     getSysList() {

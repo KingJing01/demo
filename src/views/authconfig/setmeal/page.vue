@@ -274,6 +274,7 @@ export default {
     saveData() {
       this.$refs.mealForm.validate(valid => {
         if (valid) {
+          debugger
           var transData = transPermissionCheckedData(this.authData)
           if (transData.perName === '') {
             this.$message({

@@ -218,6 +218,7 @@ export default {
               this.getList()
               this.tenant = {}
             }
+            this.$refs.userData.cancleValid()
           })
         } else {
           const transData = transPermissionCheckedData(this.form.authData)
@@ -240,6 +241,7 @@ export default {
               this.getList()
               this.tenant = {}
             }
+            this.$refs.userData.cancleValid()
           })
         }
       }

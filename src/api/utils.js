@@ -11,7 +11,6 @@
    * 返回数据 permission{perName：xxx ,perId:xxx }
    */
 export function transPermissionCheckedData(data) {
-  debugger
   var permission = {}
   var permissionNameStr = ''
   var permissionIdStr = ''

@@ -135,16 +135,16 @@ export default {
       SelectData: [], // 记录选择的系统数据 tab迭代使用
       childPerSelect: [], // 记录历史选择的套餐及权限信息
       formRules: {
-        TenantName: [{ required: true, trigger: 'blur', message: '公司名称为必填项' },
-          { min: 3, max: 40, message: '输入内容最大长度为40', trigger: 'blur' }],
-        TenantAddress: [{ max: 40, message: '输入内容最大长度为40', trigger: 'blur' }],
-        Email: [{ required: true, trigger: 'blur', message: '邮件为必输项' },
-          { pattern: /^[A-Za-z\d]+([-_.][A-Za-z\d]+)*@([A-Za-z\d]+[-.])+[A-Za-z\d]{2,4}$/, trigger: 'blur', message: '请输入正确格式的邮箱' }],
-        LinkPhone: [{ required: true, trigger: 'blur', message: '联系人电话为必输项' },
-          { pattern: /^1[345678]\d{9}$/, trigger: 'blur', message: '请输入正确格式的手机号' }],
-        SysCode: [{ required: true, trigger: 'blur', message: '系统为必选项' }],
-        ShortName: [{ required: true, trigger: 'blur', message: '公司简称为必选项' }],
-        LinkMan: [{ required: true, trigger: 'blur', message: '公司联系人为必选项' }]
+        TenantName: [{ required: true, trigger: 'change', message: '公司名称为必填项' },
+          { max: 40, message: '输入内容最大长度为40', trigger: 'change' }],
+        TenantAddress: [{ max: 40, message: '输入内容最大长度为40', trigger: 'change' }],
+        Email: [{ required: true, trigger: 'change', message: '邮件为必输项' },
+          { pattern: /^[A-Za-z\d]+([-_.][A-Za-z\d]+)*@([A-Za-z\d]+[-.])+[A-Za-z\d]{2,4}$/, trigger: 'change', message: '请输入正确格式的邮箱' }],
+        LinkPhone: [{ required: true, trigger: 'change', message: '联系人电话为必输项' }, { max: 11, message: '请输入11位手机号', trigger: 'change' },
+          { pattern: /^1[345678]\d{9}$/, trigger: 'change', message: '请输入正确格式的手机号' }],
+        SysCode: [{ required: true, trigger: 'change', message: '系统为必选项' }],
+        ShortName: [{ required: true, trigger: 'change', message: '公司简称为必选项' }],
+        LinkMan: [{ required: true, trigger: 'change', message: '公司联系人为必选项' }]
       }
     }
   },

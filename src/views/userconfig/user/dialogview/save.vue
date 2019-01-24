@@ -78,9 +78,9 @@ export default {
       formData: {},
       formRules: {
         Name: [{ required: true, trigger: 'change', message: '姓名为必填项' }],
-        EmailAddress: [{ required: true, trigger: 'change', message: '邮箱为必填项' }, { pattern: /^[A-Za-z\d]+([-_.][A-Za-z\d]+)*@([A-Za-z\d]+[-.])+[A-Za-z\d]{2,4}$/, trigger: 'blur', message: '请输入正确格式的邮箱' }],
-        PhoneNumber: [{ required: true, trigger: 'change', message: '手机号为必填项' }, { pattern: /^1[345678]\d{9}$/, trigger: 'blur', message: '请输入正确格式的手机号' }],
-        UserName: [{ required: true, trigger: 'change', message: '用户名为必填项' }, { max: 20, message: '输入内容最大长度为20', trigger: 'blur' }]
+        EmailAddress: [{ required: true, trigger: 'change', message: '邮箱为必填项' }, { pattern: /^[A-Za-z\d]+([-_.][A-Za-z\d]+)*@([A-Za-z\d]+[-.])+[A-Za-z\d]{2,4}$/, trigger: 'change', message: '请输入正确格式的邮箱' }],
+        PhoneNumber: [{ required: true, trigger: 'change', message: '手机号为必填项' }, { max: 11, message: '手机号长度为11位', trigger: 'change' }, { pattern: /^1[345678]\d{9}$/, trigger: 'change', message: '请输入正确格式的手机号' }],
+        UserName: [{ required: true, trigger: 'change', message: '用户名为必填项' }, { max: 20, message: '输入内容最大长度为20', trigger: 'change' }]
       }
     }
   },

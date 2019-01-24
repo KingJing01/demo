@@ -248,7 +248,7 @@ func (c *AuthorityManageController) AuthLogin() {
 		// jwt 唯一标识存放userId
 		claims["jti"] = user.Id
 		// jwt 有效时间
-		claims["exp"] = time.Now().Add(time.Minute * time.Duration(10)).Unix()
+		claims["exp"] = time.Now().Add(time.Minute * time.Duration(60)).Unix()
 		// jwt 发布时间
 		claims["iat"] = time.Now().Unix()
 		// jwt 发布者 存放用户

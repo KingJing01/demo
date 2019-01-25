@@ -2,14 +2,13 @@ package outmodels
 
 import (
 	"bytes"
-	"encoding/json"
 	"errors"
 	"fmt"
-	"net/http"
 	"strconv"
 	"strings"
 
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/httplib"
 )
 
 const (
@@ -41,26 +40,16 @@ func ParseUser(tmsUser TMSUser) (result *bytes.Buffer) {
 
 //SendUserInfoToTms 向tms推送用用户数据
 func SendUserInfoToTms(tmsUser TMSUser) (respCode int, err error) {
-	jsonStr := ParseUser(tmsUser)
+	//jsonStr := ParseUser(tmsUser)
 	url := fmt.Sprintf("%s%s", GetServerUrl(), TMSAddUser)
-	req, err := http.NewRequest("POST", url, jsonStr)
-	//设置请求头为 application/json
-	req.Header.Set("Content-Type", "application/json")
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		panic(err)
-	}
-	defer resp.Body.Close()
+	req := httplib.Post(url)
+	req.JSONBody(tmsUser)
 	var result TMSRespData
-	if err := json.NewDecoder(resp.Body).Decode(&result); err == nil {
-		if result.Success == false {
-			return 111, errors.New(result.Msg)
-		}
-	} else {
-		return 111, err
+	req.ToJSON(&result)
+	if result.Success == false {
+		return 111, errors.New("TMS系统报错" + result.Msg)
 	}
-	return resp.StatusCode, err
+	return 200, err
 }
 
 /* authData: [

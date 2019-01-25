@@ -108,8 +108,6 @@ func AddUser(m *User, roleIds []string, sysCodes []string, tenantID int64, userI
 	}
 	v := Tenant{Id: tenantID}
 	o.Read(&v)
-
-	o.Commit()
 	tmsUser.SsoUID = strconv.FormatInt(ssoID, 10)
 	tmsUser.UserCode = m.UserName
 	tmsUser.Email = m.EmailAddress

@@ -47,7 +47,7 @@ func SendUserInfoToTms(tmsUser TMSUser) (respCode int, err error) {
 	var result TMSRespData
 	req.ToJSON(&result)
 	if result.Success == false {
-		return 111, errors.New("TMS系统报错" + result.Msg)
+		return 111, errors.New("TMS系统异常" + result.Msg)
 	}
 	return 200, err
 }

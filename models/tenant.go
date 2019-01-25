@@ -2,6 +2,7 @@ package models
 
 import (
 	out "demo/outmodels"
+	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -129,8 +130,6 @@ func AddTenant(m *Tenant, syScode []string, perId []string, perMenu []string, us
 		o.Rollback()
 		return err, tmsUser
 	}
-	//事务提交
-	o.Commit()
 	/**
 	userCode string
 	ssoUid   string
@@ -147,6 +146,14 @@ func AddTenant(m *Tenant, syScode []string, perId []string, perMenu []string, us
 	tmsUser.ShortCompanyName = m.ShortName
 	tmsUser.Contact = m.LinkMan
 	tmsUser.IsAdmin = "1"
+	respCode, err := out.SendUserInfoToTms(tmsUser)
+	fmt.Println("################接口返回的标记值################ ", respCode)
+	if respCode != 200 {
+		o.Rollback()
+		return err, tmsUser
+	}
+	//事务提交
+	o.Commit()
 	return err, tmsUser
 }
 
@@ -215,7 +222,7 @@ func GetTenantList(tenantName string, sysName string, offset int64, limit int64)
 	if len(conditions) > 0 {
 		sql = sql + " where " + strings.Join(conditions, " and ")
 	}
-	sql = sql + " limit " + strconv.FormatInt(limit, 10) + "  offset " + strconv.FormatInt(offset, 10)
+	sql = sql + " order by t1.LastModificationTime desc,t1.CreationTime desc  limit " + strconv.FormatInt(limit, 10) + "  offset " + strconv.FormatInt(offset, 10)
 	_, err = o.Raw(sql).QueryRows(&result)
 	return result, err
 }

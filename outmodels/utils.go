@@ -2,6 +2,8 @@ package outmodels
 
 import (
 	"bytes"
+	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -50,6 +52,14 @@ func SendUserInfoToTms(tmsUser TMSUser) (respCode int, err error) {
 		panic(err)
 	}
 	defer resp.Body.Close()
+	var result TMSRespData
+	if err := json.NewDecoder(resp.Body).Decode(&result); err == nil {
+		if result.Success == false {
+			return 111, errors.New(result.Msg)
+		}
+	} else {
+		return 111, err
+	}
 	return resp.StatusCode, err
 }
 

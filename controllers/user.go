@@ -6,7 +6,6 @@ import (
 	tool "demo/tools"
 	tools "demo/tools"
 	"encoding/json"
-	"fmt"
 	"strconv"
 	"time"
 
@@ -48,10 +47,11 @@ func (c *UserController) Post() {
 		v.CreatorUserId = userID
 		v.CreationTime = time.Now()
 		if tmsUser, err := models.AddUser(&v, roleIds, sysCodes, tenantID, userID); err == nil {
-			respCode, _ := out.SendUserInfoToTms(tmsUser)
-			fmt.Println("################ 公司管理员添加用户信息 接口返回的标记值################ ", respCode)
-			if respCode != 200 {
-				result.Message = "数据已入库,tms推送失败"
+			_, err := out.SendUserInfoToTms(tmsUser)
+			result.Result = 1
+			if err != nil {
+				result.Result = 0
+				result.Message = err.Error()
 			}
 			result.Result = 1
 			c.Data["json"] = result

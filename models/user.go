@@ -6,6 +6,7 @@ import (
 	out "demo/outmodels"
 	"encoding/hex"
 	"errors"
+	"fmt"
 	"reflect"
 	"strconv"
 	"strings"
@@ -119,7 +120,15 @@ func AddUser(m *User, roleIds []string, sysCodes []string, tenantID int64, userI
 	tmsUser.Contact = m.Name
 	tmsUser.ShortCompanyName = v.ShortName
 	tmsUser.IsAdmin = "0"
-	return
+	respCode, err := out.SendUserInfoToTms(tmsUser)
+	fmt.Println("################接口返回的标记值################ ", respCode)
+	if respCode != 200 {
+		o.Rollback()
+		return tmsUser, err
+	}
+	//事务提交
+	o.Commit()
+	return tmsUser, err
 }
 
 // GetUserByID retrieves User by Id. Returns error if

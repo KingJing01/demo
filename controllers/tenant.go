@@ -5,7 +5,6 @@ import (
 	out "demo/outmodels"
 	tool "demo/tools"
 	"encoding/json"
-	"fmt"
 	"strconv"
 	"time"
 
@@ -46,17 +45,17 @@ func (c *TenantController) Post() {
 	perMenu := tool.ParseInterfaceArr(mystruct["perMenu"].([]interface{}))
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 		v.LastModificationTime = time.Now()
-		if err, tmsUser := models.AddTenant(&v, sysCode, perID, perMenu, userID); err == nil {
-			tool.InitRedis()
-			jsonBytes, _ := json.Marshal(v)
-			tool.Globalcluster.Do("set", v.Id, string(jsonBytes))
-			tool.Globalcluster.Close()
-			respCode, _ := out.SendUserInfoToTms(tmsUser)
-			fmt.Println("################接口返回的标记值################ ", respCode)
-			if respCode != 200 {
-				result.Message = "数据已入库,tms推送失败"
-			}
+		if err, _ := models.AddTenant(&v, sysCode, perID, perMenu, userID); err == nil {
 			result.Result = 1
+			if err != nil {
+				result.Result = 0
+				result.Message = err.Error()
+			} else {
+				tool.InitRedis()
+				jsonBytes, _ := json.Marshal(v)
+				tool.Globalcluster.Do("set", v.Id, string(jsonBytes))
+				tool.Globalcluster.Close()
+			}
 			c.Data["json"] = result
 		} else {
 			result.Result = 0

@@ -1,7 +1,6 @@
 package outmodels
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"strconv"
@@ -21,7 +20,7 @@ func GetServerUrl() (url string) {
 }
 
 //ParseUser 请求数据解析
-func ParseUser(tmsUser TMSUser) (result *bytes.Buffer) {
+func ParseUser(tmsUser TMSUser) (result string) {
 	//json序列化
 	post := "{\"userCode\":\"" + tmsUser.UserCode +
 		"\",\"ssoUid\":\"" + tmsUser.SsoUID +
@@ -34,16 +33,15 @@ func ParseUser(tmsUser TMSUser) (result *bytes.Buffer) {
 		"\",\"contact\":\"" + tmsUser.Contact +
 		"\",\"shortCompanyName\":\"" + tmsUser.ShortCompanyName +
 		"\"}"
-	var jsonStr = []byte(post)
-	return bytes.NewBuffer(jsonStr)
+	return post
 }
 
 //SendUserInfoToTms 向tms推送用用户数据
 func SendUserInfoToTms(tmsUser TMSUser) (respCode int, err error) {
-	//jsonStr := ParseUser(tmsUser)
 	url := fmt.Sprintf("%s%s", GetServerUrl(), TMSAddUser)
 	req := httplib.Post(url)
-	req.JSONBody(tmsUser)
+	req.JSONBody(map[string]interface{}{"userCode": tmsUser.UserCode, "ssoUid": tmsUser.SsoUID, "mobile": tmsUser.Mobile, "email": tmsUser.Email, "sysId": tmsUser.SysID,
+		"companyId": tmsUser.CompanyID, "companyName": tmsUser.CompanyName, "isAdmin": tmsUser.IsAdmin, "contact": tmsUser.Contact, "shortCompanyName": tmsUser.ShortCompanyName})
 	var result TMSRespData
 	req.ToJSON(&result)
 	if result.Success == false {

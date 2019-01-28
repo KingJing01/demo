@@ -14,7 +14,7 @@
       <el-form-item label="角色名称">
         <el-input
           v-model="search.roleName"
-          placeholder="套餐名称"
+          placeholder="角色名称"
         />
       </el-form-item>
       <el-form-item label="登录名">
@@ -34,8 +34,8 @@
     <!-- 查询 form end -->
     <el-row id="action_line" style="margin-bottom:10px">
       <el-button @click="dialogFormVisible = true">新增用户</el-button>
-      <el-button type="primary" @click="handleDeleteUser">删除用户</el-button>
-      <el-button type="success" @click="handleAddExistUser">新增</el-button>
+      <!--  <el-button type="primary" @click="handleDeleteUser">删除用户</el-button> -->
+      <el-button type="success" @click="handleAddExistUser">新增系统</el-button>
     </el-row>
     <!-- 基础权限列表  start -->
     <el-table
@@ -108,11 +108,11 @@
             size="small"
             @click="handleClick(scope.row)"
           >编辑</el-button>
-          <el-button
+          <!--    <el-button
             type="text"
             size="small"
             @click="handleDeleteClick(scope.row.Id)"
-          >删除</el-button>
+          >删除</el-button> -->
         </template>
       </el-table-column>
     </el-table>
@@ -245,6 +245,7 @@ export default {
             }
           })
         } else {
+          debugger
           updateUserInfo(this.form.formData).then(response => {
             if (response.Result === 0) {
               this.$message.error(response.Message)

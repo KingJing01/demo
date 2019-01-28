@@ -100,6 +100,7 @@ export default {
     getUserInfoById() {
       getUserInfoById(this.userId).then(response => {
         this.form = response.Data
+        this.data.formData = this.form
         getRoleDataBySysCodes(this.form.SysCode).then(response => {
           this.radioData = response.Data
         })

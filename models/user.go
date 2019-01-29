@@ -314,6 +314,7 @@ func RegistUser(loginInfo *input.LoginInfo, SysCode string) (ssoId int64, err er
 	user.PhoneNumber = loginInfo.UserName
 	user.SsoID = ssoId
 	user.SysCode = SysCode
+	user.TenantId = 1
 	user.CreationTime = time.Now()
 	_, err = o.Insert(user)
 	if err != nil {

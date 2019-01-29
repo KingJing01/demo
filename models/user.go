@@ -240,7 +240,28 @@ func UpdateUserByID(m *User, roleCode string, userID int64) (err error) {
 	return
 }
 
-//根据用户名、密码查询
+// 根据用户名查询当前人是否存在
+func LoginValidUser(username string) (total int64, err error) {
+	var maps []orm.Params
+	o := orm.NewOrm()
+	o.Raw("SELECT count(0) total FROM USER t1  WHERE t1.IsDeleted = 0 and (t1.PhoneNumber=? or t1.UserName=? or t1.EmailAddress=?)", username, username, username).Values(&maps)
+	total, _ = strconv.ParseInt(maps[0]["total"].(string), 10, 64)
+	return total, err
+}
+
+//根据用户名、密码查询系统
+func LoginValidSys(username string) (sysCode string, err error) {
+	o := orm.NewOrm()
+	var maps []orm.Params
+	_, err = o.Raw("select GROUP_CONCAT(SysCode) sysCode from user where  IsDeleted=0 and (UserName = ? or PhoneNumber =? or EmailAddress=?)", username, username, username).Values(&maps)
+	if maps[0]["sysCode"] == nil {
+		return "", err
+	}
+	sysCode = maps[0]["sysCode"].(string)
+	return sysCode, err
+}
+
+//根据用户名、密码，系统查询
 func LoginCheck(username string, password string, SysCode string) (result bool, user User, err error) {
 	valid := validation.Validation{}
 	resultEmail := valid.Email(username, "username")

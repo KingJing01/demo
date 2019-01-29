@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/astaxie/beego"
@@ -120,14 +121,34 @@ func (c *AuthorityManageController) Login() {
 			c.ServeJSON()
 			return
 		}
+		userTotal, _ := models.LoginValidUser(l.UserName)
+		if userTotal == 0 {
+			lresult.Result = 0
+			lresult.Message = "用户信息不存在"
+			c.Data["json"] = lresult
+			c.ServeJSON()
+			return
+		}
+		// 获取登陆信息有哪些系统
+		sysCodeStr, _ := models.LoginValidSys(l.UserName)
+		if sysCodeStr != "" {
+			if flag := strings.Contains(sysCodeStr, sysCode); flag == false {
+				lresult.Result = 0
+				lresult.Message = "系统身份选择错误"
+				c.Data["json"] = lresult
+				c.ServeJSON()
+				return
+			}
+		}
+		//验证用户登陆信息
 		result, user, err := models.LoginCheck(l.UserName, l.Password, sysCode)
 		respmessage := ""
 		if result == false {
 			if err == nil {
-				respmessage = "用户名和密码不匹配，重新登陆"
+				respmessage = "用户名密码不匹配,请重新登陆"
 			} else {
 				if err == orm.ErrNoRows {
-					respmessage = "用户名和密码不匹配，重新登陆"
+					respmessage = "用户名密码不匹配,请重新登陆"
 				} else {
 					respmessage = err.Error()
 				}

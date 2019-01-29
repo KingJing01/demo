@@ -306,19 +306,39 @@ func RegistUser(loginInfo *input.LoginInfo, SysCode string) (ssoId int64, err er
 	_, err = o.Insert(ssoUser)
 	if err != nil {
 		o.Rollback()
+		return
 	}
 	ssoId = ssoUser.Id
 	user := new(User)
 	user.Password = GetDefaultPassword(loginInfo.Password)
 	user.Name = loginInfo.UserName
+	user.UserName = loginInfo.UserName
 	user.PhoneNumber = loginInfo.UserName
 	user.SsoID = ssoId
 	user.SysCode = SysCode
+	user.EmailAddress = loginInfo.UserName
 	user.TenantId = 1
 	user.CreationTime = time.Now()
 	_, err = o.Insert(user)
 	if err != nil {
 		o.Rollback()
+		return
+	}
+	userRole := new(UserRole)
+	userRole.CreationTime = time.Now()
+	userRole.TenantId = 1
+	userRole.UserId = user.Id
+	userRole.SysCode = SysCode
+	if SysCode == "100002" {
+		userRole.RoleId = 2
+	} else if SysCode == "100003" {
+		userRole.RoleId = 3
+	}
+	userRole.CreatorUserId = user.CreatorUserId
+	_, err = o.Insert(userRole)
+	if err != nil {
+		o.Rollback()
+		return
 	}
 	o.Commit()
 	return

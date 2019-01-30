@@ -253,10 +253,10 @@ func GetPerInfoForTenant(sysCode string, tenantId int64) (result []out.Permissio
 	o := orm.NewOrm()
 	_, err = o.Raw(`SELECT t5.DisplayName display_name ,t5.NAME name,GROUP_CONCAT(t5.perName) code_name,	GROUP_CONCAT(t5.perId) code,GROUP_CONCAT(t5.flag) flag
 	FROM (SELECT t3.DisplayName, t3.MenuCode as NAME,t1.DisplayName perName,t1. NAME perId,CASE 	WHEN t2. NAME IS NULL THEN 	0 ELSE 1 END flag
-	FROM (SELECT 	MenuCode,	DisplayName,NAME FROM	permission WHERE SysCode = ? AND IsMenu = 1 ) t1
+	FROM (SELECT 	MenuCode,	DisplayName,NAME FROM	permission WHERE SysCode = ? AND TenantId = ?  and IsMenu = 1 ) t1
 	LEFT JOIN ( SELECT DisplayName,	NAME FROM	permission WHERE 	TenantId = ? AND IsMenu = 1 ) t2 ON t1. NAME = t2. NAME
 	LEFT JOIN ( SELECT	MenuCode,	DisplayName,NAME	FROM permission WHERE  IsMenu = 0 ) t3 ON t3.MenuCode = t1.MenuCode
-	GROUP BY 	t1. NAME ) t5 GROUP BY NAME`, sysCode, tenantId).QueryRows(&result)
+	GROUP BY 	t1. NAME ) t5 GROUP BY NAME`, sysCode, tenantId, tenantId).QueryRows(&result)
 	return result, err
 }
 

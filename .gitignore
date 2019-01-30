@@ -1,25 +1,10 @@
-<<<<<<< HEAD
-.DS_Store
-node_modules/
-dist/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-package-lock.json
 
-# Editor directories and files
-.idea
-.vscode
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-=======
 *.zip
 
-*.exe
+/.idea
 
-*.e*zip
+
+*.exe~
 
 *.exe
 
@@ -27,6 +12,6 @@ package-lock.json
 
 *.tmp
 
-*.gz
+*.tgz
 
->>>>>>> da108e9131645734badd72cd243f38782f690c04
+

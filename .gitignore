@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 .DS_Store
 node_modules/
 dist/
@@ -13,3 +14,19 @@ package-lock.json
 *.ntvs*
 *.njsproj
 *.sln
+=======
+*.zip
+
+*.exe
+
+*.e*zip
+
+*.exe
+
+/test
+
+*.tmp
+
+*.gz
+
+>>>>>>> da108e9131645734badd72cd243f38782f690c04

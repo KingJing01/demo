@@ -1,0 +1,89 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>欣阳物流后台审核系统</title>
+    <link rel="icon" href="/static/img/favicon.ico" type="image/x-icon"/>
+    <link rel="shortcut icon" href="/static/img/favicon.ico" type="image/x-icon">
+    <link href="/static/css/style.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css"
+          href="http://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="/static/js/jquery.min.js"></script>
+
+</head>
+<body style="margin: 0;padding: 0">
+<div id="login_body">
+    <!-- 登录框窗体-->
+    <div id="login_div">
+        <div id="login_top">
+            <span id="login_span">欣阳物流登陆系统</span>
+        </div>
+        <div id="login_content">
+            <div class="login_input_div">
+                <label class="fa fa-user-o"></label>
+                <input type="text" id="username" name="username" class="login_input" placeholder="请输入用户名">
+            </div>
+            <div class="login_input_div">
+                <label class="fa fa-lock"></label>
+                <input type="password" id="password" name="password" class="login_input" placeholder="请输入密码"></div>
+            <div id="drag">
+            </div>
+            <input type="hidden" id="backUrl" value="{{.ReturnUrl}}"> 
+            <input type="hidden" id="sysId" value="4"  type ="{{.SysID}}"> 
+            <p id="message_p" style="color:red;display:none;margin-left: 10%;font-size: 13px;"></p>
+        </div>
+        <div id="login_button_div">
+            <p id="login_button">登陆</p>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $("#username,#password,#submit").keyup(function (event) {
+            code = event.which;
+            if (code == 13) {
+                login();
+            }
+        });
+        $("#login_button_div").click(function () {
+            login();
+        })
+      
+    });
+
+    function login() {
+    
+        if (!$("#username").val()) {
+            $("#message_p").fadeIn().html("请输入用户名!");
+            return false;
+        }
+        if (!$("#password").val()) {
+            $("#message_p").fadeIn().html("请输入密码!");
+            return false;
+        }
+        var jsonObj = {};
+                 jsonObj.username = $("#username").val();
+                 jsonObj.password =  $("#password").val();
+                 jsonObj.sysId = $("#sysId").val();
+        $.ajax({
+            url: "Login",
+            type: 'post',
+            dataType: "json",
+            data: JSON.stringify(jsonObj),
+            success: function (data) {
+                var backUrl  = $("#backUrl").val();
+                if (data.Result == true) {
+                    if(backUrl)  window.location.href=backUrl
+                    localStorage.setItem("xy_token",data.Token)
+                } else {
+                    $("#message_p").fadeIn().html("登陆失败，请重新登陆！");
+                }
+
+            },
+            error: function (err) {
+            }
+        });
+    }
+
+</script>
+</body>
+</html>

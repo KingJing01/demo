@@ -24,6 +24,7 @@ type User struct {
 	DeletionTime           time.Time `orm:"column(DeletionTime);type(datetime);null"`
 	EmailAddress           string    `orm:"column(EmailAddress);size(256)"`
 	EmailConfirmationCode  string    `orm:"column(EmailConfirmationCode);size(328);null"`
+	IsValid                int8      `orm:"column(IsValid)"`
 	IsDeleted              int8      `orm:"column(IsDeleted)"`
 	IsEmailConfirmed       int8      `orm:"column(IsEmailConfirmed)"`
 	IsPhoneNumberConfirmed int8      `orm:"column(IsPhoneNumberConfirmed)"`
@@ -354,7 +355,7 @@ func PasswdUpdate(info *input.LoginInfo, SysCode string) (err error) {
 func GetUserList(roleName string, sysName string, userName string, offset int64, limit int64, tenantID int64) (result []out.UserInfo, err error) {
 	o := orm.NewOrm()
 	var sql = `SELECT t2.EmailAddress email_address ,t2.PhoneNumber phone_number,t2.UserName user_name,t2.Id id,t3.SysName sys_name,t4.RoleName role_name,
-	t4.AuthText auth_text,t4.IsValid is_valid FROM	USER t2 LEFT JOIN  userrole t1  ON t1.UserId = t2.Id
+	t4.AuthText auth_text,t2.IsValid is_valid FROM	USER t2 LEFT JOIN  userrole t1  ON t1.UserId = t2.Id
 	LEFT JOIN application t3 ON t2.SysCode = t3.SysCode LEFT JOIN role t4 ON t1.RoleId = t4.Id
 	where t2.TenantId=?  and t2.IsDeleted=0`
 	conditions := []string{}

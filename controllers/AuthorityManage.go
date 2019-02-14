@@ -140,6 +140,7 @@ func (c *AuthorityManageController) Login() {
 				return
 			}
 		}
+
 		//验证用户登陆信息
 		result, user, err := models.LoginCheck(l.UserName, l.Password, sysCode)
 		respmessage := ""
@@ -158,6 +159,15 @@ func (c *AuthorityManageController) Login() {
 			c.Data["json"] = lresult
 			c.ServeJSON()
 			return
+		} else {
+			if user.IsValid == 1 {
+				respmessage = "用户被禁用，请联系管理员"
+				lresult.Result = 0
+				lresult.Message = respmessage
+				c.Data["json"] = lresult
+				c.ServeJSON()
+				return
+			}
 		}
 		token := jwt.New(jwt.SigningMethodHS256)
 		claims := make(jwt.MapClaims)

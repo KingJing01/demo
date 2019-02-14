@@ -245,7 +245,7 @@ func CountTenantInfo(tenantName string, sysName string) (total int64) {
 	var maps []orm.Params
 	o.Raw(sql).Values(&maps)
 	total, _ = strconv.ParseInt(maps[0]["total"].(string), 10, 64)
-	return total
+	return total   
 }
 
 // 获取企业所拥有的所有权限

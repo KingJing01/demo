@@ -25,6 +25,7 @@ type SetMeal struct {
 	SysCode                string    `orm:"column(SysCode);size(20)"`
 }
 
+//TableName 设置表名
 func (t *SetMeal) TableName() string {
 	return "setmeal"
 }
@@ -33,7 +34,7 @@ func init() {
 	orm.RegisterModel(new(SetMeal))
 }
 
-// 获取套餐列表的信息
+//GetSetMealList 获取套餐列表的信息
 func GetSetMealList(setMealName string, sysName string, offset int64, limit int64) (result []out.SetMealInfo, err error) {
 	o := orm.NewOrm()
 	var sql = "SELECT t1.Id id,t1.SetMealCode set_meal_code, t1.SetMealName set_meal_name, t2.SysName sys_name,t1.PermissionText permission_text,t1.IsDeleted is_deleted,t1.SysCode sys_code FROM setmeal t1 LEFT JOIN application t2 ON t1.SysCode = t2.SysCode "
@@ -52,7 +53,7 @@ func GetSetMealList(setMealName string, sysName string, offset int64, limit int6
 	return result, err
 }
 
-// 统计查询条件的数量
+//CountSetMealInfo 统计查询条件的数量
 func CountSetMealInfo(setMealName string, sysName string) (total int64) {
 	o := orm.NewOrm()
 	conditions := []string{}
@@ -72,6 +73,7 @@ func CountSetMealInfo(setMealName string, sysName string) (total int64) {
 	return total
 }
 
+//GenerateSetMeatCode 生成套餐编号
 func GenerateSetMeatCode() (SetMealCode string) {
 	var maps []orm.Params
 	o := orm.NewOrm()
@@ -79,6 +81,7 @@ func GenerateSetMeatCode() (SetMealCode string) {
 	return maps[0]["setMealCode"].(string)
 }
 
+//AddSetMeal 新增套餐
 func AddSetMeal(setMeatInfo *input.SetMeatInput, userID int64) (id int64, err error) {
 	//生成套餐编号
 	setMeatCode := GenerateSetMeatCode()
@@ -106,7 +109,7 @@ func AddSetMeal(setMeatInfo *input.SetMeatInput, userID int64) (id int64, err er
 	return id, err
 }
 
-// 禁用套餐信息
+//DeleteSetMeal 禁用套餐信息
 func DeleteSetMeal(ids string, userID int64) (err error) {
 	arr := strings.Split(ids, ",")
 	var param string
@@ -115,12 +118,13 @@ func DeleteSetMeal(ids string, userID int64) (err error) {
 	}
 	length := len(param) - 1
 	params := param[0:length]
-	var sql = "update setmeal set IsDeleted=1 , DeletionTime = ? ,DeleterUserId = ? where Id in ( " + params + ")"
+	var sql = "update setmeal set IsDeleted=1 , DeletionTime = ? ,DeletionUserId = ? where Id in ( " + params + ")"
 	o := orm.NewOrm()
 	_, err = o.Raw(sql, time.Now(), userID).Exec()
 	return
 }
 
+//UpdateSetMeal 更新套餐信息
 func UpdateSetMeal(setMeatInfo *input.SetMeatInput, userID int64) (id int64, err error) {
 	o := orm.NewOrm()
 	o.Raw("update setmeal set SetMealName=?,SysCode=?,LastModificationTime=?,PermissionText=?,LastModificationUserId=? where Id=? ", setMeatInfo.SetMealName, setMeatInfo.SysCode, time.Now(), setMeatInfo.PerName, userID, setMeatInfo.Id).Exec()
@@ -138,9 +142,16 @@ func UpdateSetMeal(setMeatInfo *input.SetMeatInput, userID int64) (id int64, err
 	return id, err
 }
 
-// 获取套餐信息 radio
+//GetSetMealRadio 获取套餐信息 radio
 func GetSetMealRadio(sysCodes string) (data []out.PerInfo, err error) {
 	o := orm.NewOrm()
 	_, err = o.Raw("select SetMealCode name,SetMealName display_name from setmeal where SysCode=?", sysCodes).QueryRows(&data)
 	return data, err
+}
+
+//UpdateSetMealStatus  更新套餐的状态
+func UpdateSetMealStatus(id string, status string, userID int64) (err error) {
+	o := orm.NewOrm()
+	_, err = o.Raw("update setmeal set IsDeleted=? , DeletionTime = ? ,DeletionUserId = ? where Id =?", status, time.Now(), userID, id).Exec()
+	return err
 }

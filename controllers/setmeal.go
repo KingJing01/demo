@@ -23,6 +23,7 @@ func (c *SetMealController) URLMapping() {
 	c.Mapping("Put", c.Put)
 	c.Mapping("Delete", c.Delete)
 	c.Mapping("GetSetMealRadio", c.GetSetMealRadio)
+	c.Mapping("updSetMealStatus", c.UpdateSetMealStatus)
 	//c.Mapping("check", c.CheckRepeat)
 }
 
@@ -169,6 +170,29 @@ func (c *SetMealController) GetSetMealRadio() {
 	if data, err := models.GetSetMealRadio(sysCodeStr); err == nil {
 		result.Result = 1
 		result.Data = data
+		c.Data["json"] = result
+	} else {
+		result.Result = 0
+		result.Message = err.Error()
+		c.Data["json"] = result
+	}
+	c.ServeJSON()
+}
+
+// UpdateSetMealStatus ...
+// @Title UpdateSetMealStatus
+// @Description 更新套餐有效状态
+// @Param   body     body    inputmodels.SetMeatInput  true       "套餐实体  "
+// @Success 200  result:1(success)  0(false)
+// @router /updSetMealStatus/:id/:status  [put]
+func (c *SetMealController) UpdateSetMealStatus() {
+	originToken := c.Ctx.Request.Header.Get("Authorization")
+	_, _, userID, _ := tool.GetInfoFromToken(originToken)
+	id := c.Ctx.Input.Param(":id")
+	status := c.Ctx.Input.Param(":status")
+	result := &out.OperResult{}
+	if err := models.UpdateSetMealStatus(id, status, userID); err == nil {
+		result.Result = 1
 		c.Data["json"] = result
 	} else {
 		result.Result = 0

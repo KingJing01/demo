@@ -324,6 +324,15 @@ func init() {
 
     beego.GlobalControllerRouter["demo/controllers:SetMealController"] = append(beego.GlobalControllerRouter["demo/controllers:SetMealController"],
         beego.ControllerComments{
+            Method: "UpdateSetMealStatus",
+            Router: `/updSetMealStatus/:id/:status`,
+            AllowHTTPMethods: []string{"put"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
+    beego.GlobalControllerRouter["demo/controllers:SetMealController"] = append(beego.GlobalControllerRouter["demo/controllers:SetMealController"],
+        beego.ControllerComments{
             Method: "UpdateSetMealInfo",
             Router: `/updateSetMealInfo`,
             AllowHTTPMethods: []string{"put"},

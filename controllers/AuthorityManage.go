@@ -193,7 +193,9 @@ func (c *AuthorityManageController) Login() {
 		tokenMap["ssoId"] = string(user.SsoID)
 		jsonUser, _ := json.Marshal(userOut)
 		tokenMap["userInfo"] = string(jsonUser)
+		fmt.Println("/***************redis-cluster 准备进行连接 **************/")
 		tools.InitRedis()
+		fmt.Println("/***************redis-cluster 初始化成功 **************/")
 		skey := fmt.Sprintf("%s%s", strconv.FormatInt(user.SsoID, 10), sysCode)
 		_, err = tools.Globalcluster.Do("set", skey, authData)
 		if err != nil {
@@ -205,6 +207,7 @@ func (c *AuthorityManageController) Login() {
 		}
 		_, err = tools.Globalcluster.Do("EXPIRE", tokenString, 3600)
 		tools.Globalcluster.Close()
+		fmt.Println("/***************redis-cluster 连接close **************/")
 		lresult.Result = 1
 		lresult.Token = tokenString
 		c.Data["json"] = lresult

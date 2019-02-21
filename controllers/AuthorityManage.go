@@ -196,7 +196,13 @@ func (c *AuthorityManageController) Login() {
 		tools.InitRedis()
 		skey := fmt.Sprintf("%s%s", strconv.FormatInt(user.SsoID, 10), sysCode)
 		_, err = tools.Globalcluster.Do("set", skey, authData)
+		if err != nil {
+			fmt.Println("/***************redis-cluster 连接错误信息**************/" + err.Error())
+		}
 		_, err = tools.Globalcluster.Do("set", tokenString, user.SsoID)
+		if err != nil {
+			fmt.Println("/***************redis-cluster 连接错误信息**************/" + err.Error())
+		}
 		_, err = tools.Globalcluster.Do("EXPIRE", tokenString, 3600)
 		tools.Globalcluster.Close()
 		lresult.Result = 1

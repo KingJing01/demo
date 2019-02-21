@@ -18,6 +18,7 @@ type Tenant struct {
 	OrganizationCode     string    `orm:"column(OrganizationCode);size(45)"`
 	BusinessLisenceUrl   string    `orm:"column(BusinessLisenceUrl);size(200)"`
 	TaxFileNumber        string    `orm:"column(TaxFileNumber);size(40)"`
+	TransType            string    `orm:"column(TransType);size(45)"`
 	LinkMan              string    `orm:"column(LinkMan);size(45)"`
 	LinkPhone            string    `orm:"column(LinkPhone);size(45)"`
 	Email                string    `orm:"column(Email);size(45)"`
@@ -245,7 +246,7 @@ func CountTenantInfo(tenantName string, sysName string) (total int64) {
 	var maps []orm.Params
 	o.Raw(sql).Values(&maps)
 	total, _ = strconv.ParseInt(maps[0]["total"].(string), 10, 64)
-	return total   
+	return total
 }
 
 // 获取企业所拥有的所有权限

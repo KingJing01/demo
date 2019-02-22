@@ -129,4 +129,5 @@ type TMSUser struct {
 	Contact          string
 	ShortCompanyName string
 	IsAdmin          string
+	TransType        string
 }

@@ -80,6 +80,7 @@ func AddTenant(m *Tenant, syScode []string, perId []string, perMenu []string, us
 	user.EmailAddress = m.Email
 	user.PhoneNumber = m.LinkPhone
 	user.UserName = m.LinkPhone
+	user.TransType = m.TransType
 	user.TenantId = m.Id
 	//循环
 	tenApp := TenantApplication{}
@@ -147,6 +148,7 @@ func AddTenant(m *Tenant, syScode []string, perId []string, perMenu []string, us
 	tmsUser.ShortCompanyName = m.ShortName
 	tmsUser.Contact = m.LinkMan
 	tmsUser.IsAdmin = "1"
+	tmsUser.TransType = m.TransType
 	respCode, err := out.SendUserInfoToTms(tmsUser)
 	fmt.Println("################接口返回的标记值################ ", respCode)
 	if respCode != 200 {

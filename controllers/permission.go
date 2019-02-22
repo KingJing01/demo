@@ -202,14 +202,14 @@ func (c *PermissionController) GetPerInfoBySysCode() {
 	_, tenantID, _, _ := tool.GetInfoFromToken(originToken)
 	result := &out.OperResult{}
 	sysCode := c.Ctx.Input.Param(":sysCode")
-	if data, err := models.GetPerInfoBySysCode(sysCode, tenantID); len(data) > 0 {
+	if data, _ := models.GetPerInfoBySysCode(sysCode, tenantID); len(data) > 0 {
 		permissionList := out.ParsePermissionDataForCheckbox(data)
 		result.Result = 1
 		result.Data = permissionList
 		c.Data["json"] = result
 	} else {
 		result.Result = 0
-		result.Message = err.Error()
+		result.Message = "无数据"
 		c.Data["json"] = result
 	}
 	c.ServeJSON()

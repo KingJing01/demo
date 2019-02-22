@@ -40,7 +40,7 @@ func ParseUser(tmsUser TMSUser) (result string) {
 func SendUserInfoToTms(tmsUser TMSUser) (respCode int, err error) {
 	url := fmt.Sprintf("%s%s", GetServerUrl(), TMSAddUser)
 	req := httplib.Post(url)
-	req.JSONBody(map[string]interface{}{"userCode": tmsUser.UserCode, "ssoUid": tmsUser.SsoUID, "mobile": tmsUser.Mobile, "email": tmsUser.Email, "sysId": tmsUser.SysID,
+	req.JSONBody(map[string]interface{}{"userCode": tmsUser.UserCode, "ssoUid": tmsUser.SsoUID, "mobile": tmsUser.Mobile, "email": tmsUser.Email, "sysId": tmsUser.SysID, "transType": tmsUser.TransType,
 		"companyId": tmsUser.CompanyID, "companyName": tmsUser.CompanyName, "isAdmin": tmsUser.IsAdmin, "contact": tmsUser.Contact, "shortCompanyName": tmsUser.ShortCompanyName})
 	var result TMSRespData
 	req.ToJSON(&result)

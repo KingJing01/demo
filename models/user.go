@@ -32,6 +32,7 @@ type User struct {
 	LastModifierUserId     int64     `orm:"column(LastModifierUserId);null"`
 	Name                   string    `orm:"column(Name);size(32)"`
 	UserName               string    `orm:"column(UserName);size(32)"`
+	TransType              string    `orm:"column(TransType);size(45)"`
 	PasswordResetCode      string    `orm:"column(PasswordResetCode);size(328);null"`
 	PhoneNumber            string    `orm:"column(PhoneNumber);size(32);null"`
 	Password               string    `orm:"column(Password);size(64);null"`

@@ -119,15 +119,23 @@ type ComponentData struct {
 
 // TMSUser tms系统用户信息
 type TMSUser struct {
-	UserCode         string
-	SsoUID           string
-	Mobile           string
-	Email            string
-	SysID            string
-	CompanyID        string
-	CompanyName      string
-	Contact          string
+	// 用户名
+	UserCode string
+	SsoUID   string
+	Mobile   string
+	Email    string
+	//系统编码
+	SysID string
+	//公司ID号
+	CompanyID string
+	// 公司全称
+	CompanyName string
+	// 联系人
+	Contact string
+	// 公司简称
 	ShortCompanyName string
-	IsAdmin          string
-	TransType        string
+	//1 为管理员
+	IsAdmin string
+	// 运输类型
+	TransType string
 }

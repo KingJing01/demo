@@ -231,10 +231,13 @@ func UpdateUserByID(m *User, roleCode string, userID int64) (err error) {
 		m.CreatorUserId = v.CreatorUserId
 		m.TenantId = v.TenantId
 		m.SsoID = v.SsoID
+		m.Password = v.Password
 		m.LastModificationTime = time.Now()
 		m.LastModifierUserId = userID
 		_, err = o.Update(m)
-		_, err = o.Raw("update userrole set RoleId=?  where  SysCode=? and UserId=?", roleCode, m.SysCode, m.Id).Exec()
+		if roleCode != "" {
+			_, err = o.Raw("update userrole set RoleId=?  where  SysCode=? and UserId=?", roleCode, m.SysCode, m.Id).Exec()
+		}
 		if err != nil {
 			o.Rollback()
 		}

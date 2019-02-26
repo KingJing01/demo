@@ -43,9 +43,10 @@ func (c *TenantController) Post() {
 	sysCode := tool.ParseInterfaceArr(mystruct["sysCode"].([]interface{}))
 	perID := tool.ParseInterfaceArr(mystruct["perId"].([]interface{}))
 	perMenu := tool.ParseInterfaceArr(mystruct["perMenu"].([]interface{}))
+	transType := mystruct["TransType"].(string)
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 		v.LastModificationTime = time.Now()
-		if err, _ := models.AddTenant(&v, sysCode, perID, perMenu, userID); err == nil {
+		if err, _ := models.AddTenant(&v, sysCode, perID, perMenu, userID, transType); err == nil {
 			result.Result = 1
 			if err != nil {
 				result.Result = 0
@@ -76,7 +77,7 @@ func (c *TenantController) Post() {
 // @Param	id		path 	string	true		"The key for staticblock"
 // @Success 200 {object} models.Tenant
 // @Failure 403 :id is empty
-// @router /:id [get]
+// @router /:id/:sysCode [get]
 func (c *TenantController) GetOne() {
 	result := &out.OperResult{}
 	idStr := c.Ctx.Input.Param(":id")
@@ -165,9 +166,10 @@ func (c *TenantController) Put() {
 	sysCode := mystruct["sysCode"].(string)
 	perIDStr := mystruct["perId"].(string)
 	perMenu := mystruct["perMenu"].(string)
+	transType := mystruct["TransType"].(string)
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 		v.LastModificationTime = time.Now()
-		if err := models.UpdateTenantById(&v, sysCode, perIDStr, perMenu, v.Id, userID); err == nil {
+		if err := models.UpdateTenantById(&v, sysCode, perIDStr, perMenu, v.Id, userID, transType); err == nil {
 			tool.InitRedis()
 			jsonBytes, _ := json.Marshal(v)
 			tool.Globalcluster.Do("set", v.Id, string(jsonBytes))
@@ -232,6 +234,31 @@ func (c *TenantController) GetTenantPermission() {
 		permissionList := out.ParsePermissionDataForCheckboxUpdate(v)
 		result.Result = 1
 		result.Data = permissionList
+		c.Data["json"] = result
+	}
+	c.ServeJSON()
+}
+
+// GetTransType 获取公司运输类型
+// @Title GetTransType
+// @Description 获取公司运输类型
+// @Param	sysCode query    	string	true		"系统编码"
+// @Param	tenId  query    	string	true		"企业ID"
+// @Success 200  result:1(success)  0(false)
+// @router /getTransType [get]
+func (c *TenantController) GetTransType() {
+	result := &out.OperResult{}
+	sysCode := c.GetString("sysCode")
+	idStr := c.GetString("tenId")
+	id, _ := strconv.ParseInt(idStr, 10, 64)
+	v, err := models.GetTransType(sysCode, id)
+	if err != nil {
+		result.Result = 0
+		result.Message = err.Error()
+		c.Data["json"] = result
+	} else {
+		result.Result = 1
+		result.Data = v
 		c.Data["json"] = result
 	}
 	c.ServeJSON()

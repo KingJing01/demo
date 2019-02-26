@@ -405,15 +405,6 @@ func init() {
 
     beego.GlobalControllerRouter["demo/controllers:TenantController"] = append(beego.GlobalControllerRouter["demo/controllers:TenantController"],
         beego.ControllerComments{
-            Method: "GetOne",
-            Router: `/:id`,
-            AllowHTTPMethods: []string{"get"},
-            MethodParams: param.Make(),
-            Filters: nil,
-            Params: nil})
-
-    beego.GlobalControllerRouter["demo/controllers:TenantController"] = append(beego.GlobalControllerRouter["demo/controllers:TenantController"],
-        beego.ControllerComments{
             Method: "Put",
             Router: `/:id`,
             AllowHTTPMethods: []string{"put"},
@@ -432,8 +423,26 @@ func init() {
 
     beego.GlobalControllerRouter["demo/controllers:TenantController"] = append(beego.GlobalControllerRouter["demo/controllers:TenantController"],
         beego.ControllerComments{
+            Method: "GetOne",
+            Router: `/:id/:sysCode`,
+            AllowHTTPMethods: []string{"get"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
+    beego.GlobalControllerRouter["demo/controllers:TenantController"] = append(beego.GlobalControllerRouter["demo/controllers:TenantController"],
+        beego.ControllerComments{
             Method: "GetTenantPermission",
             Router: `/getTenantPermission`,
+            AllowHTTPMethods: []string{"get"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
+    beego.GlobalControllerRouter["demo/controllers:TenantController"] = append(beego.GlobalControllerRouter["demo/controllers:TenantController"],
+        beego.ControllerComments{
+            Method: "GetTransType",
+            Router: `/getTransType`,
             AllowHTTPMethods: []string{"get"},
             MethodParams: param.Make(),
             Filters: nil,

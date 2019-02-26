@@ -18,7 +18,6 @@ type Tenant struct {
 	OrganizationCode     string    `orm:"column(OrganizationCode);size(45)"`
 	BusinessLisenceUrl   string    `orm:"column(BusinessLisenceUrl);size(200)"`
 	TaxFileNumber        string    `orm:"column(TaxFileNumber);size(40)"`
-	TransType            string    `orm:"column(TransType);size(45)"`
 	LinkMan              string    `orm:"column(LinkMan);size(45)"`
 	LinkPhone            string    `orm:"column(LinkPhone);size(45)"`
 	Email                string    `orm:"column(Email);size(45)"`
@@ -32,10 +31,11 @@ type Tenant struct {
 }
 
 type TenantInput struct {
-	tenant  Tenant
-	perId   string
-	perName string
-	sysCode string
+	tenant    Tenant
+	perId     string
+	perName   string
+	sysCode   string
+	transType string
 }
 
 func (t *Tenant) TableName() string {
@@ -48,7 +48,7 @@ func init() {
 
 // AddTenant insert a new Tenant into database and returns
 // last inserted Id on success.
-func AddTenant(m *Tenant, syScode []string, perId []string, perMenu []string, userID int64) (err error, tmsUser out.TMSUser) {
+func AddTenant(m *Tenant, syScode []string, perId []string, perMenu []string, userID int64, transType string) (err error, tmsUser out.TMSUser) {
 	currTime := time.Now()
 	o := orm.NewOrm()
 	//开启事务
@@ -80,12 +80,13 @@ func AddTenant(m *Tenant, syScode []string, perId []string, perMenu []string, us
 	user.EmailAddress = m.Email
 	user.PhoneNumber = m.LinkPhone
 	user.UserName = m.LinkPhone
-	user.TransType = m.TransType
+	user.TransType = transType
 	user.TenantId = m.Id
 	//循环
 	tenApp := TenantApplication{}
 	var tenAppList []TenantApplication
 	tenApp.TenantId = m.Id
+	tenApp.TransType = transType
 	//用户 租户 角色关联关系表插入
 	userRole := UserRole{}
 	userRole.TenantId = m.Id
@@ -148,7 +149,7 @@ func AddTenant(m *Tenant, syScode []string, perId []string, perMenu []string, us
 	tmsUser.ShortCompanyName = m.ShortName
 	tmsUser.Contact = m.LinkMan
 	tmsUser.IsAdmin = "1"
-	tmsUser.TransType = m.TransType
+	tmsUser.TransType = transType
 	respCode, err := out.SendUserInfoToTms(tmsUser)
 	fmt.Println("################接口返回的标记值################ ", respCode)
 	if respCode != 200 {
@@ -172,9 +173,9 @@ func GetTenantById(id int64) (v *Tenant, err error) {
 	return nil, err
 }
 
-// UpdateTenant updates Tenant by Id and returns error if
+// UpdateTenantById updates Tenant by Id and returns error if
 // the record to be updated doesn't exist
-func UpdateTenantById(m *Tenant, sysCode string, perIdStr string, perMenu string, tenId int64, userID int64) (err error) {
+func UpdateTenantById(m *Tenant, sysCode string, perIdStr string, perMenu string, tenId int64, userID int64, transType string) (err error) {
 	o := orm.NewOrm()
 	o.Begin()
 	v := Tenant{Id: tenId}
@@ -194,6 +195,7 @@ func UpdateTenantById(m *Tenant, sysCode string, perIdStr string, perMenu string
 	if err != nil {
 		o.Rollback()
 	}
+	_, err = o.Raw("UPDATE tenantapplication SET TransType =? WHERE	TenantId =? AND SysCode =? ", transType, tenId, sysCode).Exec()
 	o.Commit()
 	return
 }
@@ -210,7 +212,7 @@ func DeleteTenant(id int64, userID int64) (err error) {
 	return
 }
 
-// 获取列表的信息
+//GetTenantList 获取列表的信息
 func GetTenantList(tenantName string, sysName string, offset int64, limit int64) (result []out.UserManageInfo, err error) {
 	o := orm.NewOrm()
 	var sql = `SELECT t1.Id id,t1.TenantName tenant_name,t3.SysName sys_name,t2.MenuText menu_text,t4.Name operator,t2.SysCode sys_code FROM tenant t1 LEFT JOIN tenantapplication t2 ON t1.Id = t2.TenantId
@@ -230,7 +232,7 @@ func GetTenantList(tenantName string, sysName string, offset int64, limit int64)
 	return result, err
 }
 
-// 统计查询条件的数量
+//CountTenantInfo 统计查询条件的数量
 func CountTenantInfo(tenantName string, sysName string) (total int64) {
 	o := orm.NewOrm()
 	conditions := []string{}
@@ -251,7 +253,7 @@ func CountTenantInfo(tenantName string, sysName string) (total int64) {
 	return total
 }
 
-// 获取企业所拥有的所有权限
+//GetPerInfoForTenant 获取企业所拥有的所有权限
 func GetPerInfoForTenant(sysCode string, tenantId int64) (result []out.PermissionCheckInfo, err error) {
 	o := orm.NewOrm()
 	_, err = o.Raw(`SELECT t5.DisplayName display_name ,t5.NAME name,GROUP_CONCAT(t5.perName) code_name,	GROUP_CONCAT(t5.perId) code,GROUP_CONCAT(t5.flag) flag
@@ -263,7 +265,7 @@ func GetPerInfoForTenant(sysCode string, tenantId int64) (result []out.Permissio
 	return result, err
 }
 
-// 更新权限信息
+//UpdateTenantPermission 更新权限信息
 func UpdateTenantPermission(sysCode string, perIdStr string, perMenu string, tenID int64, ownerID int64) (err error) {
 	err = DeleteTenatPermssion(sysCode, tenID)
 	if err != nil {
@@ -280,7 +282,7 @@ func UpdateTenantPermission(sysCode string, perIdStr string, perMenu string, ten
 	return
 }
 
-//新增套餐已经勾选的信息
+//InsertTenantPermission 新增套餐已经勾选的信息
 func InsertTenantPermission(sysCode string, perIdStr string, tenId int64, ownerID int64) (err error) {
 	arr := strings.Split(perIdStr, ",")
 	var param string
@@ -297,7 +299,7 @@ func InsertTenantPermission(sysCode string, perIdStr string, tenId int64, ownerI
 	return err
 }
 
-//删除原先配置的权限信息
+//DeleteTenatPermssion 删除原先配置的权限信息
 func DeleteTenatPermssion(sysCode string, tenId int64) (err error) {
 	o := orm.NewOrm()
 	_, err = o.Raw("DELETE FROM	permission WHERE TenantId = ? and SysCode=? and RoleId=0 ", tenId, sysCode).Exec()

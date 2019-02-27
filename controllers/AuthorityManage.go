@@ -209,7 +209,7 @@ func (c *AuthorityManageController) Login() {
 		lresult.Result = 1
 		lresult.Token = tokenString
 		c.Data["json"] = lresult
-		c.Ctx.SetCookie("xy_token", tokenString, 12*3600, "/", ".free.idcfengye.com")
+		//c.Ctx.SetCookie("xy_token", tokenString, 12*3600, "/", ".free.idcfengye.com")
 		c.ServeJSON()
 	} else {
 		respmessage := &out.OperResult{}

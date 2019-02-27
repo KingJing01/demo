@@ -198,11 +198,11 @@ func (c *AuthorityManageController) Login() {
 		skey := fmt.Sprintf("%s%s", strconv.FormatInt(user.SsoID, 10), sysCode)
 		_, err = tools.Globalcluster.Do("set", skey, authData)
 		if err != nil {
-			logs.Error("/***************redis-cluster Login 写入错误 **************/" + err.Error())
+			logs.Error("/***************redis-cluster Login 写入错误 **************/", err.Error())
 		}
 		_, err = tools.Globalcluster.Do("set", tokenString, user.SsoID)
 		if err != nil {
-			logs.Error("/***************redis-cluster Login 写入错误 **************/" + err.Error())
+			logs.Error("/***************redis-cluster Login 写入错误 **************/", err.Error())
 		}
 		_, err = tools.Globalcluster.Do("EXPIRE", tokenString, 3600)
 		tools.Globalcluster.Close()

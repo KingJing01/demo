@@ -61,8 +61,8 @@ func main() {
 		logs.SetLogger(logs.AdapterFile, `{"filename":"test.log"}`)
 	}*/
 	// 设置日志级别
-	beego.SetLevel(beego.LevelDebug)
-	logs.SetLogger(logs.AdapterFile, `{"filename":"logs/test.log"}`)
+	//beego.SetLevel(beego.LevelInformational)
+	logs.SetLogger(logs.AdapterFile, `{"filename":"logs/uam_web.log"}`)
 	// log文件显示行号
 	logs.EnableFuncCallDepth(true)
 	//异步输出日志文件

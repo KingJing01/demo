@@ -4,6 +4,7 @@ import (
 	_ "demo/routers"
 
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	"github.com/astaxie/beego/plugins/cors"
 	_ "github.com/go-sql-driver/mysql"
@@ -56,6 +57,16 @@ func init() {
 }
 
 func main() {
+	/*if beego.BConfig.RunMode != "dev" {
+		logs.SetLogger(logs.AdapterFile, `{"filename":"test.log"}`)
+	}*/
+	// 设置日志级别
+	beego.SetLevel(beego.LevelDebug)
+	logs.SetLogger(logs.AdapterFile, `{"filename":"logs/test.log"}`)
+	// log文件显示行号
+	logs.EnableFuncCallDepth(true)
+	//异步输出日志文件
+	//logs.Async()
 	beego.BConfig.WebConfig.DirectoryIndex = true
 	beego.BConfig.WebConfig.StaticDir["/swagger"] = "swagger"
 	beego.Run()

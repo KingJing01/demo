@@ -1,11 +1,11 @@
 package tools
 
 import (
-	"log"
 	"strings"
 	"time"
 
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/logs"
 	redis "github.com/chasex/redis-go-cluster"
 )
 
@@ -27,7 +27,7 @@ func InitRedis() {
 		})
 	if err != nil {
 		cluster.Do("SET", "foo", "bar")
-		log.Fatalf("redis.New error: %s", err.Error())
+		logs.Info("redis.New error: %s", err.Error())
 	}
 	Globalcluster = cluster
 }

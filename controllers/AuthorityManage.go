@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	"github.com/astaxie/beego/validation"
 	jwt "github.com/dgrijalva/jwt-go"
@@ -193,21 +194,18 @@ func (c *AuthorityManageController) Login() {
 		tokenMap["ssoId"] = string(user.SsoID)
 		jsonUser, _ := json.Marshal(userOut)
 		tokenMap["userInfo"] = string(jsonUser)
-		fmt.Println("/***************redis-cluster 准备进行连接 **************/")
 		tools.InitRedis()
-		fmt.Println("/***************redis-cluster 初始化成功 **************/")
 		skey := fmt.Sprintf("%s%s", strconv.FormatInt(user.SsoID, 10), sysCode)
 		_, err = tools.Globalcluster.Do("set", skey, authData)
 		if err != nil {
-			fmt.Println("/***************redis-cluster 连接错误信息**************/" + err.Error())
+			logs.Error("/***************redis-cluster 连接错误信息**************/" + err.Error())
 		}
 		_, err = tools.Globalcluster.Do("set", tokenString, user.SsoID)
 		if err != nil {
-			fmt.Println("/***************redis-cluster 连接错误信息**************/" + err.Error())
+			logs.Error("/***************redis-cluster 连接错误信息**************/" + err.Error())
 		}
 		_, err = tools.Globalcluster.Do("EXPIRE", tokenString, 3600)
 		tools.Globalcluster.Close()
-		fmt.Println("/***************redis-cluster 连接close **************/")
 		lresult.Result = 1
 		lresult.Token = tokenString
 		c.Data["json"] = lresult
